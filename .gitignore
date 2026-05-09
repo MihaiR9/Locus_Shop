@@ -13,6 +13,8 @@ build/
 .turbo
 coverage/
 .idea/
+tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # Claude Code agent workspace (eval runs, scratch outputs)
 .claude/skills/*/iteration-*/

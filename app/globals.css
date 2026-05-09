@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ----------------------------------------------------------------
+   Locus design tokens — light (default) + dark
+   Source: CLAUDE.md §2 + Landing_V1.html
+---------------------------------------------------------------- */
+
+:root {
+  /* brand palette (raw) */
+  --pamant: #ebe1da;
+  --nisip: #cbbeae;
+  --piatra: #a89d8d;
+  --vie: #3e4336;
+  --stejar: #4a3c2d;
+  --pivnita: #1a1a1a;
+
+  /* semantic — light */
+  --bg: var(--pamant);
+  --bg-alt: #e2d8ce;
+  --surface: #f2eae2;
+  --ink: var(--pivnita);
+  --ink-soft: var(--stejar);
+  --ink-mute: var(--piatra);
+  --line: rgba(74, 60, 45, 0.18);
+  --field-bg: #f6efe8;
+
+  /* layout */
+  --container: 1320px;
+  --px: clamp(20px, 4.5vw, 56px);
+
+  /* motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --t-fast: 240ms;
+  --t-base: 480ms;
+  --t-slow: 800ms;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: var(--pivnita);
+  --bg-alt: #111111;
+  --surface: #232220;
+  --ink: var(--pamant);
+  --ink-soft: var(--nisip);
+  --ink-mute: var(--piatra);
+  --line: rgba(203, 190, 174, 0.18);
+  --field-bg: #1f1e1c;
+
+  color-scheme: dark;
+}
+
+@layer base {
+  body {
+    font-feature-settings: "ss01", "cv11";
+  }
+}
+
+@layer components {
+  .container-locus {
+    @apply mx-auto w-full;
+    max-width: var(--container);
+    padding-left: var(--px);
+    padding-right: var(--px);
+  }
+
+  .display {
+    font-family: var(--font-serif), Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(56px, 11vw, 168px);
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+  }
+
+  .h2 {
+    font-family: var(--font-serif), Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(40px, 6vw, 88px);
+    line-height: 1;
+  }
+
+  .h3 {
+    font-family: var(--font-serif), Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(28px, 3.5vw, 44px);
+    line-height: 1.1;
+  }
+
+  .eyebrow {
+    @apply font-mono uppercase inline-flex items-center gap-3;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+  }
+
+  .eyebrow::before {
+    content: "";
+    width: 18px;
+    height: 1px;
+    background: currentColor;
+    display: inline-block;
+  }
+
+  .lead {
+    @apply font-mono;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .caps {
+    @apply font-mono uppercase;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+  }
+}
+
+/* respect reduced motion globally */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

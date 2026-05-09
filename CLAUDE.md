@@ -160,7 +160,7 @@ LocalStorage keys folosite în prototip:
 
 ### Stack final agreat
 ```
-Frontend:    Next.js 15 (App Router) + Tailwind + tokens design existent
+Frontend:    Next.js 16 (App Router, Turbopack stable, React 19.2) + Tailwind + tokens design existent
 Backend:     Next.js Server Actions / API routes
 DB:          Supabase (Postgres + Auth + Storage + RLS)
 Plăți:       Stripe Checkout (PCI = SAQ-A, hosted)
@@ -400,7 +400,7 @@ RLS pe toate tabelele cu user data. `service_role` pentru backend (webhook-uri, 
 
 ## 10. Decizii deja luate (NU mai discutăm)
 
-1. ✅ Stack: Next.js 15 + Supabase + Stripe + Resend + Smartbill + Sameday
+1. ✅ Stack: Next.js 16 + Supabase + Stripe + Resend + Smartbill + Sameday
 2. ✅ Hosting: Vercel
 3. ✅ Plăți: **Stripe Checkout** (NU Elements) — minimizează responsabilitatea PCI la SAQ-A
 4. ✅ Designul existent (`Landing_V1.html`, `wine.html`, `checkout.html`) e baseline-ul — se portează 1:1
@@ -520,7 +520,7 @@ locus-shop/
 
 Când deschizi proiectul nou în Claude Code, primul mesaj poate fi:
 
-> "Citește CLAUDE.md integral. Apoi confirmă-mi că ai înțeles stadiul și roadmap-ul. După aceea, vreau să începem cu **Fază 0 — Setup inițial**: inițializează Next.js 15 cu TypeScript și Tailwind, configurează tokens-urile brand din CLAUDE.md și conectează Supabase. Înainte să rulezi orice comandă, listează exact ce vei face."
+> "Citește CLAUDE.md integral. Apoi confirmă-mi că ai înțeles stadiul și roadmap-ul. După aceea, vreau să începem cu **Fază 0 — Setup inițial**: inițializează Next.js 16 cu TypeScript și Tailwind, configurează tokens-urile brand din CLAUDE.md și conectează Supabase. Înainte să rulezi orice comandă, listează exact ce vei face."
 
 Așa îți asiguri că agentul are context complet și nu pleacă pe direcții greșite.
 
