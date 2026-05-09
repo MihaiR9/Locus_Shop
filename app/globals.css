@@ -22,7 +22,11 @@
   --surface: #f2eae2;
   --ink: var(--pivnita);
   --ink-soft: var(--stejar);
-  --ink-mute: var(--piatra);
+  /* --piatra (#A89D8D) reads as 2.0:1 on bg-pamant which fails WCAG AA.
+     Bumped to a darker warm-gray that hits 4.7:1 on pamant / 5.2:1 on
+     surface while keeping the brand's hushed/secondary feel. The raw
+     --piatra token stays unchanged for decorative use (svg lines, etc). */
+  --ink-mute: #6e5e4b;
   --line: rgba(74, 60, 45, 0.18);
   --field-bg: #f6efe8;
 
@@ -616,7 +620,9 @@
   font-size: 11px;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--ink-mute);
+  /* ink-soft (stejar) instead of ink-mute — small uppercase needs more
+     contrast headroom against the film-grain overlay. */
+  color: var(--ink-soft);
   margin-bottom: 24px;
   display: flex;
   align-items: center;
@@ -1240,7 +1246,7 @@
   font-weight: 500;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: rgba(235, 225, 218, 0.5);
+  color: rgba(235, 225, 218, 0.6);
   margin-bottom: 22px;
 }
 .footer-col p,
@@ -1267,7 +1273,7 @@
   font-family: var(--font-mono), monospace;
   font-size: 10px;
   letter-spacing: 0.1em;
-  color: rgba(235, 225, 218, 0.4);
+  color: rgba(235, 225, 218, 0.55);
   text-transform: uppercase;
 }
 .footer-bottom .legal { max-width: 60%; }

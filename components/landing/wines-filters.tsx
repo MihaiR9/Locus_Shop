@@ -25,7 +25,7 @@ export function WinesFilters() {
   }, [active]);
 
   return (
-    <div className="filters" role="tablist" aria-label="Filtre vinuri">
+    <div className="filters" role="group" aria-label="Filtre vinuri">
       {FILTERS.map((f) => (
         <button
           key={f.value}

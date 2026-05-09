@@ -6,6 +6,7 @@ export function MapSection() {
       <div className="locul-grid">
         <Reveal
           as="div"
+          role="img"
           className="map"
           aria-label="Hartă schematică Buciumeni — Panciu — Nicorești"
         >

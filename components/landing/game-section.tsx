@@ -36,7 +36,6 @@ export function GameSection() {
             href={g.href}
             className="gama"
             data-gama={g.key}
-            aria-label={`Gama ${g.key}`}
           >
             <div className="gama-tag">{g.key}</div>
             <div className="gama-body">
