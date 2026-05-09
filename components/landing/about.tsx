@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 
 export function About() {
@@ -28,12 +29,12 @@ export function About() {
             Fiecare sticlă pe care o trimitem mai departe e rezultatul unei
             decizii: să ne lăsăm conduși de loc, nu să-l constrângem.
           </p>
-          <a href="/despre" className="btn-ghost">
+          <Link href="/despre" className="btn-ghost">
             <span>Citește povestea</span>
             <svg className="arrow-svg" viewBox="0 0 24 12" aria-hidden="true">
               <use href="#arrow-right" />
             </svg>
-          </a>
+          </Link>
         </Reveal>
       </div>
     </section>
