@@ -2286,6 +2286,325 @@
   .gama-pillars-grid { grid-template-columns: 1fr; gap: 56px; }
 }
 
+/* ----------------------------------------------------------------
+   Age gate — full-screen blocking modal
+---------------------------------------------------------------- */
+.age-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  padding: var(--px);
+}
+.age-gate-card {
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+}
+.age-gate-card .eyebrow {
+  justify-content: center;
+}
+.age-gate-card h2 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-weight: 400;
+}
+.age-gate-card p {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-soft);
+  max-width: 44ch;
+}
+.age-gate-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.age-gate-btn {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 16px 32px;
+  cursor: pointer;
+  transition:
+    background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+.age-gate-btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
+}
+.age-gate-btn-primary:hover {
+  background: var(--vie);
+  border-color: var(--vie);
+}
+.age-gate-btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.age-gate-btn-ghost:hover {
+  border-color: var(--ink);
+}
+.age-gate-warn {
+  margin-top: 16px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--ink-mute);
+  letter-spacing: 0.04em;
+  max-width: 50ch;
+}
+.age-gate-warn a {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ----------------------------------------------------------------
+   Cookie banner — bottom-fixed, expandable
+---------------------------------------------------------------- */
+.cookie-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1200;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  padding: 20px var(--px);
+  box-shadow: 0 -10px 40px rgba(26, 26, 26, 0.08);
+}
+.cookie-banner-inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.cookie-banner-row {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.cookie-banner-text {
+  flex: 1;
+  min-width: 280px;
+}
+.cookie-banner-text h3 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--ink);
+  font-weight: 400;
+  margin-bottom: 6px;
+}
+.cookie-banner-text p {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  max-width: 70ch;
+}
+.cookie-banner-text a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.cookie-banner-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.cookie-btn {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  cursor: pointer;
+  transition:
+    background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
+}
+.cookie-btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
+}
+.cookie-btn-primary:hover {
+  background: var(--vie);
+  border-color: var(--vie);
+}
+.cookie-btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.cookie-btn-ghost:hover {
+  border-color: var(--ink);
+}
+.cookie-customize-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.cookie-cat {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cookie-cat-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+  font-weight: 500;
+}
+.cookie-cat-label input[type="checkbox"] {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+.cookie-cat-label input[type="checkbox"]:checked {
+  background: var(--ink);
+}
+.cookie-cat-label input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-right: 1.5px solid var(--bg);
+  border-bottom: 1.5px solid var(--bg);
+  transform: rotate(45deg) translate(-1px, -1px);
+  width: 4px;
+  height: 8px;
+}
+.cookie-cat-label input[type="checkbox"]:disabled {
+  cursor: not-allowed;
+}
+.cookie-cat-desc {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+
+@media (max-width: 768px) {
+  .cookie-banner-row { flex-direction: column; align-items: stretch; }
+  .cookie-customize-grid { grid-template-columns: 1fr; }
+}
+
+/* ----------------------------------------------------------------
+   Legal pages — typographic prose
+---------------------------------------------------------------- */
+.legal-page {
+  padding: 96px var(--px) clamp(80px, 10vw, 144px);
+}
+.legal-prose {
+  max-width: 740px;
+  margin: 0 auto;
+}
+.legal-prose .eyebrow {
+  margin-bottom: 16px;
+}
+.legal-prose h1 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(40px, 5.5vw, 80px);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  font-weight: 400;
+  margin-bottom: 16px;
+}
+.legal-prose .meta {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 56px;
+}
+.legal-prose h2 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(24px, 2.5vw, 32px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  font-weight: 400;
+  margin: 48px 0 16px;
+}
+.legal-prose h3 {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin: 32px 0 12px;
+}
+.legal-prose p,
+.legal-prose li {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--ink-soft);
+}
+.legal-prose p { margin-bottom: 16px; }
+.legal-prose ul,
+.legal-prose ol {
+  padding-left: 24px;
+  margin-bottom: 16px;
+}
+.legal-prose li { margin-bottom: 6px; }
+.legal-prose ul { list-style: disc; }
+.legal-prose ol { list-style: decimal; }
+.legal-prose a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--t-fast) var(--ease);
+}
+.legal-prose a:hover { color: var(--vie); }
+.legal-prose strong { color: var(--ink); font-weight: 500; }
+.legal-prose .callout {
+  margin: 24px 0;
+  padding: 20px 24px;
+  border-left: 2px solid var(--vie);
+  background: var(--surface);
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--ink-soft);
+}
+
 /* slow drift for symbols (manifesto divider, etc.) */
 .drift {
   animation: drift 14s ease-in-out infinite alternate;

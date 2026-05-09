@@ -7,6 +7,9 @@ import { SvgSprite } from "@/components/svg-sprite";
 import { SiteHeader } from "@/components/site-header";
 import { HeaderScrollEffect } from "@/components/header-scroll";
 import { CartDrawer } from "@/components/cart/cart-drawer";
+import { AgeGate } from "@/components/legal/age-gate";
+import { CookieBanner } from "@/components/legal/cookie-banner";
+import { ConsentScripts } from "@/components/legal/consent-scripts";
 
 const italiana = Italiana({
   variable: "--font-serif",
@@ -52,6 +55,9 @@ export default function RootLayout({
         <HeaderScrollEffect />
         {children}
         <CartDrawer />
+        <AgeGate />
+        <CookieBanner />
+        <ConsentScripts />
       </body>
     </html>
   );

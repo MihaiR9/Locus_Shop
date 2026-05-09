@@ -59,8 +59,25 @@ export function Footer() {
             <li><a href="#" target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
             <li><a href="#" target="_blank" rel="noopener noreferrer">Facebook ↗</a></li>
           </ul>
+          <h4 style={{ marginTop: 32 }}>Reclamații</h4>
+          <ul>
+            <li>
+              <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer">
+                ANPC ↗
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://ec.europa.eu/consumers/odr"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                SOL — soluționare online ↗
+              </a>
+            </li>
+          </ul>
           <p style={{ marginTop: 32, fontSize: 11, lineHeight: 1.7 }}>
-            SC ROMVINTEC SRL · Conține sulfiți.
+            SC ROMVINTEC SRL · 18+ · Conține sulfiți.
             <br />
             Consumul excesiv de alcool dăunează sănătății.
           </p>
