@@ -1,25 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
-import { useShallow } from "zustand/react/shallow";
+import { useEffect, useMemo } from "react";
 import { BottleSvg } from "@/components/landing/bottle-svg";
-import {
-  selectLines,
-  selectSubtotalRon,
-  useCartStore,
-} from "@/lib/cart-store";
-import { formatRon, metaLine } from "@/lib/wines";
+import { selectLines, useCartStore } from "@/lib/cart-store";
+import { formatRon, metaLine, WINES } from "@/lib/wines";
+
+const WINE_BY_CODE = Object.fromEntries(WINES.map((w) => [w.code, w] as const));
 
 export function CartDrawer() {
   const isOpen = useCartStore((s) => s.isOpen);
   const close = useCartStore((s) => s.close);
   const updateQty = useCartStore((s) => s.updateQty);
   const removeItem = useCartStore((s) => s.removeItem);
-  // useShallow → equality check pe array-ul returnat de selectLines,
-  // altfel React 19 + useSyncExternalStore intră în loop infinit.
-  const lines = useCartStore(useShallow(selectLines));
-  const subtotal = useCartStore(selectSubtotalRon);
+  // Select primitiva stabilă (items obj e same-ref în Zustand cât timp nu se modifică),
+  // apoi derivăm lines + subtotal cu useMemo. Asta evită loop-ul din React 19 +
+  // useSyncExternalStore care apare când selectorul creează obiecte noi.
+  const items = useCartStore((s) => s.items);
+  const lines = useMemo(() => selectLines({ items, isOpen: false } as never), [items]);
+  const subtotal = useMemo(() => {
+    let total = 0;
+    for (const [code, qty] of Object.entries(items)) {
+      const w = WINE_BY_CODE[code];
+      if (w) total += w.priceRon * qty;
+    }
+    return total;
+  }, [items]);
 
   // ESC closes drawer + lock body scroll while open.
   useEffect(() => {

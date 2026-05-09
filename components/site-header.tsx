@@ -4,11 +4,11 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { CartButton } from "@/components/cart/cart-button";
 
 const NAV_LINKS = [
-  { href: "/#acasa", label: "Acasă" },
-  { href: "/#despre", label: "Despre noi" },
+  { href: "/", label: "Acasă" },
+  { href: "/despre", label: "Despre noi" },
   { href: "/#vinuri", label: "Vinuri" },
   { href: "/#locul", label: "Locul" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export function SiteHeader() {

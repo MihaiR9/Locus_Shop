@@ -39,10 +39,11 @@ export function Footer() {
         <div className="footer-col">
           <h4>Navighează</h4>
           <ul>
-            <li><Link href="/#acasa">Acasă</Link></li>
-            <li><Link href="/#despre">Despre noi</Link></li>
+            <li><Link href="/">Acasă</Link></li>
+            <li><Link href="/despre">Despre noi</Link></li>
             <li><Link href="/#vinuri">Vinuri</Link></li>
             <li><Link href="/#locul">Locul</Link></li>
+            <li><Link href="/contact">Contact</Link></li>
           </ul>
           <h4 style={{ marginTop: 32 }}>Legal</h4>
           <ul>
