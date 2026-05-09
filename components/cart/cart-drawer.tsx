@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { BottleSvg } from "@/components/landing/bottle-svg";
 import {
   selectLines,
@@ -15,7 +16,9 @@ export function CartDrawer() {
   const close = useCartStore((s) => s.close);
   const updateQty = useCartStore((s) => s.updateQty);
   const removeItem = useCartStore((s) => s.removeItem);
-  const lines = useCartStore(selectLines);
+  // useShallow → equality check pe array-ul returnat de selectLines,
+  // altfel React 19 + useSyncExternalStore intră în loop infinit.
+  const lines = useCartStore(useShallow(selectLines));
   const subtotal = useCartStore(selectSubtotalRon);
 
   // ESC closes drawer + lock body scroll while open.

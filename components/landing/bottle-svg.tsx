@@ -17,14 +17,14 @@ type Props = {
   code: string;
 };
 
-export function BottleSvg({ color, gama, code }: Props) {
+/** Inner geometry only — no <svg> wrapper. Use inside an existing <svg> element. */
+export function BottleInner({ color, gama, code }: Props) {
   const fill = FILL[color];
   const stroke = STROKE[color];
   const labelFill = gama === "semne" ? "#CBBEAE" : "#EBE1DA";
-  const labelStroke = "#A89D8D";
 
   return (
-    <svg viewBox="0 0 80 200" aria-hidden="true">
+    <>
       <path
         d="M32 0 H48 V40 Q60 50 60 70 V190 Q60 200 50 200 H30 Q20 200 20 190 V70 Q20 50 32 40 Z"
         fill={fill}
@@ -37,7 +37,7 @@ export function BottleSvg({ color, gama, code }: Props) {
         width={gama === "semne" ? "36" : "40"}
         height={gama === "semne" ? "64" : "60"}
         fill={labelFill}
-        stroke={labelStroke}
+        stroke="#A89D8D"
         strokeWidth="0.4"
       />
       {gama === "semne" && (
@@ -67,6 +67,15 @@ export function BottleSvg({ color, gama, code }: Props) {
       >
         lócus
       </text>
+    </>
+  );
+}
+
+/** Self-contained SVG bottle (most call sites use this). */
+export function BottleSvg({ color, gama, code }: Props) {
+  return (
+    <svg viewBox="0 0 80 200" aria-hidden="true">
+      <BottleInner color={color} gama={gama} code={code} />
     </svg>
   );
 }

@@ -45,7 +45,7 @@ export default function RootLayout({
       <head>
         <ThemeScript />
       </head>
-      <body className="bg-bg text-ink font-mono">
+      <body className="bg-bg text-ink font-mono" suppressHydrationWarning>
         <SvgSprite />
         <FilmGrain />
         <SiteHeader />
