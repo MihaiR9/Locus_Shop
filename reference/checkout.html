@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="ro" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — Domeniul Locus</title>
+  <meta name="description" content="Finalizează comanda — Domeniul Locus. Livrare prin curier sau ridicare personală, plată card online sau la livrare." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── TOKENS ────────────────────────────────────────────── */
+    :root {
+      --pamant:  #EBE1DA;
+      --nisip:   #CBBEAE;
+      --piatra:  #A89D8D;
+      --vie:     #3E4336;
+      --stejar:  #4A3C2D;
+      --pivnita: #1A1A1A;
+
+      --bg:      var(--pamant);
+      --bg-alt:  #E2D8CE;
+      --surface: #F2EAE2;
+      --ink:     var(--pivnita);
+      --ink-soft: var(--stejar);
+      --ink-mute: var(--piatra);
+      --line:    rgba(74, 60, 45, 0.18);
+      --line-strong: rgba(74, 60, 45, 0.32);
+      --field-bg: #F6EFE8;
+
+      --font-serif: 'Lora', serif;
+      --font-mono:  'IBM Plex Mono', monospace;
+
+      --container: 1280px;
+      --px: clamp(20px, 4.5vw, 56px);
+
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+      --t-fast: 240ms;
+      --t-base: 480ms;
+    }
+
+    [data-theme="dark"] {
+      --bg:      var(--pivnita);
+      --bg-alt:  #111111;
+      --surface: #1f1e1c;
+      --ink:     var(--pamant);
+      --ink-soft: var(--nisip);
+      --ink-mute: var(--piatra);
+      --line:    rgba(203, 190, 174, 0.16);
+      --line-strong: rgba(203, 190, 174, 0.32);
+      --field-bg: #232220;
+    }
+
+    /* ─── RESET ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background var(--t-base) var(--ease), color var(--t-base) var(--ease);
+      overflow-x: hidden;
+    }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+    *:focus-visible { outline: 2px solid var(--vie); outline-offset: 3px; border-radius: 2px; }
+
+    /* film grain */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.06;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+      mix-blend-mode: multiply;
+    }
+    [data-theme="dark"] body::before { mix-blend-mode: screen; opacity: 0.05; }
+
+    /* ─── TYPOGRAPHY UTILITIES ─────────────────────────────── */
+    .serif { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.005em; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 18px; height: 1px;
+      background: currentColor;
+      opacity: 0.5;
+    }
+    .h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(36px, 5vw, 64px);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      font-weight: 600;
+    }
+    .h3 {
+      font-family: var(--font-serif);
+      font-size: clamp(24px, 3vw, 36px);
+      line-height: 1.12;
+      letter-spacing: -0.015em;
+      font-weight: 400;
+    }
+    .small {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--ink-mute);
+    }
+    .caps {
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* ─── HEADER (slim, checkout) ─────────────────────────── */
+    .site-header {
+      position: sticky; top: 0;
+      z-index: 90;
+      background: color-mix(in oklab, var(--bg) 88%, transparent);
+      backdrop-filter: saturate(120%) blur(14px);
+      -webkit-backdrop-filter: saturate(120%) blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .header-inner {
+      max-width: var(--container);
+      margin-inline: auto;
+      padding: 18px var(--px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .brand { display: inline-flex; align-items: center; }
+    .brand-img { height: 44px; width: auto; object-fit: contain; }
+    [data-theme="dark"] .brand-img { filter: invert(1) brightness(1.1); }
+    .header-back {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--ink-soft);
+      transition: color var(--t-fast) var(--ease), gap var(--t-fast) var(--ease);
+    }
+    .header-back:hover { color: var(--ink); gap: 14px; }
+    .header-back .arrow { transform: rotate(180deg); }
+    .header-actions { display: inline-flex; gap: 14px; align-items: center; }
+    .theme-toggle {
+      width: 36px; height: 36px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      transition: border-color var(--t-fast) var(--ease);
+    }
+    .theme-toggle:hover { border-color: var(--ink); }
+    .theme-toggle svg { width: 14px; height: 14px; }
+    .theme-toggle .sun { display: none; }
+    [data-theme="dark"] .theme-toggle .moon { display: none; }
+    [data-theme="dark"] .theme-toggle .sun { display: block; }
+
+    /* ─── PAGE GRID ─────────────────────────────────────────── */
+    .page {
+      max-width: var(--container);
+      margin-inline: auto;
+      padding: clamp(28px, 4vw, 56px) var(--px) clamp(80px, 10vw, 140px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+      gap: clamp(28px, 5vw, 80px);
+      align-items: start;
+    }
+    @media (max-width: 920px) { .page { grid-template-columns: 1fr; gap: 36px; } }
+
+    /* ─── PAGE HEAD ─────────────────────────────────────────── */
+    .page-head { grid-column: 1 / -1; padding-bottom: clamp(20px, 3vw, 36px); border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+    .page-head .eyebrow { margin-bottom: 14px; }
+    .page-title {
+      display: flex;
+      align-items: baseline;
+      gap: 24px;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .page-title h1 { font-family: var(--font-serif); font-size: clamp(48px, 7vw, 96px); line-height: 1.0; letter-spacing: -0.03em; font-weight: 600; }
+    .step-rail {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .step-rail .step { display: inline-flex; align-items: center; gap: 8px; }
+    .step-rail .num {
+      width: 24px; height: 24px;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+    }
+    .step-rail .step.is-active .num,
+    .step-rail .step.is-done .num {
+      background: var(--ink); color: var(--bg); border-color: var(--ink);
+    }
+    .step-rail .step.is-active .label { color: var(--ink); }
+    .step-rail .sep { width: 16px; height: 1px; background: var(--line-strong); }
+    @media (max-width: 640px) { .step-rail { font-size: 10px; gap: 6px; } .step-rail .label { display: none; } }
+
+    /* ─── FORM COLUMN ───────────────────────────────────────── */
+    .form-col { display: flex; flex-direction: column; gap: clamp(28px, 4vw, 48px); min-width: 0; }
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      padding: clamp(22px, 3vw, 36px);
+      position: relative;
+    }
+    .step-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+    .step-head .step-no {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .step-head .step-status {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .step-head .step-status::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--ink-mute);
+    }
+    .step-card.is-saved .step-head .step-status { color: var(--vie); }
+    .step-card.is-saved .step-head .step-status::before { background: var(--vie); }
+    [data-theme="dark"] .step-card.is-saved .step-head .step-status { color: var(--nisip); }
+
+    /* ─── TABS / SEGMENTED ──────────────────────────────────── */
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid var(--line-strong);
+      margin-bottom: 24px;
+    }
+    .tabs button {
+      padding: 18px 18px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      background: transparent;
+      transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      border-right: 1px solid var(--line-strong);
+    }
+    .tabs button:last-child { border-right: none; }
+    .tabs button svg { width: 16px; height: 16px; }
+    .tabs button.is-active {
+      background: var(--ink);
+      color: var(--bg);
+    }
+    .tabs button:not(.is-active):hover { background: color-mix(in oklab, var(--ink) 6%, transparent); color: var(--ink); }
+
+    .tab-pane[hidden] { display: none; }
+
+    /* ─── FORM FIELDS ───────────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 540px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .field > label {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .field > label .req { color: var(--stejar); }
+    [data-theme="dark"] .field > label .req { color: var(--nisip); }
+    .input, .select, .textarea {
+      width: 100%;
+      font: inherit;
+      font-size: 14px;
+      color: var(--ink);
+      background: var(--field-bg);
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+      border-radius: 0;
+      transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+    }
+    .input::placeholder, .textarea::placeholder { color: var(--ink-mute); }
+    .input:focus, .select:focus, .textarea:focus { border-color: var(--ink); outline: none; }
+    .textarea { resize: vertical; min-height: 92px; line-height: 1.6; }
+    .select {
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%), linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+      background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 40px;
+    }
+    .field-row { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
+    .field-row input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--vie); }
+    .field-row label { font-size: 12px; color: var(--ink-soft); }
+
+    /* ─── RADIO TOGGLES (P. fizică / juridică, plată) ───── */
+    .radio-group { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line-strong); margin-bottom: 22px; }
+    .radio-group input { position: absolute; opacity: 0; pointer-events: none; }
+    .radio-group label {
+      padding: 16px 18px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      cursor: pointer;
+      text-align: center;
+      transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+      border-right: 1px solid var(--line-strong);
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .radio-group label:last-of-type { border-right: none; }
+    .radio-group input:checked + label { background: var(--ink); color: var(--bg); }
+    .radio-group label:hover { color: var(--ink); }
+    .radio-group input:checked + label:hover { color: var(--bg); }
+
+    /* payment list (full-width radios) */
+    .pay-list { display: flex; flex-direction: column; gap: 10px; }
+    .pay-row {
+      display: grid;
+      grid-template-columns: 22px 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      border: 1px solid var(--line-strong);
+      cursor: pointer;
+      transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+    }
+    .pay-row:hover { border-color: var(--ink); }
+    .pay-row.is-selected { border-color: var(--ink); background: color-mix(in oklab, var(--ink) 4%, transparent); }
+    .pay-row input { width: 14px; height: 14px; accent-color: var(--vie); margin: 0; }
+    .pay-row .pay-name { font-family: var(--font-serif); font-size: 22px; line-height: 1; }
+    .pay-row .pay-meta { font-size: 11px; color: var(--ink-mute); margin-top: 4px; letter-spacing: 0.04em; }
+    .pay-row .pay-icons { display: inline-flex; gap: 6px; align-items: center; }
+    .pay-row .pay-icons span {
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border: 1px solid var(--line-strong);
+      color: var(--ink-soft);
+      border-radius: 999px;
+    }
+
+    /* ─── ACTION BAR ───────────────────────────────────────── */
+    .step-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 22px; flex-wrap: wrap; }
+    .step-actions .save-note { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 14px 24px;
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      background: transparent;
+      transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), gap var(--t-fast) var(--ease);
+    }
+    .btn:hover { background: var(--ink); color: var(--bg); gap: 16px; }
+    .btn-solid { background: var(--ink); color: var(--bg); }
+    .btn-solid:hover { background: var(--vie); border-color: var(--vie); }
+    .btn-ghost {
+      padding: 8px 0;
+      border: none;
+      gap: 12px;
+    }
+    .btn-ghost::before {
+      content: ''; width: 0; height: 1px; background: currentColor;
+      transition: width var(--t-base) var(--ease);
+      align-self: center;
+    }
+    .btn-ghost:hover { background: transparent; color: var(--ink); }
+    .arrow { width: 16px; height: 8px; flex-shrink: 0; transition: transform var(--t-base) var(--ease); }
+    .btn:hover .arrow { transform: translateX(6px); }
+
+    /* ─── SUMMARY (right rail) ─────────────────────────────── */
+    .summary {
+      background: var(--bg-alt);
+      border: 1px solid var(--line);
+      padding: clamp(22px, 3vw, 32px);
+      position: sticky;
+      top: 100px;
+      align-self: start;
+    }
+    @media (max-width: 920px) { .summary { position: static; order: -1; } }
+    .summary-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; }
+    .summary-head h2 { font-family: var(--font-serif); font-size: 28px; line-height: 1; letter-spacing: -0.01em; }
+    .summary-head .count { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.18em; text-transform: uppercase; }
+
+    .sum-items { display: flex; flex-direction: column; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 18px; max-height: 360px; overflow-y: auto; }
+    .sum-item { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center; }
+    .sum-img {
+      width: 64px; height: 88px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      display: inline-flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .sum-img svg { height: 86%; width: auto; }
+    .sum-img .qty {
+      position: absolute;
+      top: -7px; right: -7px;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--ink); color: var(--bg);
+      font-size: 10px; font-weight: 500;
+      display: inline-flex; align-items: center; justify-content: center;
+      letter-spacing: 0.04em;
+    }
+    .sum-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .sum-name { font-family: var(--font-serif); font-size: 18px; line-height: 1.1; }
+    .sum-meta { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute); }
+    .sum-price { font-size: 12px; color: var(--ink-soft); white-space: nowrap; letter-spacing: 0.04em; }
+
+    .sum-coupon { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 18px; }
+    .sum-coupon .input { padding: 12px 14px; font-size: 12px; }
+    .sum-coupon button {
+      padding: 0 16px;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border: 1px solid var(--line-strong);
+      color: var(--ink-soft);
+      transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+    }
+    .sum-coupon button:hover { border-color: var(--ink); color: var(--ink); }
+
+    .sum-rows { display: flex; flex-direction: column; gap: 8px; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+    .sum-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-soft); letter-spacing: 0.02em; }
+    .sum-row .muted { color: var(--ink-mute); font-style: italic; }
+    .sum-total {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 22px;
+    }
+    .sum-total .label { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); }
+    .sum-total .val { font-family: var(--font-serif); font-size: 36px; line-height: 1; letter-spacing: -0.01em; }
+    .sum-total .val .currency { font-size: 14px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); margin-left: 6px; font-family: var(--font-mono); }
+
+    .place-order {
+      width: 100%;
+      justify-content: center;
+      padding: 18px 24px;
+      font-size: 12px;
+    }
+    .sum-foot-note { font-size: 10px; color: var(--ink-mute); margin-top: 14px; line-height: 1.6; letter-spacing: 0.02em; }
+    .sum-empty { padding: 40px 0; text-align: center; color: var(--ink-mute); font-size: 13px; }
+    .sum-empty a { text-decoration: underline; text-underline-offset: 4px; }
+
+    /* ─── SUCCESS OVERLAY ──────────────────────────────────── */
+    .success {
+      position: fixed; inset: 0; z-index: 200;
+      background: color-mix(in oklab, var(--bg) 92%, transparent);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 32px;
+    }
+    .success.is-open { display: flex; animation: fadein var(--t-base) var(--ease); }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+    .success-card {
+      max-width: 560px; width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      padding: clamp(36px, 5vw, 64px);
+      text-align: center;
+      position: relative;
+    }
+    .success-card h2 { font-family: var(--font-serif); font-size: clamp(40px, 6vw, 72px); line-height: 1.02; letter-spacing: -0.025em; margin-bottom: 16px; font-weight: 600; }
+    .success-card .order-no { font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 24px; }
+    .success-card p { color: var(--ink-soft); margin-bottom: 28px; line-height: 1.7; }
+    .success-card .symbol-row { display: inline-flex; gap: 14px; margin-top: 8px; opacity: 0.6; }
+    .success-card .symbol-row svg { width: 12px; height: 12px; }
+
+    /* ─── HELPERS ──────────────────────────────────────────── */
+    [hidden] { display: none !important; }
+    .saved-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid var(--line-strong);
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .saved-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--vie); }
+
+    .legal-note {
+      grid-column: 1 / -1;
+      margin-top: 24px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .legal-note a { color: var(--ink-soft); transition: color var(--t-fast) var(--ease); }
+    .legal-note a:hover { color: var(--ink); }
+  </style>
+</head>
+<body>
+
+  <!-- ─── SVG sprite ─── -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="arrow-right" viewBox="0 0 24 12">
+        <path d="M0 6 H22 M16 1 L22 6 L16 11" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      </symbol>
+      <symbol id="check" viewBox="0 0 16 16">
+        <path d="M3 8.5 L7 12.5 L13.5 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="miter"/>
+      </symbol>
+      <symbol id="truck" viewBox="0 0 24 24">
+        <path d="M2 6 H14 V16 H2 Z M14 9 H19 L22 12 V16 H14 Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <circle cx="6" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <circle cx="17.5" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      </symbol>
+      <symbol id="pin" viewBox="0 0 24 24">
+        <path d="M12 2 C7.5 2 4 5.5 4 10 c0 6 8 12 8 12 s8-6 8-12 c0-4.5-3.5-8-8-8 z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <circle cx="12" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      </symbol>
+      <symbol id="card" viewBox="0 0 24 24">
+        <rect x="3" y="6" width="18" height="13" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M3 10 H21" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M6 15 H10" stroke="currentColor" stroke-width="1.2"/>
+      </symbol>
+      <symbol id="cash" viewBox="0 0 24 24">
+        <rect x="3" y="7" width="18" height="11" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        <circle cx="12" cy="12.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      </symbol>
+      <symbol id="square" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+      <symbol id="diamond" viewBox="0 0 24 24"><path d="M12 3 L21 12 L12 21 L3 12 Z" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+      <symbol id="circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+      <symbol id="star8" viewBox="0 0 24 24">
+        <path d="M12 2 L13.5 9 L21 12 L13.5 15 L12 22 L10.5 15 L3 12 L10.5 9 Z" fill="currentColor"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- ═══════════════════════ HEADER ═══════════════════════ -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="Landing_V1.html" aria-label="Domeniul Locus — acasă">
+        <img class="brand-img" src="logo-locus.png" alt="Domeniul Locus" />
+      </a>
+
+      <a class="header-back" href="Landing_V1.html#vinuri">
+        <svg class="arrow" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+        Înapoi la vinuri
+      </a>
+
+      <div class="header-actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Comută temă">
+          <svg class="moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M13 9.5A6 6 0 0 1 6.5 3a6 6 0 1 0 6.5 6.5z"/>
+          </svg>
+          <svg class="sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2">
+            <circle cx="8" cy="8" r="3"/>
+            <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="page">
+
+      <!-- ─── PAGE HEAD ─── -->
+      <div class="page-head">
+        <div class="eyebrow">Finalizare comandă · pas cu pas</div>
+        <div class="page-title">
+          <h1>checkout.</h1>
+          <nav class="step-rail" aria-label="Pași checkout">
+            <span class="step is-active" data-step="1"><span class="num">1</span><span class="label">livrare</span></span>
+            <span class="sep"></span>
+            <span class="step" data-step="2"><span class="num">2</span><span class="label">facturare</span></span>
+            <span class="sep"></span>
+            <span class="step" data-step="3"><span class="num">3</span><span class="label">plată</span></span>
+          </nav>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════ FORM COLUMN ═══════════════════════ -->
+      <div class="form-col">
+
+        <!-- ─── STEP 1 — LIVRARE ─── -->
+        <section class="step-card" id="step-1" aria-labelledby="step-1-title">
+          <header class="step-head">
+            <div>
+              <div class="step-no">01 — livrare</div>
+              <h2 class="h3" id="step-1-title">Cum primești sticlele.</h2>
+            </div>
+            <span class="step-status" id="status-1">incomplet</span>
+          </header>
+
+          <div class="tabs" role="tablist" aria-label="Mod livrare">
+            <button type="button" class="is-active" data-tab="curier" role="tab" aria-selected="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#truck"/></svg>
+              Curier
+            </button>
+            <button type="button" data-tab="ridicare" role="tab" aria-selected="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pin"/></svg>
+              Ridicare personală
+            </button>
+          </div>
+
+          <!-- CURIER -->
+          <div class="tab-pane" data-pane="curier">
+            <form id="form-shipping-curier" novalidate>
+              <div class="grid-2" style="margin-bottom: 14px;">
+                <div class="field">
+                  <label for="ship-first">Prenume <span class="req">*</span></label>
+                  <input class="input" id="ship-first" name="firstName" required autocomplete="given-name" />
+                </div>
+                <div class="field">
+                  <label for="ship-last">Nume <span class="req">*</span></label>
+                  <input class="input" id="ship-last" name="lastName" required autocomplete="family-name" />
+                </div>
+              </div>
+              <div class="grid-2" style="margin-bottom: 14px;">
+                <div class="field">
+                  <label for="ship-phone">Telefon <span class="req">*</span></label>
+                  <input class="input" id="ship-phone" name="phone" type="tel" placeholder="07xx xxx xxx" required autocomplete="tel" />
+                </div>
+                <div class="field">
+                  <label for="ship-email">Email <span class="req">*</span></label>
+                  <input class="input" id="ship-email" name="email" type="email" placeholder="nume@exemplu.ro" required autocomplete="email" />
+                </div>
+              </div>
+              <div class="field" style="margin-bottom: 14px;">
+                <label for="ship-address">Adresă (stradă, număr, bloc, scară, ap.) <span class="req">*</span></label>
+                <input class="input" id="ship-address" name="address" required autocomplete="street-address" />
+              </div>
+              <div class="grid-3" style="margin-bottom: 14px;">
+                <div class="field">
+                  <label for="ship-city">Localitate <span class="req">*</span></label>
+                  <input class="input" id="ship-city" name="city" required autocomplete="address-level2" />
+                </div>
+                <div class="field">
+                  <label for="ship-county">Județ <span class="req">*</span></label>
+                  <select class="select" id="ship-county" name="county" required autocomplete="address-level1">
+                    <option value="">Alege județul</option>
+                    <option>Alba</option><option>Arad</option><option>Argeș</option><option>Bacău</option>
+                    <option>Bihor</option><option>Bistrița-Năsăud</option><option>Botoșani</option><option>Brașov</option>
+                    <option>Brăila</option><option>București</option><option>Buzău</option><option>Caraș-Severin</option>
+                    <option>Călărași</option><option>Cluj</option><option>Constanța</option><option>Covasna</option>
+                    <option>Dâmbovița</option><option>Dolj</option><option>Galați</option><option>Giurgiu</option>
+                    <option>Gorj</option><option>Harghita</option><option>Hunedoara</option><option>Ialomița</option>
+                    <option>Iași</option><option>Ilfov</option><option>Maramureș</option><option>Mehedinți</option>
+                    <option>Mureș</option><option>Neamț</option><option>Olt</option><option>Prahova</option>
+                    <option>Sălaj</option><option>Satu Mare</option><option>Sibiu</option><option>Suceava</option>
+                    <option>Teleorman</option><option>Timiș</option><option>Tulcea</option><option>Vaslui</option>
+                    <option>Vâlcea</option><option>Vrancea</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="ship-zip">Cod poștal</label>
+                  <input class="input" id="ship-zip" name="zip" autocomplete="postal-code" />
+                </div>
+              </div>
+              <div class="field" style="margin-bottom: 8px;">
+                <label for="ship-note">Observații pentru curier (opțional)</label>
+                <textarea class="textarea" id="ship-note" name="note" placeholder="Ex: vă rog sunați înainte de a urca; după ora 17:00." autocomplete="off"></textarea>
+              </div>
+              <div class="field-row">
+                <input type="checkbox" id="ship-save" checked />
+                <label for="ship-save">Salvează adresa pentru comenzi viitoare</label>
+              </div>
+            </form>
+          </div>
+
+          <!-- RIDICARE -->
+          <div class="tab-pane" data-pane="ridicare" hidden>
+            <div class="field" style="margin-bottom: 14px;">
+              <label for="pickup-point">Punct de ridicare <span class="req">*</span></label>
+              <select class="select" id="pickup-point" name="pickupPoint">
+                <option value="">Alege punctul</option>
+                <option value="buciumeni">Buciumeni — Domeniul Locus (sediu)</option>
+                <option value="bucuresti">București — Sector 1, Str. Mihai Eminescu 87</option>
+                <option value="iasi">Iași — Centru, Bd. Ștefan cel Mare 12</option>
+                <option value="cluj">Cluj-Napoca — Centru, Str. Memorandumului 4</option>
+              </select>
+            </div>
+            <div class="grid-2" style="margin-bottom: 14px;">
+              <div class="field">
+                <label for="pickup-name">Nume contact <span class="req">*</span></label>
+                <input class="input" id="pickup-name" name="pickupName" required autocomplete="name" />
+              </div>
+              <div class="field">
+                <label for="pickup-phone">Telefon <span class="req">*</span></label>
+                <input class="input" id="pickup-phone" name="pickupPhone" type="tel" placeholder="07xx xxx xxx" required autocomplete="tel" />
+              </div>
+            </div>
+            <p class="small" style="color: var(--ink-soft); line-height: 1.7;">
+              Te anunțăm prin SMS și email când comanda este pregătită — în general, în 24–48 h pentru sediul Buciumeni și 2–4 zile pentru celelalte puncte. Adu un act de identitate la ridicare.
+            </p>
+          </div>
+
+          <div class="step-actions">
+            <span class="save-note">Datele rămân pe acest dispozitiv. Nu trimitem nimic încă.</span>
+            <button type="button" class="btn btn-solid" id="save-shipping">
+              Salvează și continuă
+              <svg class="arrow" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+            </button>
+          </div>
+        </section>
+
+        <!-- ─── STEP 2 — FACTURARE ─── -->
+        <section class="step-card" id="step-2" aria-labelledby="step-2-title">
+          <header class="step-head">
+            <div>
+              <div class="step-no">02 — date facturare</div>
+              <h2 class="h3" id="step-2-title">Pe numele cui emitem factura.</h2>
+            </div>
+            <span class="step-status" id="status-2">incomplet</span>
+          </header>
+
+          <div class="radio-group" role="radiogroup" aria-label="Tip persoană">
+            <input type="radio" name="billType" id="bill-fizica" value="fizica" checked />
+            <label for="bill-fizica">Persoană fizică</label>
+            <input type="radio" name="billType" id="bill-juridica" value="juridica" />
+            <label for="bill-juridica">Persoană juridică</label>
+          </div>
+
+          <!-- FIZICĂ -->
+          <div class="tab-pane" data-bill="fizica">
+            <div class="grid-2" style="margin-bottom: 14px;">
+              <div class="field">
+                <label for="bill-first">Prenume <span class="req">*</span></label>
+                <input class="input" id="bill-first" required autocomplete="given-name" />
+              </div>
+              <div class="field">
+                <label for="bill-last">Nume <span class="req">*</span></label>
+                <input class="input" id="bill-last" required autocomplete="family-name" />
+              </div>
+            </div>
+            <div class="grid-2" style="margin-bottom: 14px;">
+              <div class="field">
+                <label for="bill-cnp">CNP (opțional)</label>
+                <input class="input" id="bill-cnp" inputmode="numeric" maxlength="13" />
+              </div>
+              <div class="field">
+                <label for="bill-email-f">Email <span class="req">*</span></label>
+                <input class="input" id="bill-email-f" type="email" required autocomplete="email" />
+              </div>
+            </div>
+            <div class="field-row">
+              <input type="checkbox" id="bill-same" checked />
+              <label for="bill-same">Folosește adresa de livrare ca adresă de facturare</label>
+            </div>
+          </div>
+
+          <!-- JURIDICĂ -->
+          <div class="tab-pane" data-bill="juridica" hidden>
+            <div class="field" style="margin-bottom: 14px;">
+              <label for="bill-company">Denumire firmă <span class="req">*</span></label>
+              <input class="input" id="bill-company" required autocomplete="organization" />
+            </div>
+            <div class="grid-2" style="margin-bottom: 14px;">
+              <div class="field">
+                <label for="bill-cui">CUI <span class="req">*</span></label>
+                <input class="input" id="bill-cui" placeholder="RO12345678" required />
+              </div>
+              <div class="field">
+                <label for="bill-reg">Nr. registru comerț</label>
+                <input class="input" id="bill-reg" placeholder="J40/1234/2020" />
+              </div>
+            </div>
+            <div class="grid-2" style="margin-bottom: 14px;">
+              <div class="field">
+                <label for="bill-iban">IBAN (opțional)</label>
+                <input class="input" id="bill-iban" placeholder="RO00 BANK 0000 0000 0000 0000" />
+              </div>
+              <div class="field">
+                <label for="bill-email-j">Email facturare <span class="req">*</span></label>
+                <input class="input" id="bill-email-j" type="email" required autocomplete="email" />
+              </div>
+            </div>
+            <div class="field" style="margin-bottom: 14px;">
+              <label for="bill-hq">Adresă sediu social <span class="req">*</span></label>
+              <input class="input" id="bill-hq" required autocomplete="street-address" />
+            </div>
+          </div>
+
+          <div class="step-actions">
+            <span class="save-note">Salvăm datele local — vor apărea precompletate la următoarea comandă.</span>
+            <button type="button" class="btn btn-solid" id="save-billing">
+              Salvează datele
+              <svg class="arrow" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+            </button>
+          </div>
+        </section>
+
+        <!-- ─── STEP 3 — PLATĂ ─── -->
+        <section class="step-card" id="step-3" aria-labelledby="step-3-title">
+          <header class="step-head">
+            <div>
+              <div class="step-no">03 — modalitate de plată</div>
+              <h2 class="h3" id="step-3-title">Cum vrei să achiți.</h2>
+            </div>
+            <span class="step-status" id="status-3">incomplet</span>
+          </header>
+
+          <div class="pay-list" role="radiogroup" aria-label="Mod de plată">
+            <label class="pay-row is-selected" data-pay="card-online">
+              <input type="radio" name="payment" value="card-online" checked />
+              <div>
+                <div class="pay-name">Card online</div>
+                <div class="pay-meta">Procesat securizat prin Netopia / Stripe · 3-D Secure</div>
+              </div>
+              <div class="pay-icons">
+                <span>visa</span><span>mc</span><span>amex</span>
+              </div>
+            </label>
+
+            <label class="pay-row" data-pay="card-livrare">
+              <input type="radio" name="payment" value="card-livrare" />
+              <div>
+                <div class="pay-name">Card bancar la livrare</div>
+                <div class="pay-meta">Plătești cu cardul, la curier sau în punctul de ridicare</div>
+              </div>
+              <div class="pay-icons">
+                <span>POS</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="field-row" style="margin-top: 18px;">
+            <input type="checkbox" id="terms" />
+            <label for="terms">Sunt de acord cu termenii și prelucrarea datelor. Confirm că am peste 18 ani.</label>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ═══════════════════════ SUMMARY (right rail) ═══════════════════════ -->
+      <aside class="summary" aria-label="Sumar comandă">
+        <div class="summary-head">
+          <h2>comanda ta.</h2>
+          <span class="count" id="sumCount">0 sticle</span>
+        </div>
+
+        <div class="sum-items" id="sumItems"></div>
+
+        <div class="sum-coupon">
+          <input class="input" id="coupon" placeholder="Cod voucher" />
+          <button type="button" id="couponBtn">aplică</button>
+        </div>
+
+        <div class="sum-rows">
+          <div class="sum-row"><span>Subtotal</span><span id="sumSubtotal">0 lei</span></div>
+          <div class="sum-row"><span>Transport</span><span id="sumShipping" class="muted">se calculează la pasul 1</span></div>
+          <div class="sum-row" id="sumDiscountRow" hidden><span>Voucher</span><span id="sumDiscount">−0 lei</span></div>
+        </div>
+
+        <div class="sum-total">
+          <div class="label">Total</div>
+          <div class="val"><span id="sumTotalNum">0</span><span class="currency">lei</span></div>
+        </div>
+
+        <button type="button" class="btn btn-solid place-order" id="placeOrder" disabled>
+          Plasează comanda
+          <svg class="arrow" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+        </button>
+
+        <p class="sum-foot-note">
+          Livrare 2–4 zile lucrătoare prin curier · gratis peste 250 lei.<br/>
+          Conține sulfiți. Consumul excesiv de alcool dăunează sănătății.
+        </p>
+      </aside>
+
+      <!-- ─── LEGAL ─── -->
+      <div class="legal-note">
+        <a href="#">Termeni și condiții</a>
+        <a href="#">Politica de confidențialitate</a>
+        <a href="#">ANPC · SOL</a>
+        <span style="margin-left:auto">Plăți securizate · SSL</span>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ─── SUCCESS OVERLAY ─── -->
+  <div class="success" id="success" aria-hidden="true" role="dialog" aria-labelledby="success-title">
+    <div class="success-card">
+      <div class="eyebrow" style="margin-bottom:18px;justify-content:center;display:flex;">comandă confirmată</div>
+      <h2 id="success-title">mulțumim.</h2>
+      <div class="order-no" id="orderNo">#LC-—</div>
+      <p>
+        Am primit comanda ta. Îți trimitem un email cu confirmarea și detaliile de livrare.<br/>
+        Vinul, ca și locul, are nevoie de timp.
+      </p>
+      <a href="Landing_V1.html" class="btn">
+        înapoi la domeniu
+        <svg class="arrow" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+      </a>
+      <div class="symbol-row" aria-hidden="true">
+        <svg><use href="#square"/></svg>
+        <svg><use href="#diamond"/></svg>
+        <svg><use href="#star8"/></svg>
+        <svg><use href="#circle"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ─── THEME TOGGLE (shared with index/wine) ────────────
+    const themeBtn = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('locus-theme');
+    if (stored) document.documentElement.dataset.theme = stored;
+    themeBtn.addEventListener('click', () => {
+      const cur = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = cur;
+      localStorage.setItem('locus-theme', cur);
+    });
+
+    // ─── DATA (mirror of WINES from index/wine) ───────────
+    const WINES = {
+      LC01: { code: 'LC01', name: 'Fetească Regală', gama: 'cuvinte', meta: 'Alb · Demisec · 13,5%', price: 79, color: 'white' },
+      LC02: { code: 'LC02', name: 'Fetească Neagră', gama: 'cuvinte', meta: 'Roșu · Demisec · 14,9%', price: 89, color: 'red' },
+      LC04: { code: 'LC04', name: 'Riesling Italian', gama: 'cuvinte', meta: 'Alb · Sec · 13%',        price: 79, color: 'white' },
+      LS01: { code: 'LS01', name: 'Fetească Regală', gama: 'semne',   meta: 'Alb · Demisec · 13,5%', price: 109, color: 'white' },
+      LS02: { code: 'LS02', name: 'Fetească Neagră', gama: 'semne',   meta: 'Roșu · Demisec · 14,9%', price: 119, color: 'red' },
+      LS04: { code: 'LS04', name: 'Riesling Italian', gama: 'semne',   meta: 'Alb · Sec · 13%',        price: 109, color: 'white' },
+    };
+    const CART_KEY     = 'locus-cart';
+    const SHIP_KEY     = 'locus-shipping';
+    const BILL_KEY     = 'locus-billing';
+    const SHIP_FREE_AT = 250;
+    const SHIP_FEE     = 19;
+    const fmt = n => n.toLocaleString('ro-RO');
+
+    const loadCart = () => { try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; } catch { return {}; } };
+    const loadJSON = (k) => { try { return JSON.parse(localStorage.getItem(k)) || null; } catch { return null; } };
+    const saveJSON = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+    // ─── BOTTLE SVG ───────────────────────────────────────
+    function bottleSvg(color) {
+      const fill = color === 'red' ? '#2a1416' : '#DCD0BC';
+      const cap  = color === 'red' ? '#0F0708' : '#3E4336';
+      return `
+        <svg viewBox="0 0 60 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="25" y="2"  width="10" height="22" fill="${cap}"/>
+          <path d="M25 24 Q25 38 18 50 Q12 64 12 86 V174 Q12 178 16 178 H44 Q48 178 48 174 V86 Q48 64 42 50 Q35 38 35 24 Z" fill="${fill}"/>
+          <rect x="14" y="92" width="32" height="46" fill="#F2EAE2" opacity="0.92"/>
+          <rect x="14" y="92" width="32" height="1.2" fill="rgba(0,0,0,0.18)"/>
+          <rect x="14" y="137" width="32" height="1.2" fill="rgba(0,0,0,0.18)"/>
+          <text x="30" y="115" text-anchor="middle" font-family="Lora, serif" font-weight="600" font-size="9" fill="#1A1A1A">lócus</text>
+          <text x="30" y="128" text-anchor="middle" font-family="monospace" font-size="5" fill="#4A3C2D" letter-spacing="1">DOMENIUL</text>
+        </svg>`;
+    }
+
+    // ─── ORDER SUMMARY RENDER ─────────────────────────────
+    let coupon = null; // { code, percent }
+
+    function recalc() {
+      const cart = loadCart();
+      const ids = Object.keys(cart);
+      const subtotal = ids.reduce((s, id) => s + (WINES[id]?.price || 0) * cart[id], 0);
+      const qty = ids.reduce((s, id) => s + cart[id], 0);
+
+      const sumItems = document.getElementById('sumItems');
+      const countEl  = document.getElementById('sumCount');
+      const subEl    = document.getElementById('sumSubtotal');
+      const shipEl   = document.getElementById('sumShipping');
+      const discRow  = document.getElementById('sumDiscountRow');
+      const discEl   = document.getElementById('sumDiscount');
+      const totalEl  = document.getElementById('sumTotalNum');
+
+      countEl.textContent = `${qty} ${qty === 1 ? 'sticlă' : 'sticle'}`;
+
+      if (ids.length === 0) {
+        sumItems.innerHTML = `<div class="sum-empty">Coșul este gol.<br/><a href="Landing_V1.html#vinuri">Alege un vin</a></div>`;
+      } else {
+        sumItems.innerHTML = ids.map(id => {
+          const w = WINES[id]; if (!w) return '';
+          const q = cart[id];
+          return `
+            <div class="sum-item">
+              <div class="sum-img">${bottleSvg(w.color)}<span class="qty">${q}</span></div>
+              <div class="sum-body">
+                <div class="sum-name">${w.name}</div>
+                <div class="sum-meta">${w.code} · ${w.gama}</div>
+              </div>
+              <div class="sum-price">${fmt(w.price * q)} lei</div>
+            </div>`;
+        }).join('');
+      }
+
+      subEl.textContent = `${fmt(subtotal)} lei`;
+
+      // shipping based on saved shipping data
+      const ship = loadJSON(SHIP_KEY);
+      let shipFee = 0;
+      if (!ship) {
+        shipEl.textContent = 'se calculează la pasul 1';
+        shipEl.classList.add('muted');
+      } else if (ship.method === 'ridicare') {
+        shipEl.textContent = 'gratuit · ridicare personală';
+        shipEl.classList.remove('muted');
+      } else if (subtotal >= SHIP_FREE_AT) {
+        shipEl.textContent = 'gratuit · peste 250 lei';
+        shipEl.classList.remove('muted');
+      } else {
+        shipFee = SHIP_FEE;
+        shipEl.textContent = `${SHIP_FEE} lei · curier`;
+        shipEl.classList.remove('muted');
+      }
+
+      let discount = 0;
+      if (coupon) {
+        discount = Math.round(subtotal * coupon.percent / 100);
+        discRow.hidden = false;
+        discEl.textContent = `−${fmt(discount)} lei`;
+      } else {
+        discRow.hidden = true;
+      }
+
+      const total = Math.max(0, subtotal - discount + shipFee);
+      totalEl.textContent = fmt(total);
+
+      // place-order enabling
+      updatePlaceOrderState();
+    }
+
+    // ─── STEP 1 — TABS + SAVE ─────────────────────────────
+    const tabs = document.querySelectorAll('.tabs button[data-tab]');
+    const panes = document.querySelectorAll('.tab-pane[data-pane]');
+    let shipMethod = 'curier';
+    tabs.forEach(t => t.addEventListener('click', () => {
+      tabs.forEach(x => { x.classList.remove('is-active'); x.setAttribute('aria-selected','false'); });
+      t.classList.add('is-active'); t.setAttribute('aria-selected','true');
+      shipMethod = t.dataset.tab;
+      panes.forEach(p => p.hidden = p.dataset.pane !== shipMethod);
+    }));
+
+    document.getElementById('save-shipping').addEventListener('click', () => {
+      let data = { method: shipMethod };
+      if (shipMethod === 'curier') {
+        const get = id => document.getElementById(id).value.trim();
+        const required = ['ship-first','ship-last','ship-phone','ship-email','ship-address','ship-city','ship-county'];
+        const missing = required.find(id => !get(id));
+        if (missing) {
+          const el = document.getElementById(missing);
+          el.focus(); el.style.borderColor = '#a23';
+          setTimeout(() => el.style.borderColor = '', 1600);
+          return;
+        }
+        data = {
+          ...data,
+          firstName: get('ship-first'), lastName: get('ship-last'),
+          phone: get('ship-phone'), email: get('ship-email'),
+          address: get('ship-address'), city: get('ship-city'),
+          county: document.getElementById('ship-county').value,
+          zip: get('ship-zip'), note: get('ship-note'),
+        };
+        if (!document.getElementById('ship-save').checked) {
+          // do not persist, just keep in-memory
+          sessionStorage.setItem(SHIP_KEY, JSON.stringify(data));
+          localStorage.removeItem(SHIP_KEY);
+        } else {
+          saveJSON(SHIP_KEY, data);
+        }
+      } else {
+        const point = document.getElementById('pickup-point').value;
+        const name  = document.getElementById('pickup-name').value.trim();
+        const phone = document.getElementById('pickup-phone').value.trim();
+        if (!point || !name || !phone) {
+          const target = !point ? 'pickup-point' : !name ? 'pickup-name' : 'pickup-phone';
+          const el = document.getElementById(target);
+          el.focus(); el.style.borderColor = '#a23';
+          setTimeout(() => el.style.borderColor = '', 1600);
+          return;
+        }
+        data = { ...data, point, name, phone };
+        saveJSON(SHIP_KEY, data);
+      }
+      markStepSaved(1);
+      recalc();
+    });
+
+    // ─── STEP 2 — RADIO + SAVE ────────────────────────────
+    const billRadios = document.querySelectorAll('input[name="billType"]');
+    let billType = 'fizica';
+    billRadios.forEach(r => r.addEventListener('change', () => {
+      billType = r.value;
+      document.querySelectorAll('[data-bill]').forEach(p => p.hidden = p.dataset.bill !== billType);
+    }));
+
+    document.getElementById('save-billing').addEventListener('click', () => {
+      const get = id => document.getElementById(id).value.trim();
+      let data = { type: billType };
+      if (billType === 'fizica') {
+        const req = ['bill-first','bill-last','bill-email-f'];
+        const miss = req.find(id => !get(id));
+        if (miss) { const el = document.getElementById(miss); el.focus(); el.style.borderColor='#a23'; setTimeout(()=>el.style.borderColor='',1600); return; }
+        data = { ...data, firstName: get('bill-first'), lastName: get('bill-last'), cnp: get('bill-cnp'), email: get('bill-email-f'), sameAsShipping: document.getElementById('bill-same').checked };
+      } else {
+        const req = ['bill-company','bill-cui','bill-email-j','bill-hq'];
+        const miss = req.find(id => !get(id));
+        if (miss) { const el = document.getElementById(miss); el.focus(); el.style.borderColor='#a23'; setTimeout(()=>el.style.borderColor='',1600); return; }
+        data = { ...data, company: get('bill-company'), cui: get('bill-cui'), reg: get('bill-reg'), iban: get('bill-iban'), email: get('bill-email-j'), hq: get('bill-hq') };
+      }
+      saveJSON(BILL_KEY, data);
+      markStepSaved(2);
+    });
+
+    // ─── STEP 3 — PAYMENT ─────────────────────────────────
+    const payRows = document.querySelectorAll('.pay-row');
+    payRows.forEach(row => {
+      row.addEventListener('click', () => {
+        payRows.forEach(r => r.classList.remove('is-selected'));
+        row.classList.add('is-selected');
+        row.querySelector('input').checked = true;
+        markStepSaved(3);
+      });
+    });
+    document.getElementById('terms').addEventListener('change', updatePlaceOrderState);
+
+    // ─── COUPON (mock) ────────────────────────────────────
+    document.getElementById('couponBtn').addEventListener('click', () => {
+      const code = document.getElementById('coupon').value.trim().toUpperCase();
+      const valid = { 'LOCUS10': 10, 'PARTENER15': 15 };
+      if (valid[code]) {
+        coupon = { code, percent: valid[code] };
+      } else {
+        coupon = null;
+        if (code) {
+          const el = document.getElementById('coupon');
+          el.style.borderColor = '#a23';
+          setTimeout(() => el.style.borderColor = '', 1600);
+        }
+      }
+      recalc();
+    });
+
+    // ─── STEP RAIL UI ─────────────────────────────────────
+    function markStepSaved(n) {
+      const card = document.getElementById(`step-${n}`);
+      card.classList.add('is-saved');
+      const status = document.getElementById(`status-${n}`);
+      if (status) status.textContent = 'salvat';
+      const rail = document.querySelectorAll('.step-rail .step');
+      rail.forEach((s, i) => {
+        const idx = i + 1;
+        s.classList.toggle('is-done', idx <= n);
+        s.classList.toggle('is-active', idx === n + 1);
+      });
+      updatePlaceOrderState();
+    }
+
+    function updatePlaceOrderState() {
+      const ship = loadJSON(SHIP_KEY) || (sessionStorage.getItem(SHIP_KEY) && JSON.parse(sessionStorage.getItem(SHIP_KEY)));
+      const bill = loadJSON(BILL_KEY);
+      const cart = loadCart();
+      const cartHasItems = Object.keys(cart).length > 0;
+      const terms = document.getElementById('terms').checked;
+      const ok = ship && bill && cartHasItems && terms;
+      document.getElementById('placeOrder').disabled = !ok;
+    }
+
+    // ─── PRE-FILL FROM STORAGE ────────────────────────────
+    function prefill() {
+      const ship = loadJSON(SHIP_KEY);
+      if (ship) {
+        if (ship.method === 'ridicare') {
+          document.querySelector('.tabs button[data-tab="ridicare"]').click();
+          if (ship.point)  document.getElementById('pickup-point').value = ship.point;
+          if (ship.name)   document.getElementById('pickup-name').value = ship.name;
+          if (ship.phone)  document.getElementById('pickup-phone').value = ship.phone;
+        } else {
+          const set = (id, v) => { if (v != null) document.getElementById(id).value = v; };
+          set('ship-first', ship.firstName); set('ship-last', ship.lastName);
+          set('ship-phone', ship.phone);     set('ship-email', ship.email);
+          set('ship-address', ship.address); set('ship-city', ship.city);
+          set('ship-county', ship.county);   set('ship-zip', ship.zip);
+          set('ship-note', ship.note);
+        }
+        markStepSaved(1);
+      }
+      const bill = loadJSON(BILL_KEY);
+      if (bill) {
+        if (bill.type === 'juridica') {
+          document.getElementById('bill-juridica').checked = true;
+          document.getElementById('bill-juridica').dispatchEvent(new Event('change'));
+          const set = (id, v) => { if (v != null) document.getElementById(id).value = v; };
+          set('bill-company', bill.company); set('bill-cui', bill.cui); set('bill-reg', bill.reg);
+          set('bill-iban', bill.iban); set('bill-email-j', bill.email); set('bill-hq', bill.hq);
+        } else {
+          const set = (id, v) => { if (v != null) document.getElementById(id).value = v; };
+          set('bill-first', bill.firstName); set('bill-last', bill.lastName);
+          set('bill-cnp', bill.cnp); set('bill-email-f', bill.email);
+          if (typeof bill.sameAsShipping === 'boolean') document.getElementById('bill-same').checked = bill.sameAsShipping;
+        }
+        markStepSaved(2);
+      }
+    }
+
+    // ─── PLACE ORDER ──────────────────────────────────────
+    document.getElementById('placeOrder').addEventListener('click', () => {
+      if (document.getElementById('placeOrder').disabled) return;
+      const orderId = 'LC-' + Date.now().toString(36).toUpperCase().slice(-6);
+      document.getElementById('orderNo').textContent = '#' + orderId;
+      // clear cart, keep saved billing/shipping
+      localStorage.removeItem(CART_KEY);
+      const overlay = document.getElementById('success');
+      overlay.classList.add('is-open');
+      overlay.setAttribute('aria-hidden', 'false');
+    });
+
+    // ─── INIT ─────────────────────────────────────────────
+    prefill();
+    recalc();
+  </script>
+</body>
+</html>

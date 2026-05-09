@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html lang="ro" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Domeniul Locus — un loc. un timp. un vin.</title>
+  <meta name="description" content="Domeniul Locus — vinuri din regiunea Panciu–Nicorești. Origine, timp, măsură. Gamele cuvinte, semne și pauze." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Italiana&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── TOKENS ────────────────────────────────────────────── */
+    :root {
+      --pamant:  #EBE1DA;
+      --nisip:   #CBBEAE;
+      --piatra:  #A89D8D;
+      --vie:     #3E4336;
+      --stejar:  #4A3C2D;
+      --pivnita: #1A1A1A;
+
+      --bg:      var(--pamant);
+      --bg-alt:  #E2D8CE;
+      --surface: #F2EAE2;
+      --ink:     var(--pivnita);
+      --ink-soft: var(--stejar);
+      --ink-mute: var(--piatra);
+      --line:    rgba(74, 60, 45, 0.18);
+
+      --font-serif: 'Italiana', serif;
+      --font-mono:  'IBM Plex Mono', monospace;
+
+      --container: 1320px;
+      --px: clamp(20px, 4.5vw, 56px);
+      --py: clamp(72px, 10vw, 144px);
+
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+      --t-fast: 240ms;
+      --t-base: 480ms;
+      --t-slow: 800ms;
+    }
+
+    [data-theme="dark"] {
+      --bg:      var(--pivnita);
+      --bg-alt:  #111111;
+      --surface: #232220;
+      --ink:     var(--pamant);
+      --ink-soft: var(--nisip);
+      --ink-mute: var(--piatra);
+      --line:    rgba(203, 190, 174, 0.18);
+    }
+
+    /* ─── RESET ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      transition: background var(--t-base) var(--ease), color var(--t-base) var(--ease);
+      overflow-x: hidden;
+    }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+    ul { list-style: none; }
+    *:focus-visible { outline: 2px solid var(--vie); outline-offset: 3px; border-radius: 2px; }
+
+    /* film grain — pervasive, very subtle */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.06;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+      mix-blend-mode: multiply;
+    }
+    [data-theme="dark"] body::before { mix-blend-mode: screen; opacity: 0.05; }
+
+    /* ─── LAYOUT ────────────────────────────────────────────── */
+    .container {
+      width: 100%;
+      max-width: var(--container);
+      margin-inline: auto;
+      padding-inline: var(--px);
+    }
+    .full { width: 100%; padding-inline: var(--px); }
+    .stack-lg > * + * { margin-top: clamp(20px, 2.5vw, 32px); }
+
+    /* ─── TYPOGRAPHY UTILITIES ─────────────────────────────── */
+    .serif { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.005em; }
+    .mono  { font-family: var(--font-mono); }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 18px; height: 1px;
+      background: currentColor;
+      opacity: 0.5;
+    }
+    .display {
+      font-family: var(--font-serif);
+      font-size: clamp(56px, 11vw, 168px);
+      line-height: 0.92;
+      letter-spacing: -0.02em;
+      font-weight: 400;
+    }
+    .h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(40px, 6vw, 88px);
+      line-height: 1.0;
+      letter-spacing: -0.015em;
+      font-weight: 400;
+    }
+    .h3 {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 3.5vw, 44px);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      font-weight: 400;
+    }
+    .lead {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--ink-soft);
+      max-width: 60ch;
+    }
+    .small {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--ink-mute);
+    }
+    .caps {
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* ─── BUTTONS / LINKS ──────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 16px 28px;
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      background: transparent;
+      border-radius: 0;
+      transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--ink);
+      transform: translateY(101%);
+      transition: transform var(--t-base) var(--ease);
+      z-index: 0;
+    }
+    .btn > * { position: relative; z-index: 1; transition: color var(--t-fast) var(--ease); }
+    .btn:hover::after { transform: translateY(0); }
+    .btn:hover { color: var(--bg); }
+    .btn-ghost {
+      padding: 8px 0;
+      border: none;
+      gap: 12px;
+      letter-spacing: 0.2em;
+      position: relative;
+    }
+    .btn-ghost::after { display: none; }
+    .btn-ghost::before {
+      content: '';
+      position: absolute;
+      left: 0; bottom: 0;
+      width: 0; height: 1px;
+      background: currentColor;
+      transition: width var(--t-base) var(--ease);
+    }
+    .btn-ghost:hover::before { width: 100%; }
+    .btn-ghost:hover { color: var(--ink); }
+
+    .arrow {
+      width: 16px; height: 8px;
+      flex-shrink: 0;
+      transition: transform var(--t-base) var(--ease);
+    }
+    .btn:hover .arrow,
+    .btn-ghost:hover .arrow { transform: translateX(6px); }
+
+    /* ─── HEADER ───────────────────────────────────────────── */
+    .site-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 90;
+      background: color-mix(in oklab, var(--bg) 82%, transparent);
+      backdrop-filter: saturate(120%) blur(14px);
+      -webkit-backdrop-filter: saturate(120%) blur(14px);
+      border-bottom: 1px solid transparent;
+      transition: border-color var(--t-base) var(--ease), background var(--t-base) var(--ease);
+    }
+    .site-header.is-scrolled { border-bottom-color: var(--line); }
+    .header-inner {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 24px;
+      height: 72px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      transition: opacity var(--t-fast) var(--ease);
+    }
+    .brand:hover { opacity: 0.7; }
+    .brand-img {
+      height: 38px;
+      width: auto;
+      display: block;
+    }
+    [data-theme="dark"] .site-header .brand-img,
+    .footer .brand-img {
+      filter: invert(1);
+    }
+    .footer .brand-img { height: 56px; }
+
+    .nav-main {
+      display: flex;
+      gap: clamp(16px, 2vw, 28px);
+      justify-content: center;
+    }
+    .nav-main a {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      position: relative;
+      padding: 6px 2px;
+      transition: color var(--t-fast) var(--ease);
+    }
+    .nav-main a::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: 0;
+      width: 0; height: 1px;
+      background: currentColor;
+      transition: width var(--t-base) var(--ease);
+    }
+    .nav-main a:hover { color: var(--ink); }
+    .nav-main a:hover::after { width: 100%; }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      justify-content: flex-end;
+    }
+    .lang-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+    }
+    .lang-switch button {
+      color: var(--ink-mute);
+      transition: color var(--t-fast) var(--ease);
+      padding: 4px 2px;
+    }
+    .lang-switch button.is-active { color: var(--ink); }
+    .lang-switch button:hover { color: var(--ink); }
+    .lang-switch .sep {
+      width: 1px; height: 10px;
+      background: var(--line);
+    }
+
+    .theme-toggle {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      transition: border-color var(--t-fast) var(--ease), transform var(--t-base) var(--ease);
+    }
+    .theme-toggle:hover { border-color: var(--ink); transform: rotate(20deg); }
+    .theme-toggle svg { width: 14px; height: 14px; }
+    [data-theme="light"] .theme-toggle .moon { display: block; }
+    [data-theme="light"] .theme-toggle .sun  { display: none; }
+    [data-theme="dark"] .theme-toggle .moon  { display: none; }
+    [data-theme="dark"] .theme-toggle .sun   { display: block; }
+
+    .menu-btn { display: none; }
+
+    /* ─── HERO ─────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      padding-top: 72px;
+      display: flex;
+      flex-direction: column;
+    }
+    .hero-stage {
+      position: relative;
+      aspect-ratio: 1772 / 887;
+      max-height: calc(100vh - 72px);
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: stretch;
+      overflow: hidden;
+    }
+    .hero-frames {
+      position: absolute;
+      inset: 0;
+    }
+    .hero-frame {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1200ms var(--ease);
+      overflow: hidden;
+    }
+    .hero-frame.is-active { opacity: 1; }
+    .hero-frame::after {
+      /* warm vignette */
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(26,26,26,0) 30%, rgba(26,26,26,0.55) 100%),
+                  radial-gradient(120% 80% at 50% 35%, transparent 50%, rgba(26,26,26,0.35) 100%);
+      pointer-events: none;
+    }
+    .hero-frame .ken {
+      position: absolute; inset: -6%;
+      background-size: cover;
+      background-position: center;
+      animation: ken 18s var(--ease) infinite alternate;
+      will-change: transform;
+    }
+    @keyframes ken {
+      from { transform: scale(1.02) translate(0, 0); }
+      to   { transform: scale(1.10) translate(-1.5%, -1%); }
+    }
+
+    /* Photographic placeholders — layered gradients evoking the brand mood */
+    .frame-1 .ken {
+      background:
+        url('hero-amfora.png') center/cover no-repeat #d9c8b0;
+    }
+    .frame-1 .ken::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(95deg,
+        rgba(20, 16, 12, 0.32) 0%,
+        rgba(20, 16, 12, 0.10) 45%,
+        rgba(20, 16, 12, 0) 75%);
+      pointer-events: none;
+    }
+    .frame-2 .ken {
+      background:
+        radial-gradient(ellipse at 70% 30%, rgba(255, 230, 180, 0.5) 0%, transparent 40%),
+        linear-gradient(180deg, #5a4a36 0%, #2c2419 80%);
+    }
+    .frame-2 .ken::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'><g opacity='0.6' fill='none' stroke='%23000' stroke-width='1.2'><path d='M0 380 Q200 320 400 360 T800 320'/><path d='M0 420 Q200 360 400 400 T800 360'/></g><g fill='%23000' opacity='0.5'><circle cx='150' cy='200' r='12'/><circle cx='170' cy='220' r='14'/><circle cx='185' cy='195' r='10'/><circle cx='200' cy='225' r='13'/><circle cx='220' cy='205' r='12'/><circle cx='240' cy='225' r='11'/></g></svg>");
+      background-size: cover;
+      mix-blend-mode: multiply;
+      opacity: 0.3;
+    }
+    .frame-3 .ken {
+      background:
+        radial-gradient(ellipse at 50% 60%, rgba(255, 220, 170, 0.45) 0%, transparent 50%),
+        linear-gradient(170deg, #4a3c2d 0%, #221b14 100%);
+    }
+    .frame-3 .ken::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600'><g opacity='0.7'><rect x='380' y='180' width='40' height='240' rx='4' fill='%23120c08'/><ellipse cx='400' cy='180' rx='20' ry='8' fill='%23120c08'/><rect x='388' y='150' width='24' height='40' fill='%23120c08'/><rect x='370' y='280' width='60' height='80' fill='%231a1a1a' opacity='0.7'/></g></svg>");
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.85;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      padding: clamp(40px, 8vh, 96px) var(--px) clamp(28px, 5vh, 56px);
+      display: grid;
+      grid-template-columns: 1fr;
+      align-content: space-between;
+      flex: 1;
+      gap: 32px;
+    }
+    .hero-eyebrow {
+      color: rgba(235, 225, 218, 0.7);
+    }
+    .hero-eyebrow::before { background: rgba(235, 225, 218, 0.5); }
+    .hero-title {
+      color: var(--pamant);
+      font-family: var(--font-serif);
+      font-size: clamp(64px, 12vw, 192px);
+      line-height: 0.88;
+      letter-spacing: -0.025em;
+      max-width: 14ch;
+      font-weight: 400;
+    }
+    .hero-title .line {
+      display: block;
+      overflow: hidden;
+    }
+    .hero-title .line span {
+      display: inline-block;
+      transform: translateY(110%);
+      animation: rise 1100ms var(--ease) forwards;
+    }
+    .hero-title .line:nth-child(1) span { animation-delay: 200ms; }
+    .hero-title .line:nth-child(2) span { animation-delay: 400ms; }
+    .hero-title .line:nth-child(3) span { animation-delay: 600ms; }
+    @keyframes rise { to { transform: translateY(0); } }
+
+    .hero-cta-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--pamant);
+      padding: 12px 0;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(232, 225, 218, 0.6);
+      transition: border-color var(--t-base) var(--ease), letter-spacing var(--t-base) var(--ease);
+    }
+    .hero-cta:hover { border-color: var(--pamant); letter-spacing: 0.26em; }
+    .hero-cta svg { transition: transform var(--t-base) var(--ease); }
+    .hero-cta:hover svg { transform: translateX(6px); }
+
+    .hero-pager {
+      display: flex;
+      gap: 18px;
+      color: rgba(235, 225, 218, 0.6);
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      align-items: center;
+    }
+    .hero-pager button {
+      color: inherit;
+      padding: 8px 0;
+      border-bottom: 1px solid transparent;
+      transition: color var(--t-fast) var(--ease), border-color var(--t-base) var(--ease);
+    }
+    .hero-pager button.is-active {
+      color: var(--pamant);
+      border-bottom-color: var(--pamant);
+    }
+    .hero-pager .sep {
+      width: 14px; height: 1px;
+      background: rgba(235, 225, 218, 0.4);
+    }
+
+    /* hero floating wordmark watermark */
+    .hero-watermark {
+      position: absolute;
+      right: clamp(-30px, -3vw, 0px);
+      bottom: 12vh;
+      z-index: 1;
+      font-family: var(--font-serif);
+      font-size: clamp(120px, 22vw, 360px);
+      line-height: 1;
+      color: rgba(232, 225, 218, 0.06);
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: -0.04em;
+    }
+
+    /* ─── HERO QUOTE STRIP ─────────────────────────────────── */
+    .hero-quote {
+      padding: clamp(48px, 7vw, 96px) var(--px);
+      text-align: center;
+      border-bottom: 1px solid var(--line);
+    }
+    .hero-quote p {
+      font-family: var(--font-mono);
+      font-size: clamp(13px, 1.2vw, 15px);
+      line-height: 1.85;
+      letter-spacing: 0.005em;
+      color: var(--ink-soft);
+      max-width: 64ch;
+      margin: 0 auto 28px;
+    }
+    .symbol-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 18px;
+      color: var(--ink-mute);
+    }
+    .symbol-row svg { width: 11px; height: 11px; }
+
+    /* ─── MANIFESTO ─────────────────────────────────────────── */
+    .manifesto {
+      background: var(--bg-alt);
+      padding: var(--py) var(--px);
+      border-bottom: 1px solid var(--line);
+    }
+    .manifesto-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(40px, 5vw, 96px);
+      max-width: var(--container);
+      margin: 0 auto;
+    }
+    .manifesto-item .word {
+      font-family: var(--font-serif);
+      font-size: clamp(56px, 7vw, 112px);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 14px;
+      font-weight: 400;
+      transition: letter-spacing var(--t-slow) var(--ease);
+    }
+    .manifesto-item:hover .word { letter-spacing: 0.005em; }
+    .manifesto-item .sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .manifesto-item .sub::before {
+      content: ''; width: 18px; height: 1px;
+      background: var(--ink-mute); opacity: 0.6;
+    }
+    .manifesto-item p {
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--ink-soft);
+      max-width: 32ch;
+    }
+    .manifesto-divider {
+      max-width: var(--container);
+      margin: clamp(56px, 8vw, 112px) auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--ink-mute);
+    }
+    .manifesto-divider .line { flex: 1; height: 1px; background: var(--line); max-width: 240px; }
+    .manifesto-divider svg { width: 12px; height: 12px; }
+
+    /* ─── LOCUL (map) ──────────────────────────────────────── */
+    .locul {
+      padding: var(--py) var(--px);
+      border-bottom: 1px solid var(--line);
+    }
+    .locul-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: clamp(48px, 6vw, 112px);
+      max-width: var(--container);
+      margin: 0 auto;
+      align-items: center;
+    }
+    .map {
+      aspect-ratio: 5/4;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+    .map svg { width: 100%; height: 100%; }
+    .map .marker {
+      animation: pulse 2.4s var(--ease) infinite;
+      transform-origin: center;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.55; transform: scale(1.1); }
+    }
+    .locul-text .h2 { color: var(--ink); margin-bottom: 28px; }
+    .locul-text p {
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--ink-soft);
+      margin-bottom: 24px;
+      max-width: 44ch;
+    }
+    .coords {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 16px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 32px;
+      max-width: 280px;
+    }
+    .coords .row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--ink-mute);
+    }
+    .coords .row strong { font-weight: 500; color: var(--ink-soft); }
+
+    /* ─── VINURI (game) ────────────────────────────────────── */
+    .vinuri {
+      padding: var(--py) var(--px);
+      border-bottom: 1px solid var(--line);
+    }
+    .vinuri-head {
+      max-width: var(--container);
+      margin: 0 auto clamp(48px, 6vw, 88px);
+      text-align: center;
+    }
+    .vinuri-head .display { margin: 16px auto 24px; max-width: 14ch;}
+    .vinuri-head .lead { margin: 0 auto; }
+    .game {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+    .gama {
+      position: relative;
+      background: var(--surface);
+      padding: clamp(40px, 5vw, 72px) clamp(28px, 4vw, 64px);
+      display: grid;
+      grid-template-columns: 1fr 1.4fr 1fr;
+      align-items: center;
+      gap: clamp(24px, 3vw, 48px);
+      transition: background var(--t-base) var(--ease);
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .gama:hover { background: var(--bg-alt); }
+    .gama .gama-tag {
+      font-family: var(--font-serif);
+      font-size: clamp(48px, 6vw, 88px);
+      line-height: 1;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      font-weight: 400;
+    }
+    .gama .gama-body { color: var(--ink-soft); }
+    .gama .gama-body p {
+      font-size: 14px;
+      line-height: 1.75;
+      max-width: 46ch;
+      margin-bottom: 18px;
+    }
+    .gama .gama-body .gama-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height var(--t-slow) var(--ease), opacity var(--t-base) var(--ease);
+    }
+    .gama:hover .gama-body .gama-list,
+    .gama:focus-within .gama-body .gama-list {
+      max-height: 80px;
+      opacity: 1;
+    }
+    .gama-list span {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      padding: 4px 0;
+      position: relative;
+    }
+    .gama-list span:not(:last-child)::after {
+      content: '·';
+      position: absolute;
+      right: -11px;
+      color: var(--piatra);
+    }
+    .gama-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+    .gama-cta .small { color: var(--ink-mute); }
+    .gama-cta .arrow-big {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--t-base) var(--ease), border-color var(--t-base) var(--ease), transform var(--t-base) var(--ease);
+    }
+    .gama:hover .arrow-big {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--bg);
+      transform: rotate(-45deg);
+    }
+    .gama-cta svg { width: 14px; height: 14px; transition: transform var(--t-base) var(--ease); }
+
+    /* gama bg pattern */
+    .gama-pattern {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity var(--t-slow) var(--ease);
+    }
+    .gama:hover .gama-pattern { opacity: 0.18; }
+    .gama-pattern svg { position: absolute; right: 4%; top: 50%; transform: translateY(-50%); width: 360px; height: 360px; }
+
+    .gama--soon { opacity: 0.65; cursor: default; }
+    .gama--soon:hover { background: var(--surface); }
+    .gama--soon .arrow-big { display: none; }
+    .gama--soon .gama-cta::before {
+      content: 'în curând';
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      padding: 8px 14px;
+      border: 1px dashed var(--line);
+    }
+
+    /* ─── COLECȚIA ─────────────────────────────────────────── */
+    .colectia {
+      padding: var(--py) var(--px);
+      border-bottom: 1px solid var(--line);
+    }
+    .colectia-head {
+      max-width: var(--container);
+      margin: 0 auto clamp(40px, 5vw, 72px);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .colectia-head .h2 {max-width: 14ch; }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .filter {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 10px 16px;
+      color: var(--ink-mute);
+      border: 1px solid var(--line);
+      transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+    }
+    .filter:hover { color: var(--ink); border-color: var(--ink-soft); }
+    .filter.is-active {
+      color: var(--bg);
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .wines {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+    .wine {
+      background: var(--bg);
+      padding: 36px 32px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: background var(--t-base) var(--ease);
+    }
+    .wine:hover { background: var(--surface); }
+    .wine.is-hidden { display: none; }
+    .wine-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .wine-bottle {
+      aspect-ratio: 3/4;
+      background: var(--bg-alt);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transition: background var(--t-base) var(--ease);
+    }
+    .wine:hover .wine-bottle { background: var(--surface); }
+    .wine-bottle svg {
+      height: 78%;
+      filter: drop-shadow(0 14px 28px rgba(26,26,26,0.18));
+      transition: transform var(--t-slow) var(--ease);
+    }
+    .wine:hover .wine-bottle svg { transform: translateY(-6px) rotate(-1deg); }
+    .wine-name {
+      font-family: var(--font-serif);
+      font-size: clamp(22px, 2vw, 28px);
+      line-height: 1.05;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+    }
+    .wine-meta {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 4px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--ink-mute);
+      text-transform: uppercase;
+      padding: 12px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .wine-meta strong { font-weight: 500; color: var(--ink-soft); }
+    .wine-notes {
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--ink-soft);
+      flex: 1;
+    }
+    .wine-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+    .wine-temp {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      color: var(--ink-mute);
+    }
+    .wine-link {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+    }
+    .wine-link::after {
+      content: '';
+      position: absolute;
+      left: 0; bottom: -4px;
+      width: 0; height: 1px;
+      background: currentColor;
+      transition: width var(--t-base) var(--ease);
+    }
+    .wine-link:hover::after { width: 100%; }
+
+    /* bottle code-color pairings — inferred from etichete */
+    .bottle-glass-white {  /* alb */
+      fill: #DCD0BC;
+      stroke: #8a7a5c;
+    }
+    .bottle-glass-red {    /* roșu */
+      fill: #2a1416;
+      stroke: #110608;
+    }
+    .bottle-glass-rose {
+      fill: #d8a8a0;
+      stroke: #7a4a44;
+    }
+
+    /* ─── DESPRE ─────────────────────────────────────────────── */
+    .despre {
+      padding: var(--py) var(--px);
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+    .despre-grid {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(48px, 6vw, 96px);
+      align-items: center;
+    }
+    .despre-img {
+      aspect-ratio: 4/5;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(160deg, #5a4a36 0%, #2c2418 100%);
+    }
+    .despre-img::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(255, 230, 180, 0.25) 0%, transparent 60%),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 500'><g opacity='0.7' fill='none' stroke='%23120c08' stroke-width='1'><path d='M50 480 Q100 400 80 320 T120 180 T100 80'/><path d='M120 420 Q170 360 150 280 T180 160'/><path d='M200 460 Q240 380 230 290 T260 130'/><path d='M280 480 Q320 410 310 320 T340 170 T320 80'/></g><g fill='%23120c08' opacity='0.6'><circle cx='100' cy='180' r='6'/><circle cx='150' cy='200' r='5'/><circle cx='90' cy='230' r='6'/><circle cx='160' cy='260' r='5'/><circle cx='130' cy='280' r='6'/></g></svg>");
+      background-size: cover;
+      background-position: center;
+    }
+    .despre-img::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 60%, rgba(26,26,26,0.5) 100%);
+    }
+    .despre-text .eyebrow { margin-bottom: 24px; }
+    .despre-text .h2 { color: var(--ink); margin-bottom: 32px; max-width: 16ch;}
+    .despre-text p { color: var(--ink-soft); margin-bottom: 20px; font-size: 14px; line-height: 1.85; max-width: 50ch; }
+    .despre-text .btn-ghost { margin-top: 16px; }
+
+    /* ─── NEWSLETTER ───────────────────────────────────────── */
+    .newsletter {
+      background: var(--vie);
+      color: var(--pamant);
+      padding: clamp(48px, 7vw, 96px) var(--px);
+    }
+    .newsletter-inner {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: clamp(28px, 4vw, 64px);
+    }
+    .newsletter-text {
+      max-width: 56ch;
+    }
+    .newsletter h3 {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 3vw, 40px);
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .newsletter p {
+      font-size: 13px;
+      color: rgba(235, 225, 218, 0.7);
+      line-height: 1.7;
+    }
+    .newsletter-form {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      min-width: clamp(280px, 40vw, 480px);
+      border-bottom: 1px solid rgba(235, 225, 218, 0.5);
+      transition: border-color var(--t-base) var(--ease);
+    }
+    .newsletter-form:focus-within { border-bottom-color: var(--pamant); }
+    .newsletter-form input {
+      background: transparent;
+      border: none;
+      outline: none;
+      flex: 1;
+      padding: 16px 0;
+      color: var(--pamant);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 0.04em;
+    }
+    .newsletter-form input::placeholder { color: rgba(235, 225, 218, 0.4); }
+    .newsletter-form button {
+      padding: 16px 0 16px 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--pamant);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: gap var(--t-base) var(--ease);
+    }
+    .newsletter-form button:hover { gap: 18px; }
+
+    /* ─── FOOTER ─────────────────────────────────────────── */
+    .footer {
+      background: var(--pivnita);
+      color: var(--pamant);
+      padding: clamp(64px, 8vw, 112px) var(--px) 24px;
+    }
+    .footer-grid {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: clamp(40px, 5vw, 96px);
+      padding-bottom: clamp(40px, 5vw, 80px);
+      border-bottom: 1px solid rgba(235, 225, 218, 0.12);
+    }
+    .footer .brand-mark .word { color: var(--pamant); }
+    .footer .brand-mark .word::after { border-bottom-color: var(--pamant); }
+    .footer .brand-mark .descriptor { color: rgba(235, 225, 218, 0.5); }
+    .footer-col h4 {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: rgba(235, 225, 218, 0.5);
+      margin-bottom: 22px;
+    }
+    .footer-col p,
+    .footer-col li,
+    .footer-col a {
+      font-size: 12px;
+      line-height: 1.85;
+      color: rgba(235, 225, 218, 0.7);
+      transition: color var(--t-fast) var(--ease);
+    }
+    .footer-col a:hover { color: var(--pamant); }
+    .footer-col p { margin-bottom: 20px; }
+    .footer-col ul { display: flex; flex-direction: column; gap: 4px; }
+    .footer-bottom {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: rgba(235, 225, 218, 0.4);
+      text-transform: uppercase;
+    }
+    .footer-bottom .legal {
+      max-width: 60%;
+      font-family: var(--font-mono);
+    }
+    .footer-bottom .coords-line {
+      font-family: var(--font-mono);
+    }
+
+    /* ─── REVEAL ANIMATIONS ────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 900ms var(--ease), transform 900ms var(--ease);
+      will-change: opacity, transform;
+    }
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-stagger > * {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 800ms var(--ease), transform 800ms var(--ease);
+    }
+    .reveal-stagger.in > * { opacity: 1; transform: translateY(0); }
+    .reveal-stagger.in > *:nth-child(1) { transition-delay: 0ms; }
+    .reveal-stagger.in > *:nth-child(2) { transition-delay: 120ms; }
+    .reveal-stagger.in > *:nth-child(3) { transition-delay: 240ms; }
+    .reveal-stagger.in > *:nth-child(4) { transition-delay: 360ms; }
+    .reveal-stagger.in > *:nth-child(5) { transition-delay: 480ms; }
+    .reveal-stagger.in > *:nth-child(6) { transition-delay: 600ms; }
+
+    /* slow drift for symbols */
+    .drift { animation: drift 14s ease-in-out infinite alternate; }
+    @keyframes drift {
+      from { transform: translateY(-3px) rotate(-2deg); }
+      to   { transform: translateY(3px) rotate(2deg); }
+    }
+    .spin-slow { animation: spinSlow 60s linear infinite; transform-origin: center; }
+    @keyframes spinSlow { to { transform: rotate(360deg); } }
+
+    /* ─── WINE BUY ROW ─────────────────────────────────── */
+    .wine-buy {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+    .wine-price {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      line-height: 1;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+    }
+    .wine-price .currency {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: var(--ink-mute);
+      text-transform: uppercase;
+      margin-left: 6px;
+    }
+    .wine-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      padding: 10px 16px;
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      background: transparent;
+      transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+    }
+    .wine-add:hover { background: var(--ink); color: var(--bg); }
+    .wine-add.is-pulse { animation: addPulse 600ms var(--ease); }
+    @keyframes addPulse {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(0.94); }
+      70%  { transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+    .wine-link { cursor: pointer; }
+
+    /* ─── CART BUTTON (header) ─────────────────────────── */
+    .cart-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px; height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      transition: border-color var(--t-fast) var(--ease), transform var(--t-base) var(--ease);
+    }
+    .cart-btn:hover { border-color: var(--ink); transform: translateY(-2px); }
+    .cart-btn svg { width: 14px; height: 14px; color: var(--ink); }
+    .cart-count {
+      position: absolute;
+      top: -4px; right: -4px;
+      min-width: 16px; height: 16px;
+      padding: 0 4px;
+      border-radius: 8px;
+      background: var(--vie);
+      color: var(--pamant);
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transform: scale(0);
+      transition: transform var(--t-base) var(--ease);
+    }
+    .cart-count.is-visible { transform: scale(1); }
+
+    /* ─── CART DRAWER ──────────────────────────────────── */
+    .cart-drawer {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      pointer-events: none;
+    }
+    .cart-drawer.is-open { pointer-events: auto; }
+    .cart-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(26, 26, 26, 0.55);
+      opacity: 0;
+      transition: opacity var(--t-base) var(--ease);
+    }
+    .cart-drawer.is-open .cart-backdrop { opacity: 1; }
+    .cart-panel {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: min(440px, 100vw);
+      background: var(--bg);
+      transform: translateX(100%);
+      transition: transform 600ms var(--ease);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -24px 0 60px rgba(26,26,26,0.12);
+    }
+    .cart-drawer.is-open .cart-panel { transform: translateX(0); }
+    .cart-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 28px 28px 24px;
+      border-bottom: 1px solid var(--line);
+      gap: 16px;
+    }
+    .cart-head .eyebrow { margin-bottom: 8px; }
+    .cart-title {
+      font-family: var(--font-serif);
+      font-size: 32px;
+      line-height: 1;
+      color: var(--ink);
+    }
+    .cart-close {
+      width: 32px; height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink);
+      transition: border-color var(--t-fast) var(--ease), transform var(--t-base) var(--ease);
+      flex-shrink: 0;
+    }
+    .cart-close:hover { border-color: var(--ink); transform: rotate(90deg); }
+    .cart-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 28px;
+    }
+    .cart-empty {
+      padding: 56px 0;
+      text-align: center;
+      color: var(--ink-mute);
+    }
+    .cart-empty p {
+      font-size: 13px;
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .cart-empty .btn-ghost { display: inline-flex; }
+    .cart-items { padding: 16px 0; }
+    .cart-item {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 16px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--line);
+      align-items: center;
+    }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-img {
+      width: 64px;
+      aspect-ratio: 1/1.4;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .cart-item-img svg { height: 88%; }
+    .cart-item-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .cart-item-name {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      line-height: 1.1;
+      color: var(--ink);
+    }
+    .cart-item-meta {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .cart-item-price {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 6px;
+    }
+    .qty {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      margin-top: 6px;
+      width: fit-content;
+    }
+    .qty button {
+      width: 26px; height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--ink-soft);
+      transition: color var(--t-fast) var(--ease);
+    }
+    .qty button:hover { color: var(--ink); }
+    .qty span {
+      min-width: 22px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink);
+    }
+    .cart-item-remove {
+      align-self: start;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      color: var(--ink-mute);
+      padding: 4px 6px;
+      transition: color var(--t-fast) var(--ease);
+    }
+    .cart-item-remove:hover { color: var(--ink); }
+    .cart-foot {
+      padding: 24px 28px 28px;
+      border-top: 1px solid var(--line);
+      background: var(--bg);
+    }
+    .cart-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--ink-soft);
+      padding: 6px 0;
+    }
+    .cart-row.cart-total {
+      padding-top: 14px;
+      margin-top: 8px;
+      border-top: 1px solid var(--line);
+      font-family: var(--font-serif);
+      font-size: 22px;
+      color: var(--ink);
+    }
+    .cart-checkout {
+      width: 100%;
+      margin-top: 16px;
+      padding: 18px 24px;
+      background: var(--ink);
+      color: var(--bg);
+      border: 1px solid var(--ink);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: background var(--t-base) var(--ease), gap var(--t-base) var(--ease);
+    }
+    .cart-checkout:hover { background: var(--vie); border-color: var(--vie); gap: 18px; }
+    .cart-note {
+      margin-top: 12px;
+      font-size: 10px;
+      line-height: 1.6;
+      color: var(--ink-mute);
+      letter-spacing: 0.04em;
+    }
+
+    /* ─── REDUCED MOTION ─────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+      .reveal, .reveal-stagger > * { opacity: 1 !important; transform: none !important; }
+      .ken { animation: none !important; }
+      .hero-title .line span { transform: none !important; animation: none !important; }
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .nav-main { display: none; }
+      .menu-btn {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 8px;
+      }
+      .menu-btn span {
+        display: block;
+        width: 22px;
+        height: 1px;
+        background: var(--ink);
+        transition: transform var(--t-base) var(--ease), opacity var(--t-base) var(--ease);
+      }
+      .header-inner { grid-template-columns: 1fr auto auto; }
+      .gama { grid-template-columns: 1fr; gap: 16px; }
+      .gama-cta { align-items: flex-start; }
+      .locul-grid { grid-template-columns: 1fr; }
+      .despre-grid { grid-template-columns: 1fr; }
+      .wines { grid-template-columns: repeat(2, 1fr); }
+      .exp-grid { grid-template-columns: 1fr; }
+      .newsletter-inner { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+    }
+    @media (max-width: 640px) {
+      .manifesto-grid { grid-template-columns: 1fr; gap: 56px; }
+      .wines { grid-template-columns: 1fr; }
+      .colectia-head { flex-direction: column; align-items: flex-start; }
+      .hero-title { font-size: clamp(54px, 16vw, 96px); }
+      .display { font-size: clamp(48px, 16vw, 96px); }
+      .h2 { font-size: clamp(34px, 10vw, 64px); }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+      .footer-bottom .legal { max-width: 100%; }
+    }
+
+    /* ─── MOBILE NAV OVERLAY ─────────────────────────────── */
+    .nav-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--t-base) var(--ease);
+    }
+    .nav-overlay.is-open { opacity: 1; pointer-events: auto; }
+    .nav-overlay a {
+      font-family: var(--font-serif);
+      font-size: clamp(36px, 8vw, 56px);
+      color: var(--ink);
+      letter-spacing: -0.01em;
+      font-weight: 400;
+    }
+    .nav-overlay a:hover { color: var(--ink-soft); }
+    .nav-overlay__close {
+      position: absolute;
+      top: 24px; right: var(--px);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════ INLINE SVG SYMBOLS ═══════════════════════ -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="star8" viewBox="0 0 24 24">
+        <path d="M12 0 L13.5 9 L22.39 5.61 L15.92 12 L22.39 18.39 L13.5 15 L12 24 L10.5 15 L1.61 18.39 L8.08 12 L1.61 5.61 L10.5 9 Z" fill="currentColor"/>
+      </symbol>
+      <symbol id="triangle-flag" viewBox="0 0 12 12">
+        <path d="M0 12 L6 0 L12 12 Z" fill="currentColor"/>
+      </symbol>
+      <symbol id="square" viewBox="0 0 10 10"><rect width="10" height="10" fill="currentColor"/></symbol>
+      <symbol id="diamond" viewBox="0 0 12 12"><path d="M6 0 L12 6 L6 12 L0 6 Z" fill="currentColor"/></symbol>
+      <symbol id="circle" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="currentColor"/></symbol>
+      <symbol id="arrow-right" viewBox="0 0 24 12">
+        <path d="M0 6 H22 M16 0 L22 6 L16 12" stroke="currentColor" stroke-width="1.2" fill="none"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- ═══════════════════════ HEADER ═══════════════════════ -->
+  <header class="site-header" id="siteHeader">
+    <div class="container">
+      <div class="header-inner">
+        <a class="brand" href="#top" aria-label="Domeniul Locus — acasă">
+          <img class="brand-img" src="logo-locus.png" alt="Domeniul Locus" />
+        </a>
+
+        <nav class="nav-main" aria-label="Navigare principală">
+          <a href="#acasa">Acasă</a>
+          <a href="#despre">Despre noi</a>
+          <a href="#vinuri">Vinuri</a>
+          <a href="#locul">Locul</a>
+          <a href="#contact">Contact</a>
+        </nav>
+
+        <div class="nav-actions">
+          <div class="lang-switch" role="group" aria-label="Limbă">
+            <button class="is-active" data-lang="ro" aria-pressed="true">RO</button>
+            <span class="sep" aria-hidden="true"></span>
+            <button data-lang="en" aria-pressed="false">EN</button>
+          </div>
+          <button class="cart-btn" id="cartBtn" aria-label="Coș" type="button">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+              <path d="M3 4 L4 14 H12 L13 4 Z"/>
+              <path d="M5 4 V2.5 A3 3 0 0 1 11 2.5 V4"/>
+            </svg>
+            <span class="cart-count" id="cartCount" aria-live="polite">0</span>
+          </button>
+          <button class="theme-toggle" id="themeToggle" aria-label="Comută temă">
+            <svg class="moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2">
+              <path d="M13 9.5A6 6 0 0 1 6.5 3a6 6 0 1 0 6.5 6.5z"/>
+            </svg>
+            <svg class="sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2">
+              <circle cx="8" cy="8" r="3"/>
+              <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/>
+            </svg>
+          </button>
+          <button class="menu-btn" id="menuBtn" aria-label="Meniu" aria-expanded="false">
+            <span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- mobile overlay -->
+  <div class="nav-overlay" id="navOverlay" aria-hidden="true">
+    <button class="nav-overlay__close" id="navClose">închide ✕</button>
+    <a href="#acasa" data-overlay-link>Acasă</a>
+    <a href="#despre" data-overlay-link>Despre noi</a>
+    <a href="#vinuri" data-overlay-link>Vinuri</a>
+    <a href="#locul" data-overlay-link>Locul</a>
+    <a href="#contact" data-overlay-link>Contact</a>
+  </div>
+
+  <main id="top">
+
+    <!-- ═══════════════════════ HERO ═══════════════════════ -->
+    <section class="hero" id="acasa" aria-label="Hero">
+      <div class="hero-stage">
+        <div class="hero-frames" aria-hidden="true">
+          <div class="hero-frame frame-1 is-active"><div class="ken"></div></div>
+          <div class="hero-frame frame-2"><div class="ken"></div></div>
+          <div class="hero-frame frame-3"><div class="ken"></div></div>
+        </div>
+
+        <div class="hero-watermark" aria-hidden="true">lócus</div>
+
+        <div class="hero-content">
+          <div>
+            <div class="eyebrow hero-eyebrow">Domeniul Locus · Panciu — Nicorești</div>
+          </div>
+
+          <h1 class="hero-title">
+            <span class="line"><span>un loc.</span></span>
+            <span class="line"><span>un timp.</span></span>
+            <span class="line"><span>un vin.</span></span>
+          </h1>
+
+          <div class="hero-cta-row">
+            <a href="#locul" class="hero-cta">
+              <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                <use href="#star8"/>
+              </svg>
+              Descoperă locul
+              <svg width="16" height="8" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+            </a>
+
+            <div class="hero-pager" role="tablist" aria-label="Cadre hero">
+              <button class="is-active" data-frame="1" role="tab" aria-selected="true">01</button>
+              <span class="sep" aria-hidden="true"></span>
+              <button data-frame="2" role="tab" aria-selected="false">02</button>
+              <span class="sep" aria-hidden="true"></span>
+              <button data-frame="3" role="tab" aria-selected="false">03</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-quote">
+        <p class="reveal">
+          Vinul începe în vie, acolo unde timpul și natura își urmează cursul firesc.
+          Fiecare recoltă păstrează amprenta locului, iar fiecare sticlă devine o mărturie
+          a unui parcurs dus cu respect și măsură.
+        </p>
+        <div class="symbol-row reveal" aria-hidden="true">
+          <svg><use href="#square"/></svg>
+          <svg><use href="#triangle-flag"/></svg>
+          <svg><use href="#star8"/></svg>
+          <svg><use href="#circle"/></svg>
+          <svg><use href="#diamond"/></svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ MANIFESTO ═══════════════════════ -->
+    <section class="manifesto" aria-label="Manifesto">
+      <div class="manifesto-grid reveal-stagger">
+        <article class="manifesto-item">
+          <div class="word">Origine</div>
+          <div class="sub">teritoriu</div>
+          <p>Vinurile noastre se nasc la granița dintre Panciu și Nicorești — două arealuri viticole istorice, cu relief, sol și lumină proprii. Locul lor exact contează la fel de mult ca soiul.</p>
+        </article>
+        <article class="manifesto-item">
+          <div class="word">Timp</div>
+          <div class="sub">viață</div>
+          <p>Răbdarea e singurul ingredient pe care nu-l putem grăbi. Cules la maturitate deplină, vinificat fără urgență, păstrat până când vinul își găsește singur echilibrul.</p>
+        </article>
+        <article class="manifesto-item">
+          <div class="word">Măsură</div>
+          <div class="sub">atenție</div>
+          <p>Intervenția umană e discretă — o mână care orientează, nu una care impune. Fiecare gest e cântărit, fiecare detaliu observat. Restul îl face locul.</p>
+        </article>
+      </div>
+      <div class="manifesto-divider reveal" aria-hidden="true">
+        <span class="line"></span>
+        <svg class="drift"><use href="#star8"/></svg>
+        <span class="line"></span>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ LOCUL ═══════════════════════ -->
+    <section class="locul" id="locul" aria-label="Locul">
+      <div class="locul-grid">
+        <div class="map reveal" aria-label="Hartă schematică Buciumeni — Panciu — Nicorești">
+          <svg viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- relief lines -->
+            <g stroke="var(--ink-mute)" stroke-width="0.6" fill="none" opacity="0.5">
+              <path d="M0 80 Q120 60 240 90 T500 80"/>
+              <path d="M0 130 Q140 110 260 140 T500 130"/>
+              <path d="M0 180 Q160 160 280 190 T500 180"/>
+              <path d="M0 240 Q180 220 300 250 T500 240"/>
+              <path d="M0 300 Q200 280 320 310 T500 300"/>
+              <path d="M0 350 Q220 330 340 360 T500 350"/>
+            </g>
+
+            <!-- triangles (relief peaks) -->
+            <g fill="var(--ink-mute)" opacity="0.8">
+              <path d="M80 200 L95 220 L65 220 Z"/>
+              <path d="M150 170 L165 195 L135 195 Z"/>
+              <path d="M380 180 L398 210 L362 210 Z"/>
+              <path d="M420 230 L432 250 L408 250 Z"/>
+            </g>
+
+            <!-- river/path dotted -->
+            <path d="M40 360 Q120 320 200 290 T340 230 T440 180" stroke="var(--ink)" stroke-width="1" stroke-dasharray="2 4" fill="none" opacity="0.6"/>
+
+            <!-- village dot: Panciu -->
+            <g transform="translate(120,260)">
+              <circle r="3" fill="var(--ink)"/>
+              <text x="8" y="4" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-soft)">PANCIU</text>
+            </g>
+            <!-- village dot: Nicorești -->
+            <g transform="translate(390,290)">
+              <circle r="3" fill="var(--ink)"/>
+              <text x="-66" y="4" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--ink-soft)">NICOREȘTI</text>
+            </g>
+
+            <!-- crama star marker -->
+            <g transform="translate(265, 230)" class="marker">
+              <use href="#star8" width="24" height="24" x="-12" y="-12" color="var(--vie)"/>
+            </g>
+            <text x="280" y="220" font-family="IBM Plex Mono, monospace" font-size="9" fill="var(--ink)" letter-spacing="1">BUCIUMENI</text>
+            <text x="280" y="232" font-family="IBM Plex Mono, monospace" font-size="8" fill="var(--ink-mute)" letter-spacing="0.5">CRAMĂ · 45.98°N 27.30°E</text>
+
+            <!-- compass mini -->
+            <g transform="translate(450, 50)" opacity="0.7">
+              <circle r="14" fill="none" stroke="var(--ink-mute)" stroke-width="0.6"/>
+              <path d="M0 -10 L3 0 L0 10 L-3 0 Z" fill="var(--ink)"/>
+              <text y="-18" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="7" fill="var(--ink-mute)">N</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="locul-text reveal">
+          <div class="eyebrow" style="margin-bottom: 24px;">Locul</div>
+          <h2 class="h2">Un punct precis, între Panciu și Nicorești.</h2>
+          <p>Centrul de Vinificație Buciumeni stă pe o coamă de deal, în județul Galați, la întâlnirea celor două areale viticole. Aici se obține vinul cu denumire de origine controlată — cules la maturitate deplină.</p>
+          <div class="coords">
+            <div class="row"><strong>Coordonate</strong><span>45.98°N 27.30°E</span></div>
+            <div class="row"><strong>Sat</strong><span>Buciumeni · Galați</span></div>
+            <div class="row"><strong>Apelațiune</strong><span>DOC-CMD Panciu</span></div>
+          </div>
+          <a href="#despre" class="btn-ghost">
+            Vezi povestea locului
+            <svg class="arrow" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ VINURI (game) ═══════════════════════ -->
+    <section class="vinuri" id="vinuri" aria-label="Game de vin">
+      <div class="vinuri-head reveal">
+        <div class="eyebrow" style="justify-content: center;">trei game · același loc</div>
+        <h2 class="display">vinul vorbește.</h2>
+        <p class="lead" style="margin-inline: auto; text-align: center;">Trei feluri în care vinul vorbește. Trei game, același loc, aceeași mână de om.</p>
+      </div>
+
+      <div class="game">
+        <article class="gama" data-gama="cuvinte" tabindex="0">
+          <div class="gama-pattern" aria-hidden="true">
+            <svg viewBox="0 0 200 200">
+              <text x="100" y="120" font-family="IBM Plex Mono, monospace" font-size="24" fill="var(--ink)" text-anchor="middle">cuvinte</text>
+            </svg>
+          </div>
+          <div class="gama-tag">cuvinte</div>
+          <div class="gama-body">
+            <p>Eticheta minimalistă, tipografică. Vinul vorbește singur — un cod, un soi, un an. Restul se află în pahar.</p>
+            <div class="gama-list">
+              <span>Fetească Regală</span>
+              <span>Fetească Neagră</span>
+              <span>Riesling Italian</span>
+            </div>
+          </div>
+          <div class="gama-cta">
+            <span class="small">3 vinuri · gama LC</span>
+            <span class="arrow-big" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 17 L17 7 M9 7 H17 V15"/></svg>
+            </span>
+          </div>
+        </article>
+
+        <article class="gama" data-gama="semne" tabindex="0">
+          <div class="gama-pattern" aria-hidden="true">
+            <svg viewBox="0 0 200 200">
+              <g fill="var(--ink)" opacity="0.5">
+                <path d="M40 100 L60 100 M50 90 L50 110"/>
+                <path d="M100 70 L120 90 L100 110 L80 90 Z" fill-opacity="0.2"/>
+                <circle cx="160" cy="100" r="6"/>
+                <path d="M40 140 L60 140 M40 60 L60 60" stroke="var(--ink)" stroke-width="1"/>
+              </g>
+              <text x="100" y="170" font-family="IBM Plex Mono, monospace" font-size="20" fill="var(--ink)" text-anchor="middle">semne</text>
+            </svg>
+          </div>
+          <div class="gama-tag">semne</div>
+          <div class="gama-body">
+            <p>Paletă cu hartă și relief. Locul se citește pe etichetă — coordonate, simboluri, ritmuri vizuale ale teritoriului.</p>
+            <div class="gama-list">
+              <span>Fetească Regală</span>
+              <span>Fetească Neagră</span>
+              <span>Riesling Italian</span>
+            </div>
+          </div>
+          <div class="gama-cta">
+            <span class="small">3 vinuri · gama LS</span>
+            <span class="arrow-big" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 17 L17 7 M9 7 H17 V15"/></svg>
+            </span>
+          </div>
+        </article>
+
+        <article class="gama gama--soon" data-gama="pauze" aria-disabled="true">
+          <div class="gama-tag">pauze</div>
+          <div class="gama-body">
+            <p>Momentul când vinul tace și asculți. O gamă în lansare — vinuri de rezervă, ediții limitate, păstrate dincolo de recolta lor.</p>
+          </div>
+          <div class="gama-cta"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ COLECȚIA ═══════════════════════ -->
+    <section class="colectia" aria-label="Colecția de vinuri">
+      <div class="colectia-head">
+        <div>
+          <div class="eyebrow" style="margin-bottom: 16px;">Colecția 2025</div>
+          <h2 class="h2">Șase sticle.<br>Un singur loc.</h2>
+        </div>
+        <div class="filters" role="tablist" aria-label="Filtre vinuri">
+          <button class="filter is-active" data-filter="all">Toate</button>
+          <button class="filter" data-filter="alb">Alb</button>
+          <button class="filter" data-filter="rosu">Roșu</button>
+          <button class="filter" data-filter="sec">Sec</button>
+          <button class="filter" data-filter="demisec">Demisec</button>
+          <button class="filter" data-filter="cuvinte">Cuvinte</button>
+          <button class="filter" data-filter="semne">Semne</button>
+        </div>
+      </div>
+
+      <div class="wines reveal-stagger" id="winesGrid">
+        <!-- LC01 -->
+        <article class="wine" data-id="LC01" data-price="79" data-tags="alb demisec cuvinte">
+          <div class="wine-header">
+            <span>cuvinte · LC01</span>
+            <span>2025</span>
+          </div>
+          <div class="wine-bottle">
+            <svg viewBox="0 0 80 200" aria-hidden="true">
+              <path d="M32 0 H48 V40 Q60 50 60 70 V190 Q60 200 50 200 H30 Q20 200 20 190 V70 Q20 50 32 40 Z" class="bottle-glass-white" stroke-width="0.8"/>
+              <rect x="20" y="100" width="40" height="60" fill="#EBE1DA" stroke="#A89D8D" stroke-width="0.4"/>
+              <text x="40" y="130" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="6" fill="#1A1A1A" letter-spacing="0.5">LC01</text>
+              <text x="40" y="142" text-anchor="middle" font-family="Italiana, serif" font-size="6" fill="#1A1A1A">lócus</text>
+            </svg>
+          </div>
+          <h3 class="wine-name">Fetească Regală</h3>
+          <div class="wine-meta">
+            <strong>Alb · Demisec</strong><span>13,5% VOL</span>
+          </div>
+          <p class="wine-notes">Flori albe, fructe galbene coapte, citrice fine, accente discrete de miere. Final curat, delicat.</p>
+          <div class="wine-foot">
+            <span class="wine-temp">Servire 8–10°C</span>
+            <a class="wine-link" href="wine.html" data-view>Vezi fișa <svg width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg></a>
+          </div>
+          <div class="wine-buy">
+            <span class="wine-price"></span>
+            <button class="wine-add" data-add aria-label="Adaugă în coș">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+              </svg>
+              Adaugă
+            </button>
+          </div>
+        </article>
+
+        <!-- LC02 -->
+        <article class="wine" data-id="LC02" data-price="89" data-tags="rosu demisec cuvinte">
+          <div class="wine-header">
+            <span>cuvinte · LC02</span>
+            <span>2025</span>
+          </div>
+          <div class="wine-bottle">
+            <svg viewBox="0 0 80 200" aria-hidden="true">
+              <path d="M32 0 H48 V40 Q60 50 60 70 V190 Q60 200 50 200 H30 Q20 200 20 190 V70 Q20 50 32 40 Z" class="bottle-glass-red" stroke-width="0.8"/>
+              <rect x="20" y="100" width="40" height="60" fill="#EBE1DA" stroke="#A89D8D" stroke-width="0.4"/>
+              <text x="40" y="130" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="6" fill="#1A1A1A" letter-spacing="0.5">LC02</text>
+              <text x="40" y="142" text-anchor="middle" font-family="Italiana, serif" font-size="6" fill="#1A1A1A">lócus</text>
+            </svg>
+          </div>
+          <h3 class="wine-name">Fetească Neagră</h3>
+          <div class="wine-meta">
+            <strong>Roșu · Demisec</strong><span>14,9% VOL</span>
+          </div>
+          <p class="wine-notes">Fructe negre coapte, prune uscate, accente fine de condimente. Structură catifelată, taninuri integrate.</p>
+          <div class="wine-foot">
+            <span class="wine-temp">Servire 14–16°C</span>
+            <a class="wine-link" href="wine.html" data-view>Vezi fișa <svg width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg></a>
+          </div>
+          <div class="wine-buy">
+            <span class="wine-price"></span>
+            <button class="wine-add" data-add aria-label="Adaugă în coș">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+              </svg>
+              Adaugă
+            </button>
+          </div>
+        </article>
+
+        <!-- LC04 -->
+        <article class="wine" data-id="LC04" data-price="79" data-tags="alb sec cuvinte">
+          <div class="wine-header">
+            <span>cuvinte · LC04</span>
+            <span>2025</span>
+          </div>
+          <div class="wine-bottle">
+            <svg viewBox="0 0 80 200" aria-hidden="true">
+              <path d="M32 0 H48 V40 Q60 50 60 70 V190 Q60 200 50 200 H30 Q20 200 20 190 V70 Q20 50 32 40 Z" class="bottle-glass-white" stroke-width="0.8"/>
+              <rect x="20" y="100" width="40" height="60" fill="#EBE1DA" stroke="#A89D8D" stroke-width="0.4"/>
+              <text x="40" y="130" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="6" fill="#1A1A1A" letter-spacing="0.5">LC04</text>
+              <text x="40" y="142" text-anchor="middle" font-family="Italiana, serif" font-size="6" fill="#1A1A1A">lócus</text>
+            </svg>
+          </div>
+          <h3 class="wine-name">Riesling Italian</h3>
+          <div class="wine-meta">
+            <strong>Alb · Sec</strong><span>13% VOL</span>
+          </div>
+          <p class="wine-notes">Citrice, măr verde, accente florale discrete. Aciditate bine definită, final curat, răcoritor.</p>
+          <div class="wine-foot">
+            <span class="wine-temp">Servire 8–12°C</span>
+            <a class="wine-link" href="wine.html" data-view>Vezi fișa <svg width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg></a>
+          </div>
+          <div class="wine-buy">
+            <span class="wine-price"></span>
+            <button class="wine-add" data-add aria-label="Adaugă în coș">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+              </svg>
+              Adaugă
+            </button>
+          </div>
+        </article>
+
+        <!-- LS01 -->
+        <article class="wine" data-id="LS01" data-price="109" data-tags="alb demisec semne">
+          <div class="wine-header">
+            <span>semne · LS01</span>
+            <span>2025</span>
+          </div>
+          <div class="wine-bottle">
+            <svg viewBox="0 0 80 200" aria-hidden="true">
+              <path d="M32 0 H48 V40 Q60 50 60 70 V190 Q60 200 50 200 H30 Q20 200 20 190 V70 Q20 50 32 40 Z" class="bottle-glass-white" stroke-width="0.8"/>
+              <rect x="22" y="98" width="36" height="64" fill="#CBBEAE" stroke="#A89D8D" stroke-width="0.4"/>
+              <g stroke="#1A1A1A" stroke-width="0.3" fill="none" opacity="0.7">
+                <path d="M25 112 Q40 108 55 114"/>
+                <path d="M25 120 Q40 116 55 122"/>
+              </g>
+              <text x="40" y="140" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="5" fill="#1A1A1A" letter-spacing="0.4">LS01</text>
+              <text x="40" y="152" text-anchor="middle" font-family="Italiana, serif" font-size="6" fill="#1A1A1A">lócus</text>
+            </svg>
+          </div>
+          <h3 class="wine-name">Fetească Regală</h3>
+          <div class="wine-meta">
+            <strong>Alb · Demisec</strong><span>13,5% VOL</span>
+          </div>
+          <p class="wine-notes">Flori albe, fructe coapte, miere și citrice. Textură rotundă, final delicat care invită la încă un pahar.</p>
+          <div class="wine-foot">
+            <span class="wine-temp">Servire 8–10°C</span>
+            <a class="wine-link" href="wine.html" data-view>Vezi fișa <svg width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg></a>
+          </div>
+          <div class="wine-buy">
+            <span class="wine-price"></span>
+            <button class="wine-add" data-add aria-label="Adaugă în coș">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+              </svg>
+              Adaugă
+            </button>
+          </div>
+        </article>
+
+        <!-- LS02 -->
+        <article class="wine" data-id="LS02" data-price="119" data-tags="rosu demisec semne">
+          <div class="wine-header">
+            <span>semne · LS02</span>
+            <span>2025</span>
+          </div>
+          <div class="wine-bottle">
+            <svg viewBox="0 0 80 200" aria-hidden="true">
+              <path d="M32 0 H48 V40 Q60 50 60 70 V190 Q60 200 50 200 H30 Q20 200 20 190 V70 Q20 50 32 40 Z" class="bottle-glass-red" stroke-width="0.8"/>
+              <rect x="22" y="98" width="36" height="64" fill="#CBBEAE" stroke="#A89D8D" stroke-width="0.4"/>
+              <g stroke="#1A1A1A" stroke-width="0.3" fill="none" opacity="0.7">
+                <path d="M25 112 Q40 108 55 114"/>
+                <path d="M25 120 Q40 116 55 122"/>
+              </g>
+              <text x="40" y="140" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="5" fill="#1A1A1A" letter-spacing="0.4">LS02</text>
+              <text x="40" y="152" text-anchor="middle" font-family="Italiana, serif" font-size="6" fill="#1A1A1A">lócus</text>
+            </svg>
+          </div>
+          <h3 class="wine-name">Fetească Neagră</h3>
+          <div class="wine-meta">
+            <strong>Roșu · Demisec</strong><span>14,9% VOL</span>
+          </div>
+          <p class="wine-notes">Fructe negre coapte, prune uscate, condimente fine. Structură amplă și catifelată, final persistent.</p>
+          <div class="wine-foot">
+            <span class="wine-temp">Servire 14–16°C</span>
+            <a class="wine-link" href="wine.html" data-view>Vezi fișa <svg width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg></a>
+          </div>
+          <div class="wine-buy">
+            <span class="wine-price"></span>
+            <button class="wine-add" data-add aria-label="Adaugă în coș">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+              </svg>
+              Adaugă
+            </button>
+          </div>
+        </article>
+
+        <!-- LS04 -->
+        <article class="wine" data-id="LS04" data-price="109" data-tags="alb sec semne">
+          <div class="wine-header">
+            <span>semne · LS04</span>
+            <span>2025</span>
+          </div>
+          <div class="wine-bottle">
+            <svg viewBox="0 0 80 200" aria-hidden="true">
+              <path d="M32 0 H48 V40 Q60 50 60 70 V190 Q60 200 50 200 H30 Q20 200 20 190 V70 Q20 50 32 40 Z" class="bottle-glass-white" stroke-width="0.8"/>
+              <rect x="22" y="98" width="36" height="64" fill="#CBBEAE" stroke="#A89D8D" stroke-width="0.4"/>
+              <g stroke="#1A1A1A" stroke-width="0.3" fill="none" opacity="0.7">
+                <path d="M25 112 Q40 108 55 114"/>
+                <path d="M25 120 Q40 116 55 122"/>
+              </g>
+              <text x="40" y="140" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="5" fill="#1A1A1A" letter-spacing="0.4">LS04</text>
+              <text x="40" y="152" text-anchor="middle" font-family="Italiana, serif" font-size="6" fill="#1A1A1A">lócus</text>
+            </svg>
+          </div>
+          <h3 class="wine-name">Riesling Italian</h3>
+          <div class="wine-meta">
+            <strong>Alb · Sec</strong><span>13% VOL</span>
+          </div>
+          <p class="wine-notes">Citrice, măr verde, accente florale. Aciditate susținută, tensiune și un final răcoritor, precis.</p>
+          <div class="wine-foot">
+            <span class="wine-temp">Servire 8–12°C</span>
+            <a class="wine-link" href="wine.html" data-view>Vezi fișa <svg width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg></a>
+          </div>
+          <div class="wine-buy">
+            <span class="wine-price"></span>
+            <button class="wine-add" data-add aria-label="Adaugă în coș">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/>
+              </svg>
+              Adaugă
+            </button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ DESPRE ═══════════════════════ -->
+    <section class="despre" id="despre" aria-label="Despre Domeniul Locus">
+      <div class="despre-grid">
+        <div class="despre-img reveal" aria-hidden="true"></div>
+        <div class="despre-text reveal">
+          <div class="eyebrow">Despre noi</div>
+          <h2 class="h2">Rădăcini adânci, privire înainte.</h2>
+          <p>Domeniul Locus s-a născut din legătura cu pământul — și din dorința de a face vinuri care spun o poveste despre origine, timp și sens. Lucrăm pe arealele Panciu și Nicorești, două teritorii istorice cu identități proprii, și ducem mai departe o tradiție care se măsoară în generații.</p>
+          <p>Fiecare sticlă pe care o trimitem mai departe e rezultatul unei decizii: să ne lăsăm conduși de loc, nu să-l constrângem.</p>
+          <a href="#" class="btn-ghost">
+            Citește povestea
+            <svg class="arrow" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ NEWSLETTER ═══════════════════════ -->
+    <section class="newsletter" aria-label="Newsletter">
+      <div class="newsletter-inner">
+        <div class="newsletter-text reveal">
+          <h3>Câteva cuvinte, rar.</h3>
+          <p>Despre recolte, evenimente la cramă și pauzele dintre ele. Niciodată mai des decât merită.</p>
+        </div>
+        <form class="newsletter-form reveal" onsubmit="event.preventDefault(); this.querySelector('button').textContent='mulțumim ✓';">
+          <label class="visually-hidden" for="email" style="position:absolute; clip:rect(0 0 0 0);">Email</label>
+          <input type="email" id="email" placeholder="adresa ta de email" required />
+          <button type="submit">
+            Abonează-te
+            <svg width="16" height="8" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+    <footer class="footer" id="contact">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <a class="brand" href="#top" style="margin-bottom: 32px; display: inline-flex;">
+            <img class="brand-img" src="logo-locus.png" alt="Domeniul Locus" />
+          </a>
+          <p>
+            Sediu social<br>
+            Jud. Galați, mun. Galați,<br>
+            str. Portului, nr. 20, tronson 1, camera 211<br>
+            <br>
+            Punct de lucru<br>
+            Centrul de Vinificație Buciumeni,<br>
+            jud. Galați, com. Buciumeni
+          </p>
+          <p>
+            <a href="tel:+40752232912">(0752) 232 912</a><br>
+            <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navighează</h4>
+          <ul>
+            <li><a href="#acasa">Acasă</a></li>
+            <li><a href="#despre">Despre noi</a></li>
+            <li><a href="#vinuri">Vinuri</a></li>
+            <li><a href="#locul">Locul</a></li>
+          </ul>
+          <h4 style="margin-top: 32px;">Legal</h4>
+          <ul>
+            <li><a href="#">Termeni</a></li>
+            <li><a href="#">Confidențialitate</a></li>
+            <li><a href="#">Cookies</a></li>
+            <li><a href="#">GDPR</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Urmărește-ne</h4>
+          <ul>
+            <li><a href="#" target="_blank" rel="noopener">Instagram ↗</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Facebook ↗</a></li>
+          </ul>
+          <p style="margin-top: 32px; font-size: 11px; line-height: 1.7;">
+            SC ROMVINTEC SRL · Conține sulfiți.<br>
+            Consumul excesiv de alcool dăunează sănătății.
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span class="coords-line">45.98°N 27.30°E · Buciumeni · România</span>
+        <span class="legal">© 2026 Domeniul Locus · Identitate vizuală: STUDIOMASURA</span>
+      </div>
+    </footer>
+  </main>
+
+  <!-- ═══════════════════════ CART DRAWER ═══════════════════════ -->
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-label="Coșul tău">
+    <div class="cart-backdrop" data-cart-close></div>
+    <div class="cart-panel" role="dialog" aria-modal="true">
+      <header class="cart-head">
+        <div>
+          <div class="eyebrow">coșul tău</div>
+          <h3 class="cart-title">Selecția ta</h3>
+        </div>
+        <button class="cart-close" data-cart-close aria-label="Închide coșul">
+          <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+            <path d="M2 2 L10 10 M10 2 L2 10"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="cart-body">
+        <div class="cart-empty" id="cartEmpty" hidden>
+          <p>Coșul e încă gol.<br>Începe cu o sticlă.</p>
+          <a href="#vinuri" class="btn-ghost" data-cart-close>Vezi vinurile <svg class="arrow" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg></a>
+        </div>
+        <ul class="cart-items" id="cartItems"></ul>
+      </div>
+
+      <footer class="cart-foot" id="cartFoot" hidden>
+        <div class="cart-row"><span>Subtotal</span><span id="cartSubtotal">0 lei</span></div>
+        <div class="cart-row"><span>Transport</span><span>se calculează la checkout</span></div>
+        <div class="cart-row cart-total"><span>Total</span><span id="cartTotal">0 lei</span></div>
+        <a class="cart-checkout" href="checkout.html">
+          Comandă
+          <svg width="16" height="8" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+        </a>
+        <p class="cart-note">Livrare în 2–4 zile lucrătoare. Conține sulfiți. Consumul excesiv de alcool dăunează sănătății.</p>
+      </footer>
+    </div>
+  </aside>
+
+  <script>
+    // ─── HEADER scroll state ──────────────────────────────
+    const header = document.getElementById('siteHeader');
+    const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 4);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // ─── THEME TOGGLE ─────────────────────────────────────
+    const themeBtn = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('locus-theme');
+    if (stored) document.documentElement.dataset.theme = stored;
+    themeBtn.addEventListener('click', () => {
+      const cur = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = cur;
+      localStorage.setItem('locus-theme', cur);
+    });
+
+    // ─── HERO CAROUSEL ───────────────────────────────────
+    const frames = document.querySelectorAll('.hero-frame');
+    const pagerBtns = document.querySelectorAll('.hero-pager [data-frame]');
+    let frameIdx = 0;
+    let frameTimer;
+    function setFrame(i) {
+      frameIdx = (i + frames.length) % frames.length;
+      frames.forEach((f, k) => f.classList.toggle('is-active', k === frameIdx));
+      pagerBtns.forEach((b, k) => {
+        b.classList.toggle('is-active', k === frameIdx);
+        b.setAttribute('aria-selected', k === frameIdx ? 'true' : 'false');
+      });
+    }
+    function startCarousel() {
+      stopCarousel();
+      frameTimer = setInterval(() => setFrame(frameIdx + 1), 5500);
+    }
+    function stopCarousel() { if (frameTimer) clearInterval(frameTimer); }
+    pagerBtns.forEach((b, k) => b.addEventListener('click', () => { setFrame(k); startCarousel(); }));
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) startCarousel();
+
+    // ─── REVEAL ON SCROLL ────────────────────────────────
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+    document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => io.observe(el));
+
+    // ─── WINE FILTER ─────────────────────────────────────
+    const filterBtns = document.querySelectorAll('.filter');
+    const wines = document.querySelectorAll('.wine');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        const f = btn.dataset.filter;
+        wines.forEach(w => {
+          const tags = w.dataset.tags || '';
+          const match = f === 'all' || tags.split(' ').includes(f);
+          w.classList.toggle('is-hidden', !match);
+        });
+      });
+    });
+
+    // ─── LANG SWITCH (visual only on this static demo) ───
+    document.querySelectorAll('.lang-switch button').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.lang-switch button').forEach(x => {
+          x.classList.remove('is-active');
+          x.setAttribute('aria-pressed', 'false');
+        });
+        b.classList.add('is-active');
+        b.setAttribute('aria-pressed', 'true');
+        document.documentElement.lang = b.dataset.lang;
+      });
+    });
+
+    // ─── CART ────────────────────────────────────────────
+    const WINES = {
+      LC01: { code: 'LC01', name: 'Fetească Regală', gama: 'cuvinte', meta: 'Alb · Demisec · 13,5%', price: 79, color: 'white' },
+      LC02: { code: 'LC02', name: 'Fetească Neagră', gama: 'cuvinte', meta: 'Roșu · Demisec · 14,9%', price: 89, color: 'red' },
+      LC04: { code: 'LC04', name: 'Riesling Italian', gama: 'cuvinte', meta: 'Alb · Sec · 13%',        price: 79, color: 'white' },
+      LS01: { code: 'LS01', name: 'Fetească Regală', gama: 'semne',   meta: 'Alb · Demisec · 13,5%', price: 109, color: 'white' },
+      LS02: { code: 'LS02', name: 'Fetească Neagră', gama: 'semne',   meta: 'Roșu · Demisec · 14,9%', price: 119, color: 'red' },
+      LS04: { code: 'LS04', name: 'Riesling Italian', gama: 'semne',   meta: 'Alb · Sec · 13%',        price: 109, color: 'white' },
+    };
+    const CART_KEY = 'locus-cart';
+    const fmtPrice = n => `${n.toLocaleString('ro-RO')} lei`;
+    function loadCart() {
+      try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; } catch { return {}; }
+    }
+    function saveCart(c) { localStorage.setItem(CART_KEY, JSON.stringify(c)); }
+
+    function renderPriceTags() {
+      document.querySelectorAll('.wine[data-id]').forEach(card => {
+        const price = parseFloat(card.dataset.price);
+        const slot = card.querySelector('.wine-price');
+        if (slot) slot.innerHTML = `${price} <span class="currency">lei</span>`;
+      });
+    }
+
+    function bottleSvg(color) {
+      const fill = color === 'red' ? '#2a1416' : '#DCD0BC';
+      const stroke = color === 'red' ? '#110608' : '#8a7a5c';
+      return `<svg viewBox="0 0 80 200" aria-hidden="true">
+        <path d="M32 0 H48 V40 Q60 50 60 70 V190 Q60 200 50 200 H30 Q20 200 20 190 V70 Q20 50 32 40 Z" fill="${fill}" stroke="${stroke}" stroke-width="0.8"/>
+        <rect x="22" y="105" width="36" height="56" fill="#EBE1DA" stroke="#A89D8D" stroke-width="0.4"/>
+      </svg>`;
+    }
+
+    const cartDrawer = document.getElementById('cartDrawer');
+    const cartItemsEl = document.getElementById('cartItems');
+    const cartEmptyEl = document.getElementById('cartEmpty');
+    const cartFootEl = document.getElementById('cartFoot');
+    const cartCountEl = document.getElementById('cartCount');
+    const cartSubtotalEl = document.getElementById('cartSubtotal');
+    const cartTotalEl = document.getElementById('cartTotal');
+
+    function renderCart() {
+      const cart = loadCart();
+      const ids = Object.keys(cart);
+      const totalQty = ids.reduce((s, id) => s + cart[id], 0);
+      const subtotal = ids.reduce((s, id) => s + (WINES[id]?.price || 0) * cart[id], 0);
+
+      cartCountEl.textContent = totalQty;
+      cartCountEl.classList.toggle('is-visible', totalQty > 0);
+
+      if (ids.length === 0) {
+        cartItemsEl.innerHTML = '';
+        cartEmptyEl.hidden = false;
+        cartFootEl.hidden = true;
+        return;
+      }
+      cartEmptyEl.hidden = true;
+      cartFootEl.hidden = false;
+
+      cartItemsEl.innerHTML = ids.map(id => {
+        const w = WINES[id]; if (!w) return '';
+        const qty = cart[id];
+        return `
+        <li class="cart-item" data-cart-id="${id}">
+          <div class="cart-item-img">${bottleSvg(w.color)}</div>
+          <div class="cart-item-body">
+            <div class="cart-item-meta">${w.gama} · ${w.code}</div>
+            <div class="cart-item-name">${w.name}</div>
+            <div class="cart-item-meta" style="text-transform:none; letter-spacing:0.04em;">${w.meta}</div>
+            <div class="cart-item-price">${fmtPrice(w.price)} <span style="color:var(--ink-mute);">/ sticlă</span></div>
+            <div class="qty">
+              <button data-qty-dec aria-label="Scade cantitatea">−</button>
+              <span>${qty}</span>
+              <button data-qty-inc aria-label="Crește cantitatea">+</button>
+            </div>
+          </div>
+          <button class="cart-item-remove" data-remove aria-label="Elimină">✕</button>
+        </li>`;
+      }).join('');
+
+      cartSubtotalEl.textContent = fmtPrice(subtotal);
+      cartTotalEl.textContent = fmtPrice(subtotal);
+    }
+
+    function openCart() {
+      cartDrawer.classList.add('is-open');
+      cartDrawer.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeCart() {
+      cartDrawer.classList.remove('is-open');
+      cartDrawer.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function addToCart(id) {
+      if (!WINES[id]) return;
+      const c = loadCart();
+      c[id] = (c[id] || 0) + 1;
+      saveCart(c);
+      renderCart();
+      openCart();
+    }
+    function setQty(id, qty) {
+      const c = loadCart();
+      if (qty <= 0) delete c[id]; else c[id] = qty;
+      saveCart(c); renderCart();
+    }
+
+    // bind cart button + drawer
+    document.getElementById('cartBtn').addEventListener('click', openCart);
+    document.querySelectorAll('[data-cart-close]').forEach(el => el.addEventListener('click', closeCart));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
+
+    // bind qty/remove inside drawer (delegation)
+    cartItemsEl.addEventListener('click', e => {
+      const li = e.target.closest('.cart-item'); if (!li) return;
+      const id = li.dataset.cartId;
+      const cart = loadCart();
+      if (e.target.closest('[data-qty-inc]')) setQty(id, (cart[id] || 0) + 1);
+      else if (e.target.closest('[data-qty-dec]')) setQty(id, (cart[id] || 0) - 1);
+      else if (e.target.closest('[data-remove]')) setQty(id, 0);
+    });
+
+    // bind wine cards: add + view
+    document.querySelectorAll('.wine[data-id]').forEach(card => {
+      const id = card.dataset.id;
+      card.querySelector('[data-add]')?.addEventListener('click', e => {
+        e.preventDefault();
+        e.currentTarget.classList.add('is-pulse');
+        setTimeout(() => e.currentTarget.classList.remove('is-pulse'), 600);
+        addToCart(id);
+      });
+      const viewLink = card.querySelector('[data-view]');
+      if (viewLink) {
+        viewLink.setAttribute('href', `wine.html?id=${id}`);
+      }
+    });
+
+    renderPriceTags();
+    renderCart();
+
+    // ─── MOBILE NAV ──────────────────────────────────────
+    const menuBtn = document.getElementById('menuBtn');
+    const overlay = document.getElementById('navOverlay');
+    const closeBtn = document.getElementById('navClose');
+    function openMenu() {
+      overlay.classList.add('is-open');
+      overlay.setAttribute('aria-hidden', 'false');
+      menuBtn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMenu() {
+      overlay.classList.remove('is-open');
+      overlay.setAttribute('aria-hidden', 'true');
+      menuBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+    menuBtn.addEventListener('click', openMenu);
+    closeBtn.addEventListener('click', closeMenu);
+    document.querySelectorAll('[data-overlay-link]').forEach(a => a.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  </script>
+</body>
+</html>

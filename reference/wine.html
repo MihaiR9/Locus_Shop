@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="ro" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">Domeniul Locus — Fișa vinului</title>
+  <meta name="description" content="Fișa vinului. Domeniul Locus — vinuri din regiunea Panciu–Nicorești." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --pamant:  #EBE1DA;
+      --nisip:   #CBBEAE;
+      --piatra:  #A89D8D;
+      --vie:     #3E4336;
+      --stejar:  #4A3C2D;
+      --pivnita: #1A1A1A;
+
+      --bg:      var(--pamant);
+      --bg-alt:  #E2D8CE;
+      --surface: #F2EAE2;
+      --ink:     var(--pivnita);
+      --ink-soft: var(--stejar);
+      --ink-mute: var(--piatra);
+      --line:    rgba(74, 60, 45, 0.18);
+
+      --font-serif: 'Lora', serif;
+      --font-mono:  'IBM Plex Mono', monospace;
+
+      --container: 1320px;
+      --px: clamp(20px, 4.5vw, 56px);
+      --py: clamp(64px, 8vw, 112px);
+
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+      --t-fast: 240ms;
+      --t-base: 480ms;
+      --t-slow: 800ms;
+    }
+    [data-theme="dark"] {
+      --bg: var(--pivnita); --bg-alt: #111111; --surface: #232220;
+      --ink: var(--pamant); --ink-soft: var(--nisip); --ink-mute: var(--piatra);
+      --line: rgba(203,190,174,0.18);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      transition: background var(--t-base) var(--ease), color var(--t-base) var(--ease);
+      overflow-x: hidden;
+    }
+    img, svg { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+    ul { list-style: none; }
+    *:focus-visible { outline: 2px solid var(--vie); outline-offset: 3px; border-radius: 2px; }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 1000;
+      opacity: 0.06;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+      mix-blend-mode: multiply;
+    }
+    [data-theme="dark"] body::before { mix-blend-mode: screen; opacity: 0.05; }
+
+    .container {
+      width: 100%;
+      max-width: var(--container);
+      margin-inline: auto;
+      padding-inline: var(--px);
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .eyebrow::before {
+      content: ''; width: 18px; height: 1px; background: currentColor; opacity: 0.5;
+    }
+    .h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(48px, 7vw, 96px);
+      line-height: 1.0;
+      letter-spacing: -0.025em;
+      font-weight: 600;
+    }
+    .h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(36px, 4.5vw, 64px);
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      font-weight: 600;
+    }
+    .lead {
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--ink-soft);
+      max-width: 60ch;
+    }
+
+    /* ═══ HEADER (same as home) ═══ */
+    .site-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 90;
+      background: color-mix(in oklab, var(--bg) 82%, transparent);
+      backdrop-filter: saturate(120%) blur(14px);
+      -webkit-backdrop-filter: saturate(120%) blur(14px);
+      border-bottom: 1px solid transparent;
+      transition: border-color var(--t-base) var(--ease), background var(--t-base) var(--ease);
+    }
+    .site-header.is-scrolled { border-bottom-color: var(--line); }
+    .header-inner {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 24px;
+      height: 72px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      transition: opacity var(--t-fast) var(--ease);
+    }
+    .brand:hover { opacity: 0.7; }
+    .brand-img { height: 38px; width: auto; display: block; }
+    [data-theme="dark"] .site-header .brand-img,
+    .footer .brand-img { filter: invert(1); }
+    .footer .brand-img { height: 56px; }
+
+    .nav-main {
+      display: flex;
+      gap: clamp(16px, 2vw, 28px);
+      justify-content: center;
+    }
+    .nav-main a {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      position: relative;
+      padding: 6px 2px;
+      transition: color var(--t-fast) var(--ease);
+    }
+    .nav-main a::after {
+      content: ''; position: absolute; left: 0; bottom: 0;
+      width: 0; height: 1px; background: currentColor;
+      transition: width var(--t-base) var(--ease);
+    }
+    .nav-main a:hover { color: var(--ink); }
+    .nav-main a:hover::after { width: 100%; }
+    .nav-actions {
+      display: flex; align-items: center; gap: 14px; justify-content: flex-end;
+    }
+    .lang-switch { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; letter-spacing: 0.18em; }
+    .lang-switch button { color: var(--ink-mute); padding: 4px 2px; transition: color var(--t-fast) var(--ease); }
+    .lang-switch button.is-active { color: var(--ink); }
+    .lang-switch .sep { width: 1px; height: 10px; background: var(--line); }
+
+    .cart-btn {
+      position: relative;
+      width: 32px; height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color var(--t-fast) var(--ease), transform var(--t-base) var(--ease);
+    }
+    .cart-btn:hover { border-color: var(--ink); transform: translateY(-2px); }
+    .cart-btn svg { width: 14px; height: 14px; color: var(--ink); }
+    .cart-count {
+      position: absolute; top: -4px; right: -4px;
+      min-width: 16px; height: 16px;
+      padding: 0 4px;
+      border-radius: 8px;
+      background: var(--vie);
+      color: var(--pamant);
+      font-family: var(--font-mono);
+      font-size: 9px; font-weight: 500;
+      display: inline-flex; align-items: center; justify-content: center;
+      transform: scale(0);
+      transition: transform var(--t-base) var(--ease);
+    }
+    .cart-count.is-visible { transform: scale(1); }
+
+    .theme-toggle {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      transition: border-color var(--t-fast) var(--ease), transform var(--t-base) var(--ease);
+    }
+    .theme-toggle:hover { border-color: var(--ink); transform: rotate(20deg); }
+    .theme-toggle svg { width: 14px; height: 14px; }
+    [data-theme="light"] .theme-toggle .moon { display: block; }
+    [data-theme="light"] .theme-toggle .sun  { display: none; }
+    [data-theme="dark"] .theme-toggle .moon  { display: none; }
+    [data-theme="dark"] .theme-toggle .sun   { display: block; }
+
+    /* ═══ PRODUCT PAGE ═══ */
+    main { padding-top: 72px; }
+
+    .breadcrumb {
+      padding: 32px var(--px) 8px;
+      max-width: var(--container);
+      margin: 0 auto;
+      width: 100%;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .breadcrumb a:hover { color: var(--ink); }
+    .breadcrumb .sep { margin: 0 10px; opacity: 0.5; }
+
+    .product {
+      padding: clamp(32px, 4vw, 64px) var(--px) clamp(64px, 8vw, 96px);
+      border-bottom: 1px solid var(--line);
+    }
+    .product-grid {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: clamp(40px, 5vw, 96px);
+      align-items: start;
+    }
+
+    /* gallery */
+    .gallery {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .gallery-thumbs {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .gallery-thumb {
+      aspect-ratio: 1/1.2;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: border-color var(--t-fast) var(--ease);
+    }
+    .gallery-thumb.is-active { border-color: var(--ink); }
+    .gallery-thumb:hover { border-color: var(--ink-soft); }
+    .gallery-thumb svg { position: absolute; inset: 0; margin: auto; height: 84%; }
+    .gallery-thumb .ctx { position: absolute; inset: 0; opacity: 0.85; mix-blend-mode: multiply; }
+    .ctx-1 { background: var(--surface); }
+    .ctx-2 { background: radial-gradient(ellipse at 50% 70%, #5a6b3e 0%, #2c3a22 80%); }
+    .ctx-3 { background: radial-gradient(ellipse at 40% 60%, #5a4a36 0%, #2c2418 80%); }
+    .ctx-4 { background: radial-gradient(ellipse at 50% 50%, #2a2218 0%, #0a0a0a 80%); }
+
+    .gallery-main {
+      aspect-ratio: 4/5;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transition: background var(--t-base) var(--ease);
+    }
+    .gallery-main .bg {
+      position: absolute; inset: 0;
+      transition: opacity var(--t-base) var(--ease);
+    }
+    .gallery-main svg.bottle {
+      position: relative;
+      height: 86%;
+      filter: drop-shadow(0 24px 50px rgba(26,26,26,0.25));
+      transition: transform var(--t-slow) var(--ease);
+    }
+    .gallery-main:hover svg.bottle { transform: translateY(-8px) rotate(-1deg); }
+
+    /* buy box */
+    .buy { display: flex; flex-direction: column; gap: 24px; padding-top: 8px; }
+    .buy .meta-line {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .buy .meta-line .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--ink-mute); }
+    .buy h1 { font-family: var(--font-serif); font-size: clamp(40px, 5.5vw, 80px); line-height: 1.0; letter-spacing: -0.025em; color: var(--ink); font-weight: 600; }
+    .buy .specs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .buy .spec {
+      padding: 16px 0;
+      border-right: 1px solid var(--line);
+      padding-right: 20px;
+    }
+    .buy .spec:nth-child(2n) { border-right: none; padding-left: 20px; padding-right: 0; }
+    .buy .spec:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .buy .spec-label {
+      font-size: 9px;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-bottom: 6px;
+    }
+    .buy .spec-value {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+    }
+    .buy .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+    .buy .price {
+      font-family: var(--font-serif);
+      font-size: 56px;
+      line-height: 1;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+    }
+    .buy .price-currency {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      color: var(--ink-mute);
+      text-transform: uppercase;
+    }
+    .buy .price-sub {
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--ink-mute);
+      margin-left: auto;
+    }
+    .buy .qty-add {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .qty-input {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--ink);
+      height: 56px;
+    }
+    .qty-input button {
+      width: 44px;
+      color: var(--ink-soft);
+      transition: color var(--t-fast) var(--ease);
+    }
+    .qty-input button:hover { color: var(--ink); }
+    .qty-input span {
+      min-width: 28px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--ink);
+    }
+    .add-cart {
+      height: 56px;
+      padding: 0 24px;
+      background: var(--ink);
+      color: var(--bg);
+      border: 1px solid var(--ink);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: background var(--t-base) var(--ease), gap var(--t-base) var(--ease);
+    }
+    .add-cart:hover { background: var(--vie); border-color: var(--vie); gap: 18px; }
+    .add-cart.is-pulse { animation: pulse 600ms var(--ease); }
+    @keyframes pulse {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(0.96); }
+      70%  { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    .buy .short-note {
+      font-size: 13px;
+      line-height: 1.85;
+      color: var(--ink-soft);
+      max-width: 50ch;
+      padding: 12px 0;
+    }
+    .buy .extras {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      color: var(--ink-mute);
+    }
+    .buy .extras span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .buy .extras span::before {
+      content: ''; width: 12px; height: 1px; background: currentColor; opacity: 0.5;
+    }
+
+    /* ═══ STORY ═══ */
+    .story {
+      padding: var(--py) var(--px);
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--line);
+    }
+    .story-inner {
+      max-width: 920px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .story p {
+      font-family: var(--font-serif);
+      font-size: clamp(22px, 2.4vw, 36px);
+      line-height: 1.4;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+    }
+    .story .small-mono {
+      margin-top: 32px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+
+    /* ═══ INFO GRID ═══ */
+    .info {
+      padding: var(--py) var(--px);
+      border-bottom: 1px solid var(--line);
+    }
+    .info-head {
+      max-width: var(--container);
+      margin: 0 auto clamp(40px, 5vw, 72px);
+      text-align: center;
+    }
+    .info-head .h2 { margin-top: 16px; }
+    .info-grid {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+    .info-card {
+      background: var(--bg);
+      padding: clamp(28px, 3.5vw, 48px);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .info-card .num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.3em;
+      color: var(--ink-mute);
+    }
+    .info-card h3 {
+      font-family: var(--font-serif);
+      font-size: 32px;
+      line-height: 1.05;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .info-card p {
+      font-size: 13px;
+      line-height: 1.85;
+      color: var(--ink-soft);
+      max-width: 44ch;
+    }
+    .info-card ul { display: flex; flex-direction: column; gap: 8px; }
+    .info-card li {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .info-card li:last-child { border-bottom: none; }
+    .info-card li strong {
+      font-weight: 500;
+      color: var(--ink-mute);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 10px;
+    }
+    .info-card li span { color: var(--ink-soft); font-family: var(--font-mono); }
+
+    /* ═══ COORDS BAND ═══ */
+    .coords-band {
+      background: var(--vie);
+      color: var(--pamant);
+      padding: clamp(48px, 6vw, 88px) var(--px);
+      border-bottom: 1px solid var(--line);
+    }
+    .coords-inner {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: clamp(32px, 4vw, 64px);
+      align-items: center;
+    }
+    .coords-inner h3 {
+      font-family: var(--font-serif);
+      font-size: clamp(32px, 4vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -0.015em;
+      max-width: 18ch;
+    }
+    .coords-card {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.8;
+      color: rgba(235, 225, 218, 0.7);
+      text-align: right;
+      letter-spacing: 0.04em;
+    }
+    .coords-card strong {
+      display: block;
+      font-family: var(--font-serif);
+      font-size: 28px;
+      color: var(--pamant);
+      letter-spacing: -0.005em;
+      margin-bottom: 8px;
+      font-weight: 400;
+    }
+
+    /* ═══ RELATED ═══ */
+    .related {
+      padding: var(--py) var(--px);
+      border-bottom: 1px solid var(--line);
+    }
+    .related-head {
+      max-width: var(--container);
+      margin: 0 auto clamp(40px, 5vw, 72px);
+      text-align: center;
+    }
+    .related-head .h2 { margin-top: 16px; }
+    .related-grid {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+    .related-card {
+      background: var(--bg);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      cursor: pointer;
+      transition: background var(--t-base) var(--ease);
+    }
+    .related-card:hover { background: var(--surface); }
+    .related-card .img {
+      aspect-ratio: 4/5;
+      background: var(--bg-alt);
+      border: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .related-card .img svg { height: 78%; transition: transform var(--t-slow) var(--ease); }
+    .related-card:hover .img svg { transform: translateY(-6px); }
+    .related-card .head {
+      display: flex; justify-content: space-between;
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .related-card .name {
+      font-family: var(--font-serif);
+      font-size: 24px; line-height: 1.05; color: var(--ink);
+    }
+    .related-card .price {
+      font-family: var(--font-serif);
+      font-size: 18px; color: var(--ink);
+    }
+    .related-card .arrow-link {
+      font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--ink); display: inline-flex; align-items: center; gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+    }
+    .related-card .arrow-link svg { transition: transform var(--t-base) var(--ease); }
+    .related-card:hover .arrow-link svg { transform: translateX(4px); }
+
+    /* ═══ FOOTER (same shape as home) ═══ */
+    .footer {
+      background: var(--pivnita);
+      color: var(--pamant);
+      padding: clamp(64px, 8vw, 112px) var(--px) 24px;
+    }
+    .footer-grid {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: clamp(40px, 5vw, 96px);
+      padding-bottom: clamp(40px, 5vw, 80px);
+      border-bottom: 1px solid rgba(235, 225, 218, 0.12);
+    }
+    .footer-col h4 {
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 500; letter-spacing: 0.28em;
+      text-transform: uppercase; color: rgba(235, 225, 218, 0.5);
+      margin-bottom: 22px;
+    }
+    .footer-col p, .footer-col li, .footer-col a {
+      font-size: 12px; line-height: 1.85; color: rgba(235, 225, 218, 0.7);
+      transition: color var(--t-fast) var(--ease);
+    }
+    .footer-col a:hover { color: var(--pamant); }
+    .footer-col p { margin-bottom: 20px; }
+    .footer-col ul { display: flex; flex-direction: column; gap: 4px; }
+    .footer-bottom {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: rgba(235, 225, 218, 0.4);
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    /* ═══ CART DRAWER ═══ */
+    .cart-drawer {
+      position: fixed; inset: 0; z-index: 300;
+      pointer-events: none;
+    }
+    .cart-drawer.is-open { pointer-events: auto; }
+    .cart-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(26,26,26,0.55);
+      opacity: 0;
+      transition: opacity var(--t-base) var(--ease);
+    }
+    .cart-drawer.is-open .cart-backdrop { opacity: 1; }
+    .cart-panel {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: min(440px, 100vw);
+      background: var(--bg);
+      transform: translateX(100%);
+      transition: transform 600ms var(--ease);
+      display: flex;
+      flex-direction: column;
+      box-shadow: -24px 0 60px rgba(26,26,26,0.12);
+    }
+    .cart-drawer.is-open .cart-panel { transform: translateX(0); }
+    .cart-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 28px 28px 24px; border-bottom: 1px solid var(--line); gap: 16px;
+    }
+    .cart-head .eyebrow { margin-bottom: 8px; }
+    .cart-title { font-family: var(--font-serif); font-size: 32px; line-height: 1; color: var(--ink); }
+    .cart-close {
+      width: 32px; height: 32px;
+      border: 1px solid var(--line); border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--ink); flex-shrink: 0;
+      transition: border-color var(--t-fast) var(--ease), transform var(--t-base) var(--ease);
+    }
+    .cart-close:hover { border-color: var(--ink); transform: rotate(90deg); }
+    .cart-body { flex: 1; overflow-y: auto; padding: 0 28px; }
+    .cart-empty { padding: 56px 0; text-align: center; color: var(--ink-mute); }
+    .cart-empty p { font-size: 13px; line-height: 1.7; margin-bottom: 24px; }
+    .cart-items { padding: 16px 0; }
+    .cart-item {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 16px; padding: 20px 0;
+      border-bottom: 1px solid var(--line);
+      align-items: center;
+    }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-img {
+      width: 64px; aspect-ratio: 1/1.4;
+      background: var(--surface); border: 1px solid var(--line);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cart-item-img svg { height: 88%; }
+    .cart-item-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .cart-item-name { font-family: var(--font-serif); font-size: 18px; line-height: 1.1; color: var(--ink); }
+    .cart-item-meta { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); }
+    .cart-item-price { font-family: var(--font-mono); font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+    .qty {
+      display: inline-flex; align-items: center;
+      border: 1px solid var(--line); margin-top: 6px; width: fit-content;
+    }
+    .qty button {
+      width: 26px; height: 26px;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: var(--ink-soft); transition: color var(--t-fast) var(--ease);
+    }
+    .qty button:hover { color: var(--ink); }
+    .qty span { min-width: 22px; text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--ink); }
+    .cart-item-remove {
+      align-self: start;
+      font-family: var(--font-mono); font-size: 16px;
+      color: var(--ink-mute); padding: 4px 6px;
+      transition: color var(--t-fast) var(--ease);
+    }
+    .cart-item-remove:hover { color: var(--ink); }
+    .cart-foot {
+      padding: 24px 28px 28px;
+      border-top: 1px solid var(--line);
+      background: var(--bg);
+    }
+    .cart-row {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: var(--ink-soft); padding: 6px 0;
+    }
+    .cart-row.cart-total {
+      padding-top: 14px; margin-top: 8px;
+      border-top: 1px solid var(--line);
+      font-family: var(--font-serif); font-size: 22px; color: var(--ink);
+    }
+    .cart-checkout {
+      width: 100%; margin-top: 16px;
+      padding: 18px 24px;
+      background: var(--ink); color: var(--bg);
+      border: 1px solid var(--ink);
+      font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+      transition: background var(--t-base) var(--ease), gap var(--t-base) var(--ease);
+    }
+    .cart-checkout:hover { background: var(--vie); border-color: var(--vie); gap: 18px; }
+    .cart-note { margin-top: 12px; font-size: 10px; line-height: 1.6; color: var(--ink-mute); }
+
+    /* ═══ REVEAL ═══ */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 900ms var(--ease), transform 900ms var(--ease); }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+      }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+
+    @media (max-width: 1024px) {
+      .nav-main { display: none; }
+      .product-grid { grid-template-columns: 1fr; }
+      .gallery { grid-template-columns: 80px 1fr; }
+      .info-grid { grid-template-columns: 1fr; }
+      .related-grid { grid-template-columns: 1fr; }
+      .coords-inner { grid-template-columns: 1fr; }
+      .coords-card { text-align: left; }
+      .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+    }
+    @media (max-width: 640px) {
+      .gallery { grid-template-columns: 1fr; }
+      .gallery-thumbs { flex-direction: row; overflow-x: auto; }
+      .gallery-thumb { width: 80px; flex-shrink: 0; }
+      .buy .price { font-size: 44px; }
+      .buy .qty-add { grid-template-columns: 1fr; gap: 12px; }
+      .footer-bottom { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="arrow-right" viewBox="0 0 24 12">
+        <path d="M0 6 H22 M16 0 L22 6 L16 12" stroke="currentColor" stroke-width="1.2" fill="none"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- ═══ HEADER ═══ -->
+  <header class="site-header" id="siteHeader">
+    <div class="container">
+      <div class="header-inner">
+        <a class="brand" href="Landing_V1.html" aria-label="Domeniul Locus — acasă">
+          <img class="brand-img" src="logo-locus.png" alt="Domeniul Locus" />
+        </a>
+        <nav class="nav-main" aria-label="Navigare principală">
+          <a href="Landing_V1.html#acasa">Acasă</a>
+          <a href="Landing_V1.html#despre">Despre noi</a>
+          <a href="Landing_V1.html#vinuri">Vinuri</a>
+          <a href="Landing_V1.html#locul">Locul</a>
+          <a href="Landing_V1.html#contact">Contact</a>
+        </nav>
+        <div class="nav-actions">
+          <div class="lang-switch" role="group" aria-label="Limbă">
+            <button class="is-active" data-lang="ro" aria-pressed="true">RO</button>
+            <span class="sep" aria-hidden="true"></span>
+            <button data-lang="en" aria-pressed="false">EN</button>
+          </div>
+          <button class="cart-btn" id="cartBtn" aria-label="Coș" type="button">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+              <path d="M3 4 L4 14 H12 L13 4 Z"/>
+              <path d="M5 4 V2.5 A3 3 0 0 1 11 2.5 V4"/>
+            </svg>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
+          <button class="theme-toggle" id="themeToggle" aria-label="Comută temă">
+            <svg class="moon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2">
+              <path d="M13 9.5A6 6 0 0 1 6.5 3a6 6 0 1 0 6.5 6.5z"/>
+            </svg>
+            <svg class="sun" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2">
+              <circle cx="8" cy="8" r="3"/>
+              <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- breadcrumb -->
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="Landing_V1.html#vinuri">Vinuri</a>
+      <span class="sep">/</span>
+      <a id="bcGama" href="#"></a>
+      <span class="sep">/</span>
+      <span id="bcName"></span>
+    </nav>
+
+    <!-- product hero -->
+    <section class="product">
+      <div class="product-grid">
+        <div class="gallery reveal">
+          <div class="gallery-thumbs" role="tablist" aria-label="Galerie">
+            <button class="gallery-thumb is-active" data-ctx="ctx-1" aria-label="Studio">
+              <span class="ctx ctx-1"></span>
+              <svg id="thumb1" viewBox="0 0 80 200" aria-hidden="true"></svg>
+            </button>
+            <button class="gallery-thumb" data-ctx="ctx-2" aria-label="În vie">
+              <span class="ctx ctx-2"></span>
+              <svg id="thumb2" viewBox="0 0 80 200" aria-hidden="true"></svg>
+            </button>
+            <button class="gallery-thumb" data-ctx="ctx-3" aria-label="Pe lemn">
+              <span class="ctx ctx-3"></span>
+              <svg id="thumb3" viewBox="0 0 80 200" aria-hidden="true"></svg>
+            </button>
+            <button class="gallery-thumb" data-ctx="ctx-4" aria-label="În pivniță">
+              <span class="ctx ctx-4"></span>
+              <svg id="thumb4" viewBox="0 0 80 200" aria-hidden="true"></svg>
+            </button>
+          </div>
+          <div class="gallery-main" id="galleryMain">
+            <span class="bg ctx-1" id="galleryBg"></span>
+            <svg class="bottle" id="bottleMain" viewBox="0 0 80 200" aria-hidden="true"></svg>
+          </div>
+        </div>
+
+        <div class="buy reveal">
+          <div class="meta-line">
+            <span id="prodGama"></span>
+            <span class="dot" aria-hidden="true"></span>
+            <span id="prodCode"></span>
+            <span class="dot" aria-hidden="true"></span>
+            <span id="prodVintage"></span>
+          </div>
+          <h1 id="prodName"></h1>
+
+          <div class="specs">
+            <div class="spec">
+              <div class="spec-label">Culoare · Vinificat</div>
+              <div class="spec-value" id="specColor"></div>
+            </div>
+            <div class="spec">
+              <div class="spec-label">Alcool</div>
+              <div class="spec-value" id="specAlc"></div>
+            </div>
+            <div class="spec">
+              <div class="spec-label">Apelațiune</div>
+              <div class="spec-value">DOC-CMD<br><span style="font-size:14px; color:var(--ink-soft); font-family:var(--font-mono); letter-spacing:0.04em;">Panciu · CMD</span></div>
+            </div>
+            <div class="spec">
+              <div class="spec-label">Volum</div>
+              <div class="spec-value">750 <span style="font-size:14px; color:var(--ink-soft); font-family:var(--font-mono); letter-spacing:0.04em;">ml</span></div>
+            </div>
+          </div>
+
+          <div class="price-row">
+            <span class="price" id="prodPrice"></span>
+            <span class="price-currency">lei / sticlă</span>
+            <span class="price-sub">TVA inclus</span>
+          </div>
+
+          <p class="short-note" id="prodShort"></p>
+
+          <div class="qty-add">
+            <div class="qty-input">
+              <button id="qtyDec" aria-label="Scade">−</button>
+              <span id="qtyVal">1</span>
+              <button id="qtyInc" aria-label="Crește">+</button>
+            </div>
+            <button class="add-cart" id="addToCart" type="button">
+              Adaugă în coș
+              <svg width="16" height="8" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+            </button>
+          </div>
+
+          <div class="extras">
+            <span>Livrare 2–4 zile</span>
+            <span>Plata la livrare disponibilă</span>
+            <span>Pachet cadou opțional</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- story -->
+    <section class="story">
+      <div class="story-inner reveal">
+        <p>locus marchează un punct precis: locul unde natura, timpul și intervenția umană se întâlnesc. Ce se naște în acest punct exprimă fidel caracterul teritoriului de graniță — între Panciu și Nicorești.</p>
+        <div class="small-mono">teritoriu · timp · măsură</div>
+      </div>
+    </section>
+
+    <!-- info -->
+    <section class="info">
+      <div class="info-head reveal">
+        <div class="eyebrow" style="justify-content: center;">Detalii vin</div>
+        <h2 class="h2">Cum se citește.</h2>
+      </div>
+
+      <div class="info-grid reveal">
+        <article class="info-card">
+          <span class="num">01</span>
+          <h3>Notă de degustare</h3>
+          <p id="noteTaste"></p>
+        </article>
+        <article class="info-card">
+          <span class="num">02</span>
+          <h3>Asociere culinară</h3>
+          <p id="notePair"></p>
+        </article>
+        <article class="info-card">
+          <span class="num">03</span>
+          <h3>Servire</h3>
+          <ul>
+            <li><strong>Temperatura</strong><span id="servTemp"></span></li>
+            <li><strong>Pahar</strong><span id="servGlass"></span></li>
+            <li><strong>Decantare</strong><span id="servDecant"></span></li>
+            <li><strong>Maturare</strong><span id="servAge"></span></li>
+          </ul>
+        </article>
+        <article class="info-card">
+          <span class="num">04</span>
+          <h3>Fișă tehnică</h3>
+          <ul>
+            <li><strong>Soi</strong><span id="techGrape"></span></li>
+            <li><strong>An recoltă</strong><span id="techYear">2025</span></li>
+            <li><strong>Apelațiune</strong><span>DOC-CMD Panciu</span></li>
+            <li><strong>Volum</strong><span>750 ml</span></li>
+            <li><strong>Alcool</strong><span id="techAlc"></span></li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- coords band -->
+    <section class="coords-band">
+      <div class="coords-inner reveal">
+        <h3>Cules din parcelele de pe coama dintre Panciu și Nicorești.</h3>
+        <div class="coords-card">
+          <strong>45.98°N 27.30°E</strong>
+          Centrul de Vinificație Buciumeni<br>
+          jud. Galați · România<br>
+          DOC-CMD Panciu
+        </div>
+      </div>
+    </section>
+
+    <!-- related -->
+    <section class="related">
+      <div class="related-head reveal">
+        <div class="eyebrow" style="justify-content: center;">Continuă explorarea</div>
+        <h2 class="h2">Vinuri apropiate.</h2>
+      </div>
+      <div class="related-grid" id="relatedGrid"></div>
+    </section>
+
+    <!-- footer -->
+    <footer class="footer" id="contact">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <a class="brand" href="Landing_V1.html" style="margin-bottom: 32px; display: inline-flex;">
+            <img class="brand-img" src="logo-locus.png" alt="Domeniul Locus" />
+          </a>
+          <p>
+            Sediu social<br>
+            Jud. Galați, mun. Galați,<br>
+            str. Portului, nr. 20, tronson 1, camera 211<br><br>
+            Punct de lucru<br>
+            Centrul de Vinificație Buciumeni,<br>
+            jud. Galați, com. Buciumeni
+          </p>
+          <p>
+            <a href="tel:+40752232912">(0752) 232 912</a><br>
+            <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Navighează</h4>
+          <ul>
+            <li><a href="Landing_V1.html#acasa">Acasă</a></li>
+            <li><a href="Landing_V1.html#despre">Despre noi</a></li>
+            <li><a href="Landing_V1.html#vinuri">Vinuri</a></li>
+            <li><a href="Landing_V1.html#locul">Locul</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Urmărește-ne</h4>
+          <ul>
+            <li><a href="#" target="_blank" rel="noopener">Instagram ↗</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Facebook ↗</a></li>
+          </ul>
+          <p style="margin-top: 32px; font-size: 11px; line-height: 1.7;">
+            SC ROMVINTEC SRL · Conține sulfiți.<br>
+            Consumul excesiv de alcool dăunează sănătății.
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>45.98°N 27.30°E · Buciumeni · România</span>
+        <span>© 2026 Domeniul Locus · STUDIOMASURA</span>
+      </div>
+    </footer>
+  </main>
+
+  <!-- cart drawer -->
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-label="Coșul tău">
+    <div class="cart-backdrop" data-cart-close></div>
+    <div class="cart-panel" role="dialog" aria-modal="true">
+      <header class="cart-head">
+        <div>
+          <div class="eyebrow">coșul tău</div>
+          <h3 class="cart-title">Selecția ta</h3>
+        </div>
+        <button class="cart-close" data-cart-close aria-label="Închide coșul">
+          <svg viewBox="0 0 12 12" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+            <path d="M2 2 L10 10 M10 2 L2 10"/>
+          </svg>
+        </button>
+      </header>
+      <div class="cart-body">
+        <div class="cart-empty" id="cartEmpty" hidden>
+          <p>Coșul e încă gol.<br>Începe cu o sticlă.</p>
+          <a href="Landing_V1.html#vinuri" class="btn-ghost" data-cart-close style="display:inline-flex; align-items:center; gap:10px; font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ink); border-bottom:1px solid var(--ink); padding-bottom:4px;">Vezi vinurile</a>
+        </div>
+        <ul class="cart-items" id="cartItems"></ul>
+      </div>
+      <footer class="cart-foot" id="cartFoot" hidden>
+        <div class="cart-row"><span>Subtotal</span><span id="cartSubtotal">0 lei</span></div>
+        <div class="cart-row"><span>Transport</span><span>se calculează la checkout</span></div>
+        <div class="cart-row cart-total"><span>Total</span><span id="cartTotal">0 lei</span></div>
+        <a class="cart-checkout" href="checkout.html">
+          Comandă
+          <svg width="16" height="8" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"/></svg>
+        </a>
+        <p class="cart-note">Livrare în 2–4 zile lucrătoare. Conține sulfiți. Consumul excesiv de alcool dăunează sănătății.</p>
+      </footer>
+    </div>
+  </aside>
+
+  <script>
+    // ─── WINES DATA ─────────────────────────────────────────
+    const WINES = {
+      LC01: {
+        code: 'LC01', name: 'Fetească Regală', gama: 'cuvinte', price: 79, color: 'white',
+        meta: 'Alb · Demisec · 13,5%', vintage: 2025, alc: '13,5% VOL', cv: 'Alb · Demisec',
+        short: 'Vin elegant și armonios. Flori albe, fructe galbene coapte, citrice fine, accente discrete de miere.',
+        taste: 'Aromele de flori albe se împletesc cu note de fructe galbene coapte, citrice fine și accente discrete de miere. Textura este echilibrată, cu o prospețime bine definită și un final curat, delicat.',
+        pair: 'Carne albă, paste, risotto sau brânzeturi cremoase. Excelent ca aperitiv lângă crudități și pește alb la grătar.',
+        temp: '8–10°C', glass: 'pahar tip alb mediu', decant: 'nu este nevoie', age: 'consumă în 2–3 ani', grape: 'Fetească Regală 100%',
+      },
+      LC02: {
+        code: 'LC02', name: 'Fetească Neagră', gama: 'cuvinte', price: 89, color: 'red',
+        meta: 'Roșu · Demisec · 14,9%', vintage: 2025, alc: '14,9% VOL', cv: 'Roșu · Demisec',
+        short: 'Vin intens și bine definit. Fructe negre coapte, prune uscate, accente fine de condimente. Final persistent.',
+        taste: 'Arome de fructe negre coapte, prune uscate și accente fine de condimente. Structura este amplă și catifelată, cu taninuri bine integrate și un final persistent.',
+        pair: 'Carne roșie, vânat, preparate condimentate sau brânzeturi maturate. Funcționează și cu mâncăruri tradiționale românești.',
+        temp: '14–16°C', glass: 'pahar Burgundia', decant: '20–30 min recomandat', age: 'potențial de învechire 4–6 ani', grape: 'Fetească Neagră 100%',
+      },
+      LC04: {
+        code: 'LC04', name: 'Riesling Italian', gama: 'cuvinte', price: 79, color: 'white',
+        meta: 'Alb · Sec · 13%', vintage: 2025, alc: '13% VOL', cv: 'Alb · Sec',
+        short: 'Vin proaspăt și precis. Citrice, măr verde, accente florale. Aciditate susținută, final răcoritor.',
+        taste: 'Note de citrice, măr verde și accente florale discrete. Structura este susținută de o aciditate bine definită, care îi conferă tensiune și un final curat, răcoritor.',
+        pair: 'Preparate ușoare, pește, fructe de mare, salate sau brânzeturi fine. Excelent cu sushi și ceviche.',
+        temp: '8–12°C', glass: 'pahar tip Riesling', decant: 'nu este nevoie', age: 'consumă în 2–4 ani', grape: 'Riesling Italian 100%',
+      },
+      LS01: {
+        code: 'LS01', name: 'Fetească Regală', gama: 'semne', price: 109, color: 'white',
+        meta: 'Alb · Demisec · 13,5%', vintage: 2025, alc: '13,5% VOL', cv: 'Alb · Demisec',
+        short: 'Selecție de parcelă. Flori albe, fructe coapte, miere și citrice. Textură rotundă, final delicat care invită la încă un pahar.',
+        taste: 'Aromele de flori albe și fructe coapte se împletesc cu note subtile de miere și citrice. Textura este echilibrată, cu un gust rotund și un final delicat.',
+        pair: 'Carne albă, paste, risotto sau brânzeturi cremoase. Excelent cu mese de zi cu zi sau ocazii speciale.',
+        temp: '8–10°C', glass: 'pahar tip alb mediu', decant: 'nu este nevoie', age: 'consumă în 2–3 ani', grape: 'Fetească Regală 100%',
+      },
+      LS02: {
+        code: 'LS02', name: 'Fetească Neagră', gama: 'semne', price: 119, color: 'red',
+        meta: 'Roșu · Demisec · 14,9%', vintage: 2025, alc: '14,9% VOL', cv: 'Roșu · Demisec',
+        short: 'Selecție de parcelă. Fructe negre coapte, prune uscate, condimente fine. Structură amplă, taninuri integrate.',
+        taste: 'Vin intens și bine definit, cu arome de fructe negre coapte, prune uscate și accente fine de condimente. Structură amplă și catifelată cu un final persistent.',
+        pair: 'Carne roșie, vânat, preparate condimentate sau brânzeturi maturate. Magic lângă o tocăniță românească.',
+        temp: '14–16°C', glass: 'pahar Burgundia', decant: '30–40 min recomandat', age: 'potențial de învechire 5–7 ani', grape: 'Fetească Neagră 100%',
+      },
+      LS04: {
+        code: 'LS04', name: 'Riesling Italian', gama: 'semne', price: 109, color: 'white',
+        meta: 'Alb · Sec · 13%', vintage: 2025, alc: '13% VOL', cv: 'Alb · Sec',
+        short: 'Selecție de parcelă. Citrice, măr verde, accente florale. Aciditate susținută, tensiune precisă.',
+        taste: 'Note proaspete de citrice și măr verde, cu accente florale discrete. Aciditate bine definită care conferă tensiune și un final curat, răcoritor.',
+        pair: 'Preparate ușoare, pește, fructe de mare, salate sau brânzeturi fine. Excelent cu mâncare orientală.',
+        temp: '8–12°C', glass: 'pahar tip Riesling', decant: 'nu este nevoie', age: 'consumă în 2–4 ani', grape: 'Riesling Italian 100%',
+      },
+    };
+
+    // ─── BOTTLE SVG ─────────────────────────────────────────
+    function bottleSvg(color, code, gama) {
+      const fill = color === 'red' ? '#2a1416' : '#DCD0BC';
+      const stroke = color === 'red' ? '#110608' : '#8a7a5c';
+      if (gama === 'semne') {
+        return `<path d="M32 0 H48 V40 Q60 50 60 70 V190 Q60 200 50 200 H30 Q20 200 20 190 V70 Q20 50 32 40 Z" fill="${fill}" stroke="${stroke}" stroke-width="0.8"/>
+          <rect x="22" y="98" width="36" height="64" fill="#CBBEAE" stroke="#A89D8D" stroke-width="0.4"/>
+          <g stroke="#1A1A1A" stroke-width="0.3" fill="none" opacity="0.7">
+            <path d="M25 112 Q40 108 55 114"/>
+            <path d="M25 120 Q40 116 55 122"/>
+          </g>
+          <text x="40" y="140" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="5" fill="#1A1A1A" letter-spacing="0.4">${code}</text>
+          <text x="40" y="152" text-anchor="middle" font-family="Lora, serif" font-size="6" fill="#1A1A1A">lócus</text>`;
+      }
+      // cuvinte
+      return `<path d="M32 0 H48 V40 Q60 50 60 70 V190 Q60 200 50 200 H30 Q20 200 20 190 V70 Q20 50 32 40 Z" fill="${fill}" stroke="${stroke}" stroke-width="0.8"/>
+        <rect x="20" y="100" width="40" height="60" fill="#EBE1DA" stroke="#A89D8D" stroke-width="0.4"/>
+        <text x="40" y="130" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="6" fill="#1A1A1A" letter-spacing="0.5">${code}</text>
+        <text x="40" y="142" text-anchor="middle" font-family="Lora, serif" font-size="6" fill="#1A1A1A">lócus</text>`;
+    }
+
+    // ─── RENDER PRODUCT ─────────────────────────────────────
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id') || 'LC01';
+    const w = WINES[id] || WINES.LC01;
+
+    document.getElementById('pageTitle').textContent = `${w.name} · ${w.gama} — Domeniul Locus`;
+    document.getElementById('bcGama').textContent = w.gama;
+    document.getElementById('bcGama').href = `index.html#vinuri`;
+    document.getElementById('bcName').textContent = `${w.name} ${w.code}`;
+
+    document.getElementById('prodGama').textContent = `${w.gama} · ${w.code}`;
+    document.getElementById('prodCode').textContent = `Cod ${w.code}`;
+    document.getElementById('prodVintage').textContent = `Recoltă ${w.vintage}`;
+    document.getElementById('prodName').textContent = w.name;
+    document.getElementById('prodPrice').textContent = w.price;
+    document.getElementById('prodShort').textContent = w.short;
+
+    document.getElementById('specColor').textContent = w.cv;
+    document.getElementById('specAlc').textContent = w.alc;
+
+    document.getElementById('noteTaste').textContent = w.taste;
+    document.getElementById('notePair').textContent = w.pair;
+    document.getElementById('servTemp').textContent = w.temp;
+    document.getElementById('servGlass').textContent = w.glass;
+    document.getElementById('servDecant').textContent = w.decant;
+    document.getElementById('servAge').textContent = w.age;
+    document.getElementById('techGrape').textContent = w.grape;
+    document.getElementById('techAlc').textContent = w.alc;
+
+    const bottleHTML = bottleSvg(w.color, w.code, w.gama);
+    document.getElementById('bottleMain').innerHTML = bottleHTML;
+    document.getElementById('thumb1').innerHTML = bottleHTML;
+    document.getElementById('thumb2').innerHTML = bottleHTML;
+    document.getElementById('thumb3').innerHTML = bottleHTML;
+    document.getElementById('thumb4').innerHTML = bottleHTML;
+
+    // gallery context switch
+    const galBg = document.getElementById('galleryBg');
+    document.querySelectorAll('.gallery-thumb').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.gallery-thumb').forEach(x => x.classList.remove('is-active'));
+        t.classList.add('is-active');
+        galBg.className = 'bg ' + t.dataset.ctx;
+      });
+    });
+
+    // related (other 3 from same gama if any, else other gama)
+    const related = Object.values(WINES)
+      .filter(x => x.code !== w.code)
+      .sort((a, b) => (a.gama === w.gama ? -1 : 1))
+      .slice(0, 3);
+    const relatedHTML = related.map(r => `
+      <a class="related-card" href="wine.html?id=${r.code}">
+        <div class="img"><svg viewBox="0 0 80 200">${bottleSvg(r.color, r.code, r.gama)}</svg></div>
+        <div class="head"><span>${r.gama} · ${r.code}</span><span>${r.vintage}</span></div>
+        <div class="name">${r.name}</div>
+        <div class="price">${r.price} <span style="font-family:var(--font-mono); font-size:11px; letter-spacing:0.18em; color:var(--ink-mute); text-transform:uppercase;">lei</span></div>
+        <span class="arrow-link">Vezi fișa <svg width="14" height="6" viewBox="0 0 24 12"><use href="#arrow-right"/></svg></span>
+      </a>`).join('');
+    document.getElementById('relatedGrid').innerHTML = relatedHTML;
+
+    // ─── QTY + ADD-TO-CART ─────────────────────────────────
+    let qty = 1;
+    const qtyValEl = document.getElementById('qtyVal');
+    document.getElementById('qtyDec').addEventListener('click', () => { qty = Math.max(1, qty - 1); qtyValEl.textContent = qty; });
+    document.getElementById('qtyInc').addEventListener('click', () => { qty = Math.min(99, qty + 1); qtyValEl.textContent = qty; });
+
+    const addBtn = document.getElementById('addToCart');
+    addBtn.addEventListener('click', () => {
+      addBtn.classList.add('is-pulse');
+      setTimeout(() => addBtn.classList.remove('is-pulse'), 600);
+      const c = loadCart();
+      c[id] = (c[id] || 0) + qty;
+      saveCart(c);
+      renderCart();
+      openCart();
+    });
+
+    // ─── CART (shared logic) ───────────────────────────────
+    const CART_KEY = 'locus-cart';
+    const fmtPrice = n => `${n.toLocaleString('ro-RO')} lei`;
+    function loadCart() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; } catch { return {}; } }
+    function saveCart(c) { localStorage.setItem(CART_KEY, JSON.stringify(c)); }
+
+    const cartDrawer = document.getElementById('cartDrawer');
+    const cartItemsEl = document.getElementById('cartItems');
+    const cartEmptyEl = document.getElementById('cartEmpty');
+    const cartFootEl = document.getElementById('cartFoot');
+    const cartCountEl = document.getElementById('cartCount');
+    const cartSubtotalEl = document.getElementById('cartSubtotal');
+    const cartTotalEl = document.getElementById('cartTotal');
+
+    function renderCart() {
+      const cart = loadCart();
+      const ids = Object.keys(cart);
+      const totalQty = ids.reduce((s, k) => s + cart[k], 0);
+      const subtotal = ids.reduce((s, k) => s + (WINES[k]?.price || 0) * cart[k], 0);
+      cartCountEl.textContent = totalQty;
+      cartCountEl.classList.toggle('is-visible', totalQty > 0);
+
+      if (ids.length === 0) {
+        cartItemsEl.innerHTML = '';
+        cartEmptyEl.hidden = false;
+        cartFootEl.hidden = true;
+        return;
+      }
+      cartEmptyEl.hidden = true;
+      cartFootEl.hidden = false;
+
+      cartItemsEl.innerHTML = ids.map(k => {
+        const ww = WINES[k]; if (!ww) return '';
+        const q = cart[k];
+        return `
+        <li class="cart-item" data-cart-id="${k}">
+          <div class="cart-item-img"><svg viewBox="0 0 80 200">${bottleSvg(ww.color, ww.code, ww.gama)}</svg></div>
+          <div class="cart-item-body">
+            <div class="cart-item-meta">${ww.gama} · ${ww.code}</div>
+            <div class="cart-item-name">${ww.name}</div>
+            <div class="cart-item-meta" style="text-transform:none; letter-spacing:0.04em;">${ww.meta}</div>
+            <div class="cart-item-price">${fmtPrice(ww.price)} <span style="color:var(--ink-mute);">/ sticlă</span></div>
+            <div class="qty">
+              <button data-qty-dec aria-label="Scade">−</button>
+              <span>${q}</span>
+              <button data-qty-inc aria-label="Crește">+</button>
+            </div>
+          </div>
+          <button class="cart-item-remove" data-remove aria-label="Elimină">✕</button>
+        </li>`;
+      }).join('');
+      cartSubtotalEl.textContent = fmtPrice(subtotal);
+      cartTotalEl.textContent = fmtPrice(subtotal);
+    }
+
+    function openCart() {
+      cartDrawer.classList.add('is-open');
+      cartDrawer.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeCart() {
+      cartDrawer.classList.remove('is-open');
+      cartDrawer.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+    function setQty(id, q) {
+      const c = loadCart();
+      if (q <= 0) delete c[id]; else c[id] = q;
+      saveCart(c); renderCart();
+    }
+
+    document.getElementById('cartBtn').addEventListener('click', openCart);
+    document.querySelectorAll('[data-cart-close]').forEach(el => el.addEventListener('click', closeCart));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
+
+    cartItemsEl.addEventListener('click', e => {
+      const li = e.target.closest('.cart-item'); if (!li) return;
+      const k = li.dataset.cartId;
+      const cart = loadCart();
+      if (e.target.closest('[data-qty-inc]')) setQty(k, (cart[k] || 0) + 1);
+      else if (e.target.closest('[data-qty-dec]')) setQty(k, (cart[k] || 0) - 1);
+      else if (e.target.closest('[data-remove]')) setQty(k, 0);
+    });
+
+    renderCart();
+
+    // ─── HEADER + THEME ────────────────────────────────────
+    const header = document.getElementById('siteHeader');
+    const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 4);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    const themeBtn = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('locus-theme');
+    if (stored) document.documentElement.dataset.theme = stored;
+    themeBtn.addEventListener('click', () => {
+      const cur = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = cur;
+      localStorage.setItem('locus-theme', cur);
+    });
+
+    document.querySelectorAll('.lang-switch button').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.lang-switch button').forEach(x => {
+          x.classList.remove('is-active'); x.setAttribute('aria-pressed', 'false');
+        });
+        b.classList.add('is-active'); b.setAttribute('aria-pressed', 'true');
+        document.documentElement.lang = b.dataset.lang;
+      });
+    });
+
+    // reveal
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+</body>
+</html>

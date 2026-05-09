@@ -1,0 +1,104 @@
+{
+  "skill_name": "brand-designer",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Vreau să-mi faci un logo pentru o agenție de marketing digital numită 'Pixel Flow'. Ceva modern, minimalist, cu culori violet și alb. Target: startup-uri și companii mici. Personalitate: inovatoare, directă, energică.",
+      "expected_output": "Un logo SVG complet cu: mark/simbol relevant pentru digital/flow, wordmark 'Pixel Flow', variantă icon-only, sistem de culori definit (violet primary + neutrale), tipografie aleasă și justificată, instrucțiuni de utilizare.",
+      "assertions": [
+        {
+          "id": "svg_valid",
+          "name": "SVG logo delivered",
+          "description": "Output contains at least one complete SVG code block with viewBox attribute"
+        },
+        {
+          "id": "brand_system_defined",
+          "name": "Brand system defined before logo",
+          "description": "Output includes defined color codes (hex values) and typography choices with rationale"
+        },
+        {
+          "id": "variants_present",
+          "name": "Multiple logo variants",
+          "description": "Output includes at least a primary logo AND an icon-only variant"
+        },
+        {
+          "id": "usage_instructions",
+          "name": "Usage instructions included",
+          "description": "Output includes practical notes on how to use/export/adapt the logo"
+        },
+        {
+          "id": "brief_alignment",
+          "name": "Aligns with brief",
+          "description": "Logo concept is modern/minimalist and uses violet/purple palette as requested"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "Am o firmă de coaching personal numită 'Rise Up'. Culorile sunt auriu (#C9A84C) și negru (#111111). Fontul este Playfair Display pentru titluri și Lato pentru body. Fă-mi un template de postare Instagram pătrat și unul pentru story, pe care să le pot folosi săptămânal pentru citate motivaționale.",
+      "expected_output": "Două componente React (sau HTML/CSS): InstagramPost 1080×1080px și InstagramStory 1080×1920px, cu props pentru quote text, autor, și logo. Brand consistent cu culorile și fonturile specificate. Instrucțiuni de export.",
+      "assertions": [
+        {
+          "id": "square_template",
+          "name": "Instagram square template delivered",
+          "description": "Output includes a 1080×1080 template (React component or HTML/CSS)"
+        },
+        {
+          "id": "story_template",
+          "name": "Instagram story template delivered",
+          "description": "Output includes a 1080×1920 story template"
+        },
+        {
+          "id": "brand_colors_applied",
+          "name": "Specified brand colors applied correctly",
+          "description": "Templates use #C9A84C and #111111 from the brief, not generic colors"
+        },
+        {
+          "id": "props_for_content",
+          "name": "Customizable props for weekly use",
+          "description": "Templates have props or variables for quote text and author so they can be reused"
+        },
+        {
+          "id": "export_guidance",
+          "name": "Export/usage guidance",
+          "description": "Instructions on how to export templates as images for posting"
+        }
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Am un startup de fintech numit 'ClearPay' — facem plăți B2B simplificate pentru IMM-uri din România. Culori: albastru închis #0F2A4A și verde electric #00E5A0. Font: Space Grotesk. Fă-mi: (1) o carte de vizită față-spate, și (2) un template de ofertă comercială în HTML pe care să o trimit clienților noi. Datele mele: Andrei Popescu, CEO, andrei@clearpay.ro, +40 720 123 456, clearpay.ro",
+      "expected_output": "SVG carte de vizită față și spate (85×55mm) + template HTML complet de ofertă comercială (A4, printabilă) cu toate secțiunile: cover, servicii, prețuri, footer. Brand consistent cu culorile și tipografia specificate.",
+      "assertions": [
+        {
+          "id": "business_card_front",
+          "name": "Business card front delivered",
+          "description": "SVG or HTML business card front with correct dimensions reference (85×55mm) and contact details"
+        },
+        {
+          "id": "business_card_back",
+          "name": "Business card back delivered",
+          "description": "Business card back included (full brand color fill with logo/tagline)"
+        },
+        {
+          "id": "offer_template",
+          "name": "Offer HTML template delivered",
+          "description": "Complete HTML offer document with cover page, services section, pricing table, and footer"
+        },
+        {
+          "id": "contact_info_present",
+          "name": "Contact info populated",
+          "description": "User-provided contact details (Andrei Popescu, CEO, email, phone, website) appear in the materials"
+        },
+        {
+          "id": "brand_consistency",
+          "name": "Visual consistency across materials",
+          "description": "Both business card and offer use the same colors (#0F2A4A, #00E5A0) and Space Grotesk typography"
+        }
+      ],
+      "files": []
+    }
+  ]
+}
