@@ -6,6 +6,7 @@ import { FilmGrain } from "@/components/film-grain";
 import { SvgSprite } from "@/components/svg-sprite";
 import { SiteHeader } from "@/components/site-header";
 import { HeaderScrollEffect } from "@/components/header-scroll";
+import { CartDrawer } from "@/components/cart/cart-drawer";
 
 const italiana = Italiana({
   variable: "--font-serif",
@@ -50,6 +51,7 @@ export default function RootLayout({
         <SiteHeader />
         <HeaderScrollEffect />
         {children}
+        <CartDrawer />
       </body>
     </html>
   );

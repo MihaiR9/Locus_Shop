@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BottleSvg } from "@/components/landing/bottle-svg";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { metaLine, type Wine } from "@/lib/wines";
 
 const TYPE_TAG: Record<string, string> = { alb: "alb", rosu: "rosu", rose: "rose" };
@@ -47,25 +48,7 @@ export function WineCard({ wine }: { wine: Wine }) {
           {wine.priceRon.toLocaleString("ro-RO")}
           <span className="currency">lei</span>
         </span>
-        <button
-          type="button"
-          className="wine-add"
-          data-add={wine.code}
-          aria-label={`Adaugă ${wine.name} în coș`}
-          // Cart wiring lands in Phase 2; for now this is a visual no-op.
-          disabled
-          title="Coșul devine activ în următoarea fază"
-        >
-          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-            <path
-              d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.2"
-            />
-          </svg>
-          Adaugă
-        </button>
+        <AddToCartButton code={wine.code} wineName={wine.name} />
       </div>
     </article>
   );

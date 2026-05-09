@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { CartButton } from "@/components/cart/cart-button";
 
 const NAV_LINKS = [
   { href: "/#acasa", label: "Acasă" },
@@ -40,6 +41,7 @@ export function SiteHeader() {
               <span className="sep" aria-hidden="true" />
               <span className="lang-muted" aria-hidden="true">EN</span>
             </div>
+            <CartButton />
             <ThemeToggle />
           </div>
         </div>
