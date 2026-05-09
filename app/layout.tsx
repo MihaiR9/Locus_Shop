@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Italiana, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeScript } from "@/components/theme-script";
+import { FilmGrain } from "@/components/film-grain";
+import { SvgSprite } from "@/components/svg-sprite";
+import { SiteHeader } from "@/components/site-header";
+import { HeaderScrollEffect } from "@/components/header-scroll";
 
 const italiana = Italiana({
   variable: "--font-serif",
@@ -33,9 +38,17 @@ export default function RootLayout({
   return (
     <html
       lang="ro"
-      className={`${italiana.variable} ${ibmPlexMono.variable} h-full antialiased`}
+      className={`${italiana.variable} ${ibmPlexMono.variable} antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-bg text-ink font-mono">
+      <head>
+        <ThemeScript />
+      </head>
+      <body className="bg-bg text-ink font-mono">
+        <SvgSprite />
+        <FilmGrain />
+        <SiteHeader />
+        <HeaderScrollEffect />
         {children}
       </body>
     </html>
