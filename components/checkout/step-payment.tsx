@@ -31,11 +31,17 @@ export function StepPayment() {
   return (
     <section className="step-card is-saved" id="step-3">
       <header className="step-head">
-        <div>
-          <div className="step-no">03 — modalitate de plată</div>
+        <div className="step-head-title">
+          <span className="step-num" aria-hidden="true">03</span>
           <h2 className="h3">Cum vrei să achiți.</h2>
         </div>
-        <span className="step-status">selectat</span>
+        <span className="step-secured" aria-label="Plată securizată">
+          <svg viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true">
+            <path d="M2 7 V4.5 A4 4 0 0 1 10 4.5 V7" />
+            <rect x="1.5" y="7" width="9" height="6" />
+          </svg>
+          Plată securizată
+        </span>
       </header>
 
       <div className="pay-list" role="radiogroup" aria-label="Mod de plată">

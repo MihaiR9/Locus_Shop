@@ -86,109 +86,114 @@ export function OrderSummary() {
 
   return (
     <aside className="summary" aria-label="Sumar comandă">
-      <div className="summary-head">
-        <h2>comanda ta.</h2>
-        <span className="count">
-          {totalQty} {totalQty === 1 ? "sticlă" : "sticle"}
-        </span>
-      </div>
+      {/* LEFT: items + coupon */}
+      <div className="summary-items-block">
+        <div className="summary-head">
+          <h2>comanda ta.</h2>
+          <span className="count">
+            {totalQty} {totalQty === 1 ? "sticlă" : "sticle"}
+          </span>
+        </div>
 
-      <div className="sum-items">
-        {lines.length === 0 ? (
-          <div className="sum-empty">
-            Coșul este gol.
-            <br />
-            <Link href="/shop">Alege un vin</Link>
-          </div>
-        ) : (
-          lines.map(({ wine, qty }) => (
-            <div key={wine.code} className="sum-item">
-              <div className="sum-img">
-                <BottleSvg color={wine.bottleColor} gama={wine.gama} code={wine.code} />
-                <span className="qty">{qty}</span>
-              </div>
-              <div className="sum-body">
-                <div className="sum-name">{wine.name}</div>
-                <div className="sum-meta">
-                  {wine.code} · {wine.gama}
+        <div className="sum-items">
+          {lines.length === 0 ? (
+            <div className="sum-empty">
+              Coșul este gol.
+              <br />
+              <Link href="/shop">Alege un vin</Link>
+            </div>
+          ) : (
+            lines.map(({ wine, qty }) => (
+              <div key={wine.code} className="sum-item">
+                <div className="sum-img">
+                  <BottleSvg color={wine.bottleColor} gama={wine.gama} code={wine.code} />
+                  <span className="qty">{qty}</span>
+                </div>
+                <div className="sum-body">
+                  <div className="sum-name">{wine.name}</div>
+                  <div className="sum-meta">
+                    {wine.code} · {wine.gama}
+                  </div>
+                </div>
+                <div className="sum-price">
+                  {formatRon(wine.priceRon * qty)}
                 </div>
               </div>
-              <div className="sum-price">
-                {formatRon(wine.priceRon * qty)}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      <div className="sum-coupon">
-        <input
-          className="input"
-          placeholder="Cod voucher"
-          value={coupon}
-          onChange={(e) => {
-            setCoupon(e.target.value);
-            setCouponErr(false);
-          }}
-          style={couponErr ? { borderColor: "#a23" } : undefined}
-        />
-        <button type="button" onClick={applyCoupon}>
-          aplică
-        </button>
-      </div>
-
-      <div className="sum-rows">
-        <div className="sum-row">
-          <span>Subtotal</span>
-          <span>{formatRon(subtotal)}</span>
-        </div>
-        <div className="sum-row">
-          <span>Transport</span>
-          {shippingFee === null ? (
-            <span className="muted">se calculează la pasul 1</span>
-          ) : shippingFee === 0 ? (
-            <span>
-              {shipping?.method === "ridicare"
-                ? "gratuit · ridicare"
-                : "gratuit · peste 250 lei"}
-            </span>
-          ) : (
-            <span>{formatRon(shippingFee)} · curier</span>
+            ))
           )}
         </div>
-        {couponPct !== null && (
-          <div className="sum-row">
-            <span>Voucher ({couponPct}%)</span>
-            <span>−{formatRon(discount)}</span>
-          </div>
-        )}
-      </div>
 
-      <div className="sum-total">
-        <div className="label">Total</div>
-        <div className="val">
-          {formatRon(total).replace(" lei", "")}
-          <span className="currency">lei</span>
+        <div className="sum-coupon">
+          <input
+            className="input"
+            placeholder="Cod voucher"
+            value={coupon}
+            onChange={(e) => {
+              setCoupon(e.target.value);
+              setCouponErr(false);
+            }}
+            style={couponErr ? { borderColor: "#a23" } : undefined}
+          />
+          <button type="button" onClick={applyCoupon}>
+            aplică
+          </button>
         </div>
       </div>
 
-      <button
-        type="button"
-        className="btn btn-solid place-order"
-        disabled={!canPlace}
-        onClick={placeOrder}
-      >
-        Plasează comanda
-        <svg className="arrow" viewBox="0 0 24 12" aria-hidden="true">
-          <use href="#arrow-right" />
-        </svg>
-      </button>
+      {/* RIGHT: totals + submit */}
+      <div className="summary-total-block">
+        <div className="sum-rows">
+          <div className="sum-row">
+            <span>Subtotal</span>
+            <span>{formatRon(subtotal)}</span>
+          </div>
+          <div className="sum-row">
+            <span>Transport</span>
+            {shippingFee === null ? (
+              <span className="muted">se calculează la pasul 1</span>
+            ) : shippingFee === 0 ? (
+              <span>
+                {shipping?.method === "ridicare"
+                  ? "gratuit · ridicare"
+                  : "gratuit · peste 250 lei"}
+              </span>
+            ) : (
+              <span>{formatRon(shippingFee)} · curier</span>
+            )}
+          </div>
+          {couponPct !== null && (
+            <div className="sum-row">
+              <span>Voucher ({couponPct}%)</span>
+              <span>−{formatRon(discount)}</span>
+            </div>
+          )}
+        </div>
 
-      <p className="sum-foot-note">
-        Livrare 2–4 zile lucrătoare prin curier · gratis peste 250 lei.
-        <br />
-        Conține sulfiți. Consumul excesiv de alcool dăunează sănătății.
-      </p>
+        <div className="sum-total">
+          <div className="label">Total</div>
+          <div className="val">
+            {formatRon(total).replace(" lei", "")}
+            <span className="currency">lei</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="btn btn-solid place-order"
+          disabled={!canPlace}
+          onClick={placeOrder}
+        >
+          Plasează comanda
+          <svg className="arrow" viewBox="0 0 24 12" aria-hidden="true">
+            <use href="#arrow-right" />
+          </svg>
+        </button>
+
+        <p className="sum-foot-note">
+          Livrare 2–4 zile · gratis peste 250 lei. Conține sulfiți.
+          Consumul excesiv de alcool dăunează sănătății.
+        </p>
+      </div>
     </aside>
   );
 }

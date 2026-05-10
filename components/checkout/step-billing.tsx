@@ -79,8 +79,8 @@ export function StepBilling() {
   return (
     <section className={`step-card ${isSaved ? "is-saved" : ""}`} id="step-2">
       <header className="step-head">
-        <div>
-          <div className="step-no">02 — date facturare</div>
+        <div className="step-head-title">
+          <span className="step-num" aria-hidden="true">02</span>
           <h2 className="h3">Pe numele cui emitem factura.</h2>
         </div>
         <span className="step-status">{isSaved ? "salvat" : "incomplet"}</span>

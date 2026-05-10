@@ -102,8 +102,8 @@ export function StepShipping() {
   return (
     <section className={`step-card ${isSaved ? "is-saved" : ""}`} id="step-1">
       <header className="step-head">
-        <div>
-          <div className="step-no">01 — livrare</div>
+        <div className="step-head-title">
+          <span className="step-num" aria-hidden="true">01</span>
           <h2 className="h3">Cum primești sticlele.</h2>
         </div>
         <span className="step-status">{isSaved ? "salvat" : "incomplet"}</span>

@@ -3430,6 +3430,26 @@
 @media (max-width: 640px) { .step-rail { font-size: 10px; gap: 6px; } .step-rail .label { display: none; } }
 
 /* ── Grid 2 col ── */
+/* Stacked sections (single column) — eMAG-style: each section visible at once. */
+.checkout-stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.4vw, 24px);
+  margin-bottom: clamp(24px, 3.5vw, 36px);
+}
+
+/* Bottom bar — items + total/submit side by side. */
+.checkout-foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: clamp(20px, 2.5vw, 32px);
+  margin-bottom: clamp(20px, 3vw, 32px);
+}
+@media (max-width: 920px) {
+  .checkout-foot { grid-template-columns: 1fr; }
+}
+
+/* Legacy 2-col layout (kept for back-compat if any view still uses it). */
 .checkout-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
@@ -3449,36 +3469,90 @@
 .step-card {
   background: var(--surface);
   border: 1px solid var(--line);
-  padding: clamp(22px, 3vw, 36px);
+  padding: clamp(18px, 2.4vw, 28px);
   position: relative;
 }
-.step-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
-.step-head .step-no {
+.step-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: clamp(14px, 1.6vw, 20px);
+  flex-wrap: wrap;
+}
+.step-head-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+/* Numbered badge — filled circle with mono digit (eMAG-style cue). */
+.step-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--bg);
   font-family: var(--font-mono), monospace;
   font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--ink-mute);
-  margin-bottom: 4px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.step-card.is-saved .step-num {
+  background: var(--vie);
 }
 .step-head .h3 {
   font-family: var(--font-serif), Georgia, serif;
-  font-size: clamp(22px, 2.4vw, 32px);
+  font-size: clamp(20px, 2vw, 26px);
   line-height: 1.2;
   font-weight: 400;
   color: var(--ink);
+  letter-spacing: -0.01em;
 }
 .step-status {
   font-family: var(--font-mono), monospace;
-  font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--ink-mute);
-  display: inline-flex; align-items: center; gap: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 .step-status::before {
-  content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ink-mute);
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-mute);
 }
-.step-card.is-saved .step-status { color: var(--vie); }
-.step-card.is-saved .step-status::before { background: var(--vie); }
+.step-card.is-saved .step-status {
+  color: var(--vie);
+}
+.step-card.is-saved .step-status::before {
+  background: var(--vie);
+}
+/* Optional secured-payment badge — used on payment section. */
+.step-secured {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--vie);
+  border: 1px solid var(--line);
+  padding: 7px 10px;
+}
+.step-secured svg {
+  width: 11px;
+  height: 11px;
+}
 
 /* ── Tabs (Curier / Ridicare) ── */
 .step-card .tabs {
@@ -3660,17 +3734,26 @@
 }
 .btn-solid:hover:not(:disabled) .arrow { transform: translateX(6px); }
 
-/* ── Summary right rail ── */
+/* ── Summary as bottom bar (eMAG-style): items left, totals+submit right ── */
 .summary {
   background: var(--bg-alt);
   border: 1px solid var(--line);
-  padding: clamp(22px, 3vw, 32px);
-  position: sticky;
-  top: 92px;
-  align-self: start;
+  padding: clamp(20px, 2.5vw, 28px);
+  display: contents; /* the inner blocks place themselves into .checkout-foot grid */
 }
-@media (max-width: 920px) {
-  .summary { position: static; order: -1; }
+.summary-items-block {
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  padding: clamp(20px, 2.5vw, 28px);
+  display: flex;
+  flex-direction: column;
+}
+.summary-total-block {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: clamp(20px, 2.5vw, 28px);
+  display: flex;
+  flex-direction: column;
 }
 .summary-head {
   display: flex; align-items: baseline; justify-content: space-between;

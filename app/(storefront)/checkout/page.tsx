@@ -24,12 +24,13 @@ export default function CheckoutPage() {
           </div>
         </header>
 
-        <div className="checkout-grid">
-          <div className="checkout-form-col">
-            <StepShipping />
-            <StepBilling />
-            <StepPayment />
-          </div>
+        <div className="checkout-stack">
+          <StepShipping />
+          <StepBilling />
+          <StepPayment />
+        </div>
+
+        <div className="checkout-foot">
           <OrderSummary />
         </div>
 
