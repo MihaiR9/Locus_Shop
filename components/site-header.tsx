@@ -149,6 +149,22 @@ export function SiteHeader() {
                   EN
                 </span>
               </div>
+              <Link
+                href="/cont"
+                className="account-btn"
+                aria-label="Contul meu"
+              >
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.2"
+                  aria-hidden="true"
+                >
+                  <circle cx="8" cy="6" r="2.5" />
+                  <path d="M3 14 C3.5 11 5.5 10 8 10 C10.5 10 12.5 11 13 14" />
+                </svg>
+              </Link>
               <CartButton />
               <ThemeToggle />
               <button
