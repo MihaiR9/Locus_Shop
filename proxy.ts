@@ -9,8 +9,10 @@ import { NextResponse, type NextRequest } from "next/server";
  * La Faza 2: înlocuim verificarea cu Supabase session + role check
  * (`auth.users.app_metadata.role === 'admin'`). Tot fluxul magic-link va merge
  * prin /admin/auth/callback pentru a seta session cookie-ul Supabase.
+ *
+ * Fișierul ăsta înlocuiește vechiul middleware.ts (deprecated în Next 16).
  */
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Doar rutele /admin/* sunt protejate. /admin/login e excepție.
