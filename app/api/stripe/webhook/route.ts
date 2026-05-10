@@ -2,6 +2,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe/server";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+import {
+  sendOrderConfirmation,
+  sendOrderNotificationToAdmin,
+} from "@/lib/email/send";
+import type { OrderEmailItem } from "@/lib/email/templates";
 
 // Webhook handlers must read the RAW body to validate Stripe's signature.
 // Next App Router gives us request.text() which is the raw string —
@@ -123,8 +128,103 @@ async function handleSessionPaid(event: Stripe.Event) {
     },
   });
 
-  // TODO Pas 6: trigger Resend email — order confirmation to customer
+  // ── Send confirmation emails (Pas 6) ──────────────────────────
+  // Fetch the order + line items for the email payload. We've just
+  // written `paid` above, so this read sees fresh data.
+  await sendOrderEmails(orderId);
+
   // TODO Pas 9: trigger Smartbill invoice + Sameday AWB
+}
+
+/**
+ * Loads the order + items + customer details from DB, then fires the
+ * customer confirmation + admin notification emails. Errors are logged
+ * but DON'T re-throw — a Resend outage shouldn't undo a paid order.
+ */
+async function sendOrderEmails(orderId: string) {
+  const supabase = getSupabaseAdminClient();
+
+  const { data: order, error: orderErr } = await supabase
+    .from("orders")
+    .select(
+      "order_number, total_cents, subtotal_cents, shipping_cents, discount_cents, payment_method, shipping_method, shipping_address, billing, guest_email",
+    )
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (orderErr || !order) {
+    console.error("[email] order lookup failed", orderId, orderErr);
+    return;
+  }
+
+  const { data: items } = await supabase
+    .from("order_items")
+    .select("name_snapshot, code_snapshot, qty, unit_price_cents")
+    .eq("order_id", orderId);
+
+  const emailItems: OrderEmailItem[] = (items ?? []).map((it) => ({
+    name: it.name_snapshot,
+    code: it.code_snapshot,
+    qty: it.qty,
+    unitPriceRon: Math.round(it.unit_price_cents / 100),
+  }));
+
+  const shipping = order.shipping_address as Record<string, unknown> | null;
+  const billing = order.billing as Record<string, unknown> | null;
+
+  const customerEmail =
+    (billing?.email as string | undefined) ??
+    (shipping?.email as string | undefined) ??
+    order.guest_email ??
+    null;
+
+  const customerName =
+    (billing?.firstName && billing?.lastName
+      ? `${billing.firstName} ${billing.lastName}`
+      : (shipping?.firstName && shipping?.lastName
+        ? `${shipping.firstName} ${shipping.lastName}`
+        : (shipping?.name as string | undefined))) || undefined;
+
+  const shippingAddress =
+    order.shipping_method === "curier" && shipping?.address && shipping?.city
+      ? `${shipping.address}, ${shipping.city}`
+      : undefined;
+
+  const data = {
+    orderNumber: order.order_number,
+    customerName,
+    items: emailItems,
+    subtotalRon: Math.round(order.subtotal_cents / 100),
+    shippingRon: Math.round(order.shipping_cents / 100),
+    discountRon: Math.round(order.discount_cents / 100),
+    totalRon: Math.round(order.total_cents / 100),
+    shippingMethod: order.shipping_method as "curier" | "ridicare",
+    shippingAddress,
+    paymentMethod: order.payment_method,
+  };
+
+  // Customer email — only if we have one.
+  if (customerEmail) {
+    const r = await sendOrderConfirmation(customerEmail, data);
+    if (r.ok) {
+      console.info("[email] order confirmation sent", r.id);
+    }
+  } else {
+    console.warn("[email] no customer email on order", orderId);
+  }
+
+  // Admin email — always
+  const a = await sendOrderNotificationToAdmin({
+    ...data,
+    customerEmail,
+    customerPhone:
+      ((shipping?.phone as string | undefined) ??
+        (billing?.phone as string | undefined)) ||
+      null,
+  });
+  if (a.ok) {
+    console.info("[email] admin notification sent", a.id);
+  }
 }
 
 async function handleSessionFailed(event: Stripe.Event) {
