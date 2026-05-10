@@ -338,6 +338,7 @@ export type Database = {
           discount_cents: number
           guest_email: string | null
           id: string
+          idempotency_key: string | null
           notes: string | null
           order_number: string
           paid_at: string | null
@@ -363,6 +364,7 @@ export type Database = {
           discount_cents?: number
           guest_email?: string | null
           id?: string
+          idempotency_key?: string | null
           notes?: string | null
           order_number: string
           paid_at?: string | null
@@ -388,6 +390,7 @@ export type Database = {
           discount_cents?: number
           guest_email?: string | null
           id?: string
+          idempotency_key?: string | null
           notes?: string | null
           order_number?: string
           paid_at?: string | null
@@ -582,7 +585,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_order: {
+        Args: {
+          p_billing: Json
+          p_customer_id: string | null
+          p_discount_cents: number
+          p_guest_email: string | null
+          p_idempotency_key: string
+          p_items: Json
+          p_payment_method: Database["public"]["Enums"]["pay_method_t"]
+          p_shipping: Json
+          p_shipping_cents: number
+          p_shipping_method: Database["public"]["Enums"]["ship_method_t"]
+          p_subtotal_cents: number
+          p_total_cents: number
+        }
+        Returns: {
+          id: string
+          order_number: string
+        }[]
+      }
     }
     Enums: {
       address_kind_t: "shipping" | "billing"

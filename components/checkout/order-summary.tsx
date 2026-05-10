@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { BottleSvg } from "@/components/landing/bottle-svg";
 import { useCartStore } from "@/lib/cart-store";
 import { useCheckoutStore } from "@/lib/checkout-store";
 import { formatRon } from "@/lib/wines";
+import { createOrder } from "@/app/(storefront)/checkout/actions";
 
 const SHIP_FREE_AT = 250;
 const SHIP_FEE = 19;
@@ -26,7 +27,16 @@ export function OrderSummary() {
   const [coupon, setCoupon] = useState("");
   const [couponPct, setCouponPct] = useState<number | null>(null);
   const [couponErr, setCouponErr] = useState(false);
-  const orderRef = useRef<string | null>(null);
+  const [placeError, setPlaceError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  // Idempotency key — generated once per OrderSummary mount. If user
+  // double-clicks the submit button or the network retries, the server
+  // returns the SAME order instead of inserting twice.
+  const idempotencyKeyRef = useRef<string>(
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  );
 
   // CartLine snapshots already carry name/price/gama/bottleColor —
   // no DB join needed. Pricing at place-order time will be re-validated
@@ -68,15 +78,33 @@ export function OrderSummary() {
   }
 
   function placeOrder() {
-    if (!canPlace) return;
-    const orderId =
-      "LC-" + Date.now().toString(36).toUpperCase().slice(-6);
-    orderRef.current = orderId;
-    // Persist last order id so /success can show it after redirect.
-    sessionStorage.setItem("locus-last-order", orderId);
-    clearCart();
-    reset();
-    router.push("/checkout/success?id=" + encodeURIComponent(orderId));
+    if (!canPlace || !shipping || !billing) return;
+    setPlaceError(null);
+
+    startTransition(async () => {
+      const result = await createOrder({
+        idempotencyKey: idempotencyKeyRef.current,
+        items: lines.map((l) => ({ code: l.code, qty: l.qty })),
+        shipping,
+        billing,
+        payment: useCheckoutStore.getState().payment,
+        couponCode: couponPct !== null ? coupon.trim().toUpperCase() : null,
+      });
+
+      if (!result.ok) {
+        setPlaceError(result.error);
+        return;
+      }
+
+      // Success — clear local state, persist last order # for /success
+      // page (it'll re-fetch the order from DB to render the recap).
+      sessionStorage.setItem("locus-last-order", result.orderNumber);
+      clearCart();
+      reset();
+      router.push(
+        "/checkout/success?id=" + encodeURIComponent(result.orderNumber),
+      );
+    });
   }
 
   return (
@@ -176,13 +204,27 @@ export function OrderSummary() {
           </div>
         </div>
 
+        {placeError && (
+          <p
+            role="alert"
+            style={{
+              marginTop: 12,
+              fontSize: 12,
+              color: "#a23",
+              fontFamily: "var(--font-mono), monospace",
+            }}
+          >
+            {placeError}
+          </p>
+        )}
+
         <button
           type="button"
           className="btn btn-solid place-order"
-          disabled={!canPlace}
+          disabled={!canPlace || isPending}
           onClick={placeOrder}
         >
-          Plasează comanda
+          {isPending ? "Se procesează…" : "Plasează comanda"}
           <svg className="arrow" viewBox="0 0 24 12" aria-hidden="true">
             <use href="#arrow-right" />
           </svg>
