@@ -567,14 +567,19 @@
 }
 
 .hero-frame.frame-1 .ken {
-  background: url("/brand/hero-amfora.png") center / cover no-repeat #d9c8b0;
+  background: #d9c8b0; /* fallback color; real photo loaded via <Image priority> in JSX */
 }
-.hero-frame.frame-1 .ken::before {
+.hero-frame.frame-1 .ken > img {
+  object-fit: cover;
+  object-position: center;
+}
+.hero-frame.frame-1 .ken::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(95deg, rgba(20, 16, 12, 0.32) 0%, rgba(20, 16, 12, 0.1) 45%, rgba(20, 16, 12, 0) 75%);
   pointer-events: none;
+  z-index: 1;
 }
 .hero-frame.frame-2 .ken {
   background:

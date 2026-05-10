@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { HeroPager } from "@/components/landing/hero-pager";
@@ -8,7 +9,16 @@ export function Hero() {
       <div className="hero-stage">
         <div className="hero-frames" aria-hidden="true">
           <div className="hero-frame frame-1 is-active">
-            <div className="ken" />
+            <div className="ken">
+              <Image
+                src="/brand/hero-amfora.webp"
+                alt=""
+                fill
+                priority
+                sizes="100vw"
+                quality={85}
+              />
+            </div>
           </div>
           <div className="hero-frame frame-2">
             <div className="ken" />

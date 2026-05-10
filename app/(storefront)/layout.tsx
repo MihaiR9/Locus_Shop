@@ -1,10 +1,7 @@
 import { FilmGrain } from "@/components/film-grain";
 import { SiteHeader } from "@/components/site-header";
 import { HeaderScrollEffect } from "@/components/header-scroll";
-import { CartDrawer } from "@/components/cart/cart-drawer";
-import { AgeGate } from "@/components/legal/age-gate";
-import { CookieBanner } from "@/components/legal/cookie-banner";
-import { ConsentScripts } from "@/components/legal/consent-scripts";
+import { StorefrontOverlays } from "@/components/storefront-overlays";
 
 /**
  * Storefront layout — wraps all PUBLIC pages (landing, shop, vinuri, despre,
@@ -27,10 +24,7 @@ export default function StorefrontLayout({
       <SiteHeader />
       <HeaderScrollEffect />
       {children}
-      <CartDrawer />
-      <AgeGate />
-      <CookieBanner />
-      <ConsentScripts />
+      <StorefrontOverlays />
     </>
   );
 }

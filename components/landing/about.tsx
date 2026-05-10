@@ -8,7 +8,7 @@ export function About() {
       <div className="despre-grid">
         <Reveal as="div" className="despre-img">
           <Image
-            src="/photos/dining-setup.png"
+            src="/photos/dining-setup.webp"
             alt="Banc cu pâine, brânză și un pahar de vin Locus"
             width={1200}
             height={1500}

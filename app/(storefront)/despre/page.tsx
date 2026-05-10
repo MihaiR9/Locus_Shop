@@ -86,7 +86,7 @@ export default function DesprePage() {
 
         <Reveal as="div" className="despre-photo">
           <Image
-            src="/photos/dining-setup.png"
+            src="/photos/dining-setup.webp"
             alt="Banc cu pâine, brânză și un pahar de vin Locus"
             width={2400}
             height={1050}
