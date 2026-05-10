@@ -2,19 +2,19 @@
 
 import { useState } from "react";
 import { useCartStore } from "@/lib/cart-store";
+import type { Wine } from "@/lib/wines";
 
 type Props = {
-  code: string;
-  wineName: string;
+  wine: Wine;
 };
 
-export function AddToCartButton({ code, wineName }: Props) {
+export function AddToCartButton({ wine }: Props) {
   const addItem = useCartStore((s) => s.addItem);
   const open = useCartStore((s) => s.open);
   const [pulsing, setPulsing] = useState(false);
 
   function handleClick() {
-    addItem(code);
+    addItem(wine);
     open();
     setPulsing(true);
     window.setTimeout(() => setPulsing(false), 600);
@@ -25,7 +25,7 @@ export function AddToCartButton({ code, wineName }: Props) {
       type="button"
       className={`wine-add ${pulsing ? "is-pulse" : ""}`}
       onClick={handleClick}
-      aria-label={`Adaugă ${wineName} în coș`}
+      aria-label={`Adaugă ${wine.name} în coș`}
     >
       <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
         <path

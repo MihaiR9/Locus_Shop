@@ -1,10 +1,13 @@
 import { Reveal } from "@/components/reveal";
 import { WineCard } from "@/components/landing/wine-card";
-import { WINES, type Gama } from "@/lib/wines";
+import type { Wine } from "@/lib/wines";
 
-export function GamaWines({ gama }: { gama: Gama }) {
-  const wines = WINES.filter((w) => w.gama === gama);
+type Props = {
+  gama: Wine["gama"];
+  wines: Wine[];
+};
 
+export function GamaWines({ gama, wines }: Props) {
   if (wines.length === 0) {
     return (
       <section className="gama-empty" aria-label="Gama în pregătire">

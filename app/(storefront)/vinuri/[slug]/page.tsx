@@ -7,12 +7,21 @@ import { WineHero } from "@/components/pdp/wine-hero";
 import { WinePairing } from "@/components/pdp/wine-pairing";
 import { WineSpecs } from "@/components/pdp/wine-specs";
 import { WineRelated } from "@/components/pdp/wine-related";
-import { findWineBySlug, WINES, metaLine } from "@/lib/wines";
+import { metaLine } from "@/lib/wines";
+import {
+  getAllSlugs,
+  getWineBySlug,
+  getRelatedWines,
+} from "@/lib/wines-queries";
 
 type Params = { slug: string };
 
-export function generateStaticParams(): Params[] {
-  return WINES.map((w) => ({ slug: w.slug }));
+// Re-fetch DB at most once per minute. Stoc / preț / activ → live.
+export const revalidate = 60;
+
+export async function generateStaticParams(): Promise<Params[]> {
+  const slugs = await getAllSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -21,7 +30,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const wine = findWineBySlug(slug);
+  const wine = await getWineBySlug(slug);
   if (!wine) return { title: "Vin negăsit" };
 
   return {
@@ -36,8 +45,9 @@ export default async function WinePage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const wine = findWineBySlug(slug);
+  const wine = await getWineBySlug(slug);
   if (!wine) notFound();
+  const related = await getRelatedWines(wine, 3);
 
   return (
     <>
@@ -84,7 +94,7 @@ export default async function WinePage({
           </Reveal>
         </section>
 
-        <WineRelated wine={wine} />
+        <WineRelated wines={related} />
       </main>
       <Footer />
     </>

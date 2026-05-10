@@ -3,29 +3,24 @@
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
 import { BottleSvg } from "@/components/landing/bottle-svg";
-import { selectLines, useCartStore } from "@/lib/cart-store";
-import { formatRon, metaLine, WINES } from "@/lib/wines";
-
-const WINE_BY_CODE = Object.fromEntries(WINES.map((w) => [w.code, w] as const));
+import { useCartStore } from "@/lib/cart-store";
+import { formatRon } from "@/lib/wines";
 
 export function CartDrawer() {
   const isOpen = useCartStore((s) => s.isOpen);
   const close = useCartStore((s) => s.close);
   const updateQty = useCartStore((s) => s.updateQty);
   const removeItem = useCartStore((s) => s.removeItem);
-  // Select primitiva stabilă (items obj e same-ref în Zustand cât timp nu se modifică),
-  // apoi derivăm lines + subtotal cu useMemo. Asta evită loop-ul din React 19 +
-  // useSyncExternalStore care apare când selectorul creează obiecte noi.
+  // Stable primitive (the items object ref doesn't change unless mutated),
+  // then derive everything via useMemo. Avoids the useSyncExternalStore
+  // loop that React 19 + Zustand v5 hits if the selector returns a new
+  // array/object reference each time.
   const items = useCartStore((s) => s.items);
-  const lines = useMemo(() => selectLines({ items, isOpen: false } as never), [items]);
-  const subtotal = useMemo(() => {
-    let total = 0;
-    for (const [code, qty] of Object.entries(items)) {
-      const w = WINE_BY_CODE[code];
-      if (w) total += w.priceRon * qty;
-    }
-    return total;
-  }, [items]);
+  const lines = useMemo(() => Object.values(items), [items]);
+  const subtotal = useMemo(
+    () => lines.reduce((sum, l) => sum + l.priceRon * l.qty, 0),
+    [lines],
+  );
 
   // ESC closes drawer + lock body scroll while open.
   useEffect(() => {
@@ -100,35 +95,37 @@ export function CartDrawer() {
             </div>
           ) : (
             <ul className="cart-items">
-              {lines.map(({ wine, qty }) => (
-                <li key={wine.code} className="cart-item">
+              {lines.map((line) => (
+                <li key={line.code} className="cart-item">
                   <div className="cart-item-img">
-                    <BottleSvg color={wine.bottleColor} gama={wine.gama} code={wine.code} />
+                    <BottleSvg
+                      color={line.bottleColor}
+                      gama={line.gama}
+                      code={line.code}
+                    />
                   </div>
                   <div className="cart-item-body">
                     <div className="cart-item-meta">
-                      {wine.gama} · {wine.code}
+                      {line.gama} · {line.code}
                     </div>
-                    <div className="cart-item-name">{wine.name}</div>
-                    <div className="cart-item-meta cart-item-meta--lower">
-                      {metaLine(wine)} · {wine.abv.toString().replace(".", ",")}%
-                    </div>
+                    <div className="cart-item-name">{line.name}</div>
                     <div className="cart-item-price">
-                      {formatRon(wine.priceRon)} <span className="per">/ sticlă</span>
+                      {formatRon(line.priceRon)}{" "}
+                      <span className="per">/ sticlă</span>
                     </div>
                     <div className="qty">
                       <button
                         type="button"
-                        onClick={() => updateQty(wine.code, qty - 1)}
-                        aria-label={`Scade cantitatea pentru ${wine.name}`}
+                        onClick={() => updateQty(line.code, line.qty - 1)}
+                        aria-label={`Scade cantitatea pentru ${line.name}`}
                       >
                         −
                       </button>
-                      <span aria-live="polite">{qty}</span>
+                      <span aria-live="polite">{line.qty}</span>
                       <button
                         type="button"
-                        onClick={() => updateQty(wine.code, qty + 1)}
-                        aria-label={`Crește cantitatea pentru ${wine.name}`}
+                        onClick={() => updateQty(line.code, line.qty + 1)}
+                        aria-label={`Crește cantitatea pentru ${line.name}`}
                       >
                         +
                       </button>
@@ -137,8 +134,8 @@ export function CartDrawer() {
                   <button
                     type="button"
                     className="cart-item-remove"
-                    onClick={() => removeItem(wine.code)}
-                    aria-label={`Elimină ${wine.name} din coș`}
+                    onClick={() => removeItem(line.code)}
+                    aria-label={`Elimină ${line.name} din coș`}
                   >
                     ✕
                   </button>

@@ -48,7 +48,7 @@ export function WineCard({ wine }: { wine: Wine }) {
           {wine.priceRon.toLocaleString("ro-RO")}
           <span className="currency">lei</span>
         </span>
-        <AddToCartButton code={wine.code} wineName={wine.name} />
+        <AddToCartButton wine={wine} />
       </div>
     </article>
   );

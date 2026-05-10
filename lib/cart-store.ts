@@ -1,8 +1,30 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { WINES } from "@/lib/wines";
+import type { Wine } from "@/lib/wines";
 
-export type CartItems = Record<string, number>;
+/**
+ * Cart line — snapshot of wine fields at add-to-cart time.
+ *
+ * Why a snapshot vs. just `{ code: qty }`: the cart drawer is mounted
+ * in the storefront layout and runs purely client-side; it can't await
+ * Supabase queries. By snapshotting the display fields when the user
+ * clicks "Adaugă", the drawer stays decoupled from the DB and renders
+ * instantly from localStorage on hydrate.
+ *
+ * The snapshot is for UI ONLY. Pricing at checkout is re-validated
+ * server-side against the live `products.price_cents` (Pas 4).
+ */
+export type CartLine = {
+  code: string;
+  qty: number;
+  // Display snapshot:
+  name: string;
+  priceRon: number;
+  gama: Wine["gama"];
+  bottleColor: Wine["bottleColor"];
+};
+
+export type CartItems = Record<string, CartLine>;
 
 type CartState = {
   items: CartItems;
@@ -10,7 +32,13 @@ type CartState = {
 };
 
 type CartActions = {
-  addItem: (code: string) => void;
+  /**
+   * Add `qty` bottles of `wine` to the cart (default 1). Pass the full
+   * Wine object so we can snapshot the display fields; the DB record
+   * may change later but the cart keeps showing what the user actually
+   * saw at the moment of action.
+   */
+  addItem: (wine: Wine, qty?: number) => void;
   removeItem: (code: string) => void;
   updateQty: (code: string, qty: number) => void;
   clear: () => void;
@@ -20,22 +48,33 @@ type CartActions = {
 
 type CartStore = CartState & CartActions;
 
-/**
- * Cart store — single source of truth for line items + drawer open state.
- * Persisted to localStorage('locus-cart') for cross-session continuity
- * (matches the static prototype's key so existing testers don't lose state).
- * Drawer open flag is intentionally not persisted (closed on each load).
- */
 export const useCartStore = create<CartStore>()(
   persist(
     (set) => ({
       items: {},
       isOpen: false,
 
-      addItem: (code) =>
-        set((s) => ({
-          items: { ...s.items, [code]: (s.items[code] ?? 0) + 1 },
-        })),
+      addItem: (wine, qty = 1) =>
+        set((s) => {
+          const existing = s.items[wine.code];
+          const nextQty = Math.min(99, (existing?.qty ?? 0) + qty);
+          return {
+            items: {
+              ...s.items,
+              [wine.code]: {
+                code: wine.code,
+                qty: nextQty,
+                // Always refresh the snapshot from the most recent Wine
+                // object — the user may have added it from a page that
+                // rendered the up-to-date price.
+                name: wine.name,
+                priceRon: wine.priceRon,
+                gama: wine.gama,
+                bottleColor: wine.bottleColor,
+              },
+            },
+          };
+        }),
 
       removeItem: (code) =>
         set((s) => {
@@ -51,7 +90,11 @@ export const useCartStore = create<CartStore>()(
             delete next[code];
             return { items: next };
           }
-          return { items: { ...s.items, [code]: qty } };
+          const existing = s.items[code];
+          if (!existing) return {};
+          return {
+            items: { ...s.items, [code]: { ...existing, qty } },
+          };
         }),
 
       clear: () => set({ items: {} }),
@@ -61,33 +104,29 @@ export const useCartStore = create<CartStore>()(
     {
       name: "locus-cart",
       storage: createJSONStorage(() => localStorage),
-      // Keep only the line items in storage; drawer state stays transient.
       partialize: (s) => ({ items: s.items }),
     },
   ),
 );
 
 // ─── Selectors ──────────────────────────────────────────────────────
-const WINE_BY_CODE = Object.fromEntries(WINES.map((w) => [w.code, w] as const));
 
 export function selectCount(s: CartStore): number {
-  return Object.values(s.items).reduce((acc, n) => acc + n, 0);
+  let n = 0;
+  for (const k in s.items) n += s.items[k].qty;
+  return n;
 }
 
 export function selectSubtotalRon(s: CartStore): number {
   let total = 0;
-  for (const [code, qty] of Object.entries(s.items)) {
-    const w = WINE_BY_CODE[code];
-    if (w) total += w.priceRon * qty;
+  for (const k in s.items) {
+    const it = s.items[k];
+    total += it.priceRon * it.qty;
   }
   return total;
 }
 
-export function selectLines(s: CartStore) {
-  return Object.entries(s.items)
-    .map(([code, qty]) => {
-      const wine = WINE_BY_CODE[code];
-      return wine ? { wine, qty } : null;
-    })
-    .filter((x): x is { wine: (typeof WINES)[number]; qty: number } => x !== null);
+/** Stable list of cart lines — read snapshot fields directly. */
+export function selectLines(s: CartStore): CartLine[] {
+  return Object.values(s.items);
 }

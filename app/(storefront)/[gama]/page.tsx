@@ -6,10 +6,12 @@ import { GamaWines } from "@/components/gama/gama-wines";
 import { GamaPillars } from "@/components/gama/gama-pillars";
 import { ALL_GAMA, GAMA_META } from "@/lib/gama-meta";
 import type { Gama } from "@/lib/wines";
+import { getWinesByGama } from "@/lib/wines-queries";
 
 type Params = { gama: string };
 
 export const dynamicParams = false;
+export const revalidate = 60;
 
 export function generateStaticParams(): Params[] {
   return ALL_GAMA.map((g) => ({ gama: g }));
@@ -42,11 +44,13 @@ export default async function GamaPage({
   const { gama } = await params;
   if (!isGama(gama)) notFound();
 
+  const wines = await getWinesByGama(gama);
+
   return (
     <>
       <main className="gama-page">
         <GamaHero gama={gama} />
-        <GamaWines gama={gama} />
+        <GamaWines gama={gama} wines={wines} />
         <GamaPillars gama={gama} />
       </main>
       <Footer />

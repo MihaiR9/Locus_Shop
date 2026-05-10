@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { BottleSvg } from "@/components/landing/bottle-svg";
-import { relatedWines, type Wine } from "@/lib/wines";
+import type { Wine } from "@/lib/wines";
 
-export function WineRelated({ wine }: { wine: Wine }) {
-  const others = relatedWines(wine, 3);
+export function WineRelated({ wines }: { wines: Wine[] }) {
+  if (wines.length === 0) return null;
 
   return (
     <section className="related" aria-label="Vinuri apropiate">
@@ -14,7 +14,7 @@ export function WineRelated({ wine }: { wine: Wine }) {
         <h2 className="h2">Vinuri apropiate.</h2>
       </div>
       <div className="related-grid">
-        {others.map((r) => (
+        {wines.map((r) => (
           <Link key={r.code} href={`/vinuri/${r.slug}`} className="related-card">
             <div className="img">
               <BottleSvg color={r.bottleColor} gama={r.gama} code={r.code} />

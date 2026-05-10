@@ -8,8 +8,7 @@ export function WineBuyBox({ wine }: { wine: Wine }) {
   const [qty, setQty] = useState(1);
   const [pulsing, setPulsing] = useState(false);
 
-  const updateQtyInStore = useCartStore((s) => s.updateQty);
-  const items = useCartStore((s) => s.items);
+  const addItem = useCartStore((s) => s.addItem);
   const open = useCartStore((s) => s.open);
 
   function dec() {
@@ -20,8 +19,7 @@ export function WineBuyBox({ wine }: { wine: Wine }) {
   }
 
   function addToCart() {
-    const current = items[wine.code] ?? 0;
-    updateQtyInStore(wine.code, current + qty);
+    addItem(wine, qty);
     open();
     setPulsing(true);
     window.setTimeout(() => setPulsing(false), 600);

@@ -1,9 +1,11 @@
 import { Reveal } from "@/components/reveal";
 import { WineCard } from "@/components/landing/wine-card";
 import { WinesFilters } from "@/components/landing/wines-filters";
-import { WINES } from "@/lib/wines";
+import { getAllWines } from "@/lib/wines-queries";
 
-export function WinesGrid() {
+export async function WinesGrid() {
+  const wines = await getAllWines();
+
   return (
     <section className="colectia" aria-label="Colecția de vinuri">
       <div className="colectia-head">
@@ -12,7 +14,9 @@ export function WinesGrid() {
             Colecția 2025
           </div>
           <h2 className="h2">
-            Șase sticle.
+            {wines.length === 1
+              ? "O sticlă."
+              : `${wines.length === 6 ? "Șase" : wines.length} sticle.`}
             <br />
             Un singur loc.
           </h2>
@@ -21,7 +25,7 @@ export function WinesGrid() {
       </div>
 
       <Reveal as="div" stagger className="wines" id="winesGrid">
-        {WINES.map((w) => (
+        {wines.map((w) => (
           <WineCard key={w.code} wine={w} />
         ))}
       </Reveal>

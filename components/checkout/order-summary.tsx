@@ -6,9 +6,8 @@ import { useRouter } from "next/navigation";
 import { BottleSvg } from "@/components/landing/bottle-svg";
 import { useCartStore } from "@/lib/cart-store";
 import { useCheckoutStore } from "@/lib/checkout-store";
-import { formatRon, WINES } from "@/lib/wines";
+import { formatRon } from "@/lib/wines";
 
-const WINE_BY_CODE = Object.fromEntries(WINES.map((w) => [w.code, w] as const));
 const SHIP_FREE_AT = 250;
 const SHIP_FEE = 19;
 const COUPONS: Record<string, number> = { LOCUS10: 10, PARTENER15: 15 };
@@ -16,7 +15,7 @@ const COUPONS: Record<string, number> = { LOCUS10: 10, PARTENER15: 15 };
 export function OrderSummary() {
   const router = useRouter();
 
-  // Stable primitives only — see CartDrawer for the same Zustand v5 / React 19 pattern.
+  // Stable primitives only — same pattern as CartDrawer.
   const items = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clear);
   const shipping = useCheckoutStore((s) => s.shipping);
@@ -29,23 +28,19 @@ export function OrderSummary() {
   const [couponErr, setCouponErr] = useState(false);
   const orderRef = useRef<string | null>(null);
 
-  const lines = useMemo(() => {
-    return Object.entries(items)
-      .map(([code, qty]) => {
-        const w = WINE_BY_CODE[code];
-        return w ? { wine: w, qty } : null;
-      })
-      .filter((x): x is { wine: (typeof WINES)[number]; qty: number } => x !== null);
-  }, [items]);
+  // CartLine snapshots already carry name/price/gama/bottleColor —
+  // no DB join needed. Pricing at place-order time will be re-validated
+  // server-side against products.price_cents (Pas 4).
+  const lines = useMemo(() => Object.values(items), [items]);
 
   const subtotal = useMemo(
-    () => lines.reduce((s, l) => s + l.wine.priceRon * l.qty, 0),
+    () => lines.reduce((s, l) => s + l.priceRon * l.qty, 0),
     [lines],
   );
 
   const totalQty = useMemo(
-    () => Object.values(items).reduce((s, n) => s + n, 0),
-    [items],
+    () => lines.reduce((s, l) => s + l.qty, 0),
+    [lines],
   );
 
   const shippingFee = useMemo(() => {
@@ -103,20 +98,24 @@ export function OrderSummary() {
               <Link href="/shop">Alege un vin</Link>
             </div>
           ) : (
-            lines.map(({ wine, qty }) => (
-              <div key={wine.code} className="sum-item">
+            lines.map((line) => (
+              <div key={line.code} className="sum-item">
                 <div className="sum-img">
-                  <BottleSvg color={wine.bottleColor} gama={wine.gama} code={wine.code} />
-                  <span className="qty">{qty}</span>
+                  <BottleSvg
+                    color={line.bottleColor}
+                    gama={line.gama}
+                    code={line.code}
+                  />
+                  <span className="qty">{line.qty}</span>
                 </div>
                 <div className="sum-body">
-                  <div className="sum-name">{wine.name}</div>
+                  <div className="sum-name">{line.name}</div>
                   <div className="sum-meta">
-                    {wine.code} · {wine.gama}
+                    {line.code} · {line.gama}
                   </div>
                 </div>
                 <div className="sum-price">
-                  {formatRon(wine.priceRon * qty)}
+                  {formatRon(line.priceRon * line.qty)}
                 </div>
               </div>
             ))
