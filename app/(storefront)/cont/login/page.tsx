@@ -4,7 +4,8 @@ import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = {
   title: "Conectare · Cont",
-  description: "Conectează-te în contul tău Domeniul Locus pentru a vedea comenzile.",
+  description:
+    "Conectează-te în contul tău Domeniul Locus pentru a vedea comenzile.",
 };
 
 export default function LoginPage() {
@@ -14,20 +15,24 @@ export default function LoginPage() {
         <div className="eyebrow">contul tău</div>
         <h1>Bun venit.</h1>
         <p className="lead">
-          Pune-ți adresa de email și îți trimitem un link pentru conectare.
-          Fără parolă — un email per sesiune.
+          Alege o metodă de conectare. Dacă nu ai încă cont, creează unul în
+          mai puțin de un minut.
         </p>
         <LoginForm />
+        <div className="auth-cross-link">
+          Nu ai cont?
+          <Link href="/cont/signup">Creează cont</Link>
+        </div>
         <p
           style={{
-            marginTop: 28,
+            marginTop: 20,
             fontFamily: "var(--font-mono), monospace",
             fontSize: 11,
             lineHeight: 1.7,
             color: "var(--ink-mute)",
+            textAlign: "center",
           }}
         >
-          Nu ai încă cont? Pune adresa și creezi unul automat la primul login.
           Continuând, ești de acord cu{" "}
           <Link href="/termeni" style={{ color: "var(--ink-soft)" }}>
             Termenii
