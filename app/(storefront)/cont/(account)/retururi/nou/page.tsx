@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getReturnPickerData } from "@/lib/mock-account";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { getReturnPickerData } from "@/lib/account/returns";
 import { ReturnWizard } from "./wizard";
 
 export const metadata: Metadata = {
@@ -16,12 +18,17 @@ export default async function NewReturnPage({
 }: {
   searchParams: SearchParams;
 }) {
-  const sp = await searchParams;
-  const { eligible, ineligible } = getReturnPickerData();
+  const user = await getCurrentUser();
+  if (!user) redirect("/cont/login");
 
-  // Optional preselection from a deep link (e.g. email)
+  const sp = await searchParams;
+  const { eligible, ineligible } = await getReturnPickerData(user.customerId);
+
   let preselectedOrder: string | undefined;
-  if (sp.orderNumber && eligible.some((g) => g.order.orderNumber === sp.orderNumber)) {
+  if (
+    sp.orderNumber &&
+    eligible.some((g) => g.order.order_number === sp.orderNumber)
+  ) {
     preselectedOrder = sp.orderNumber;
   }
 

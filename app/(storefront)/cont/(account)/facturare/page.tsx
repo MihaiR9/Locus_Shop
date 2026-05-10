@@ -1,12 +1,27 @@
 import type { Metadata } from "next";
-import { MOCK_BILLING_PROFILES } from "@/lib/mock-account";
-import { BillingSection } from "./billing-section";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { BillingSection, type BillingRow } from "./billing-section";
 
 export const metadata: Metadata = {
   title: "Date facturare · Cont",
 };
 
-export default function BillingPage() {
+export default async function BillingPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/cont/login");
+
+  const supabase = await getSupabaseServerClient();
+  const { data } = await supabase
+    .from("billing_profiles")
+    .select("id, company, cui, reg_no, iban, hq_address, type")
+    .eq("customer_id", user.customerId)
+    .eq("type", "juridica")
+    .order("id", { ascending: true });
+
+  const profiles: BillingRow[] = data ?? [];
+
   return (
     <>
       <div className="eyebrow">factură · persoană juridică</div>
@@ -17,7 +32,7 @@ export default function BillingPage() {
         nevoie de nimic aici — facturăm direct pe numele de pe livrare.
       </p>
 
-      <BillingSection initial={MOCK_BILLING_PROFILES} />
+      <BillingSection initial={profiles} />
 
       <p
         style={{

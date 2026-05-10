@@ -1,23 +1,34 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { OrderCard } from "@/components/account/order-card";
-import { MOCK_ORDERS, MOCK_RETURNS, MOCK_USER } from "@/lib/mock-account";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { listMyOrders, ronFromCents } from "@/lib/account/orders";
+import { listMyReturns } from "@/lib/account/returns";
 import { formatRon } from "@/lib/wines";
 
 export const metadata: Metadata = {
   title: "Cont · Acasă",
 };
 
-export default function ContDashboardPage() {
-  const recent = MOCK_ORDERS.slice(0, 3);
-  const totalSpentRon = MOCK_ORDERS
+export default async function ContDashboardPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/cont/login");
+
+  const [orders, returns] = await Promise.all([
+    listMyOrders(user.customerId),
+    listMyReturns(user.customerId),
+  ]);
+
+  const recent = orders.slice(0, 3);
+  const totalSpentCents = orders
     .filter((o) => o.status !== "cancelled" && o.status !== "refunded")
-    .reduce((s, o) => s + o.totalRon, 0);
-  const ordersCount = MOCK_ORDERS.filter((o) => o.status !== "cancelled").length;
-  const openReturnsCount = MOCK_RETURNS.filter(
+    .reduce((s, o) => s + o.total_cents, 0);
+  const ordersCount = orders.filter((o) => o.status !== "cancelled").length;
+  const openReturnsCount = returns.filter(
     (r) => r.status !== "completed" && r.status !== "rejected",
   ).length;
-  const memberSince = new Date(MOCK_USER.createdAt).toLocaleDateString("ro-RO", {
+  const memberSince = new Date(user.createdAt).toLocaleDateString("ro-RO", {
     month: "long",
     year: "numeric",
   });
@@ -47,7 +58,9 @@ export default function ContDashboardPage() {
         </Link>
         <div className="cont-quick-tile">
           <span className="label">Total cheltuit</span>
-          <span className="value">{formatRon(totalSpentRon)}</span>
+          <span className="value">
+            {formatRon(ronFromCents(totalSpentCents))}
+          </span>
           <span
             style={{
               marginTop: "auto",
@@ -78,11 +91,7 @@ export default function ContDashboardPage() {
               color: "var(--ink-mute)",
             }}
           >
-            {openReturnsCount > 0
-              ? openReturnsCount === 1
-                ? "în curs"
-                : "în curs"
-              : "niciun retur"}
+            {openReturnsCount > 0 ? "în curs" : "niciun retur"}
           </span>
           <svg
             className="arrow-svg"
@@ -121,7 +130,7 @@ export default function ContDashboardPage() {
         ) : (
           <div>
             {recent.map((o) => (
-              <OrderCard key={o.orderNumber} order={o} />
+              <OrderCard key={o.id} order={o} />
             ))}
           </div>
         )}

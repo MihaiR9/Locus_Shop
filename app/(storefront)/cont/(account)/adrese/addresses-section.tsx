@@ -1,65 +1,55 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
-import {
-  addBillingProfile,
-  deleteBillingProfile,
-  updateBillingProfile,
-} from "./actions";
+import { addAddress, deleteAddress, updateAddress } from "./actions";
 
-export type BillingRow = {
+export type AddressRow = {
   id: string;
-  company: string | null;
-  cui: string | null;
-  reg_no: string | null;
-  iban: string | null;
-  hq_address: string | null;
+  line1: string;
+  line2: string | null;
+  city: string;
+  county: string;
+  zip: string | null;
+  is_default: boolean;
 };
 
-type Props = {
-  initial: BillingRow[];
-};
-
-const EMPTY_FORM = {
-  company: "",
-  cui: "",
-  regNo: "",
-  iban: "",
-  hqAddress: "",
+const EMPTY = {
+  line1: "",
+  line2: "",
+  city: "",
+  county: "",
+  zip: "",
   isDefault: false,
 };
 
-export function BillingSection({ initial }: Props) {
+export function AddressesSection({ initial }: { initial: AddressRow[] }) {
   const [, startTransition] = useTransition();
   const [editingId, setEditingId] = useState<string | "new" | null>(null);
-  const [form, setForm] = useState(EMPTY_FORM);
+  const [form, setForm] = useState(EMPTY);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   function startNew() {
-    setForm(EMPTY_FORM);
+    setForm({ ...EMPTY, isDefault: initial.length === 0 });
     setEditingId("new");
     setMessage(null);
   }
-
-  function startEdit(p: BillingRow) {
+  function startEdit(a: AddressRow) {
     setForm({
-      company: p.company ?? "",
-      cui: p.cui ?? "",
-      regNo: p.reg_no ?? "",
-      iban: p.iban ?? "",
-      hqAddress: p.hq_address ?? "",
-      isDefault: false,
+      line1: a.line1,
+      line2: a.line2 ?? "",
+      city: a.city,
+      county: a.county,
+      zip: a.zip ?? "",
+      isDefault: a.is_default,
     });
-    setEditingId(p.id);
+    setEditingId(a.id);
     setMessage(null);
   }
-
   function cancel() {
     setEditingId(null);
-    setForm(EMPTY_FORM);
+    setForm(EMPTY);
   }
-
   function flash(msg: string) {
     setMessage(msg);
     setTimeout(() => setMessage(null), 4000);
@@ -73,8 +63,8 @@ export function BillingSection({ initial }: Props) {
     startTransition(async () => {
       const res =
         editingId === "new"
-          ? await addBillingProfile(form)
-          : await updateBillingProfile(editingId!, form);
+          ? await addAddress(form)
+          : await updateAddress(editingId!, form);
       setPending(false);
       if (!res.ok) return setMessage(res.error);
       flash(res.message ?? "Salvat.");
@@ -83,9 +73,9 @@ export function BillingSection({ initial }: Props) {
   }
 
   function onDelete(id: string) {
-    if (!confirm("Sigur ștergi datele acestei firme?")) return;
+    if (!confirm("Sigur ștergi această adresă?")) return;
     startTransition(async () => {
-      const res = await deleteBillingProfile(id);
+      const res = await deleteAddress(id);
       if (!res.ok) return setMessage(res.error);
       flash(res.message ?? "Șters.");
     });
@@ -95,9 +85,9 @@ export function BillingSection({ initial }: Props) {
     <section className="cont-section">
       <div className="cont-section-head">
         <h2>
-          {initial.length > 0
-            ? `${initial.length} ${initial.length === 1 ? "firmă salvată" : "firme salvate"}`
-            : "Nicio firmă"}
+          {initial.length === 0
+            ? "Nicio adresă"
+            : `${initial.length} ${initial.length === 1 ? "adresă salvată" : "adrese salvate"}`}
         </h2>
         {editingId === null && (
           <button
@@ -110,7 +100,7 @@ export function BillingSection({ initial }: Props) {
             }}
             onClick={startNew}
           >
-            + adaugă firmă
+            + adaugă adresă
           </button>
         )}
       </div>
@@ -143,7 +133,7 @@ export function BillingSection({ initial }: Props) {
             padding: "20px 24px",
             display: "flex",
             flexDirection: "column",
-            gap: 14,
+            gap: 12,
             marginBottom: 16,
           }}
         >
@@ -157,68 +147,76 @@ export function BillingSection({ initial }: Props) {
               marginBottom: 4,
             }}
           >
-            {editingId === "new" ? "Firmă nouă" : "Editare firmă"}
+            {editingId === "new" ? "Adresă nouă" : "Editare adresă"}
           </h3>
 
           <Field
-            id="bf-company"
-            label="Denumire firmă"
-            value={form.company}
-            onChange={(v) => setForm({ ...form, company: v })}
-            placeholder="SC Exemplu SRL"
+            id="addr-l1"
+            label="Stradă, număr"
+            value={form.line1}
+            onChange={(v) => setForm({ ...form, line1: v })}
+            placeholder="Bd. Bucureștii Noi 25"
             required
+          />
+          <Field
+            id="addr-l2"
+            label="Bloc, scară, apartament (opțional)"
+            value={form.line2}
+            onChange={(v) => setForm({ ...form, line2: v })}
+            placeholder="Bloc Marmura, Sc 1, Et 1, Ap. D115"
           />
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: "1fr 1fr 120px",
               gap: 12,
             }}
           >
             <Field
-              id="bf-cui"
-              label="CUI"
-              value={form.cui}
-              onChange={(v) => setForm({ ...form, cui: v })}
-              placeholder="RO12345678"
+              id="addr-city"
+              label="Oraș"
+              value={form.city}
+              onChange={(v) => setForm({ ...form, city: v })}
+              placeholder="București"
               required
             />
             <Field
-              id="bf-reg"
-              label="Nr. Reg. Com. (opțional)"
-              value={form.regNo}
-              onChange={(v) => setForm({ ...form, regNo: v })}
-              placeholder="J40/1234/2020"
+              id="addr-county"
+              label="Județ"
+              value={form.county}
+              onChange={(v) => setForm({ ...form, county: v })}
+              placeholder="București"
+              required
+            />
+            <Field
+              id="addr-zip"
+              label="Cod poștal"
+              value={form.zip}
+              onChange={(v) => setForm({ ...form, zip: v })}
+              placeholder="012345"
             />
           </div>
-          <Field
-            id="bf-iban"
-            label="IBAN (opțional)"
-            value={form.iban}
-            onChange={(v) => setForm({ ...form, iban: v.toUpperCase() })}
-            placeholder="RO49 AAAA 1B31 0075 9384 0000"
-          />
-          <Field
-            id="bf-hq"
-            label="Sediu social"
-            value={form.hqAddress}
-            onChange={(v) => setForm({ ...form, hqAddress: v })}
-            placeholder="Str. Exemplu nr. 1, București"
-            required
-          />
 
-          <p
+          <label
             style={{
+              display: "flex",
+              gap: 10,
+              alignItems: "center",
               fontFamily: "var(--font-mono), monospace",
-              fontSize: 11,
-              lineHeight: 1.7,
-              color: "var(--ink-mute)",
-              margin: 0,
+              fontSize: 12,
+              color: "var(--ink-soft)",
+              cursor: "pointer",
             }}
           >
-            Datele se validează la ANAF la salvare (când conectăm Smartbill).
-            Le folosim doar pentru facturile fiscale (e-Factura).
-          </p>
+            <input
+              type="checkbox"
+              checked={form.isDefault}
+              onChange={(e) =>
+                setForm({ ...form, isDefault: e.target.checked })
+              }
+            />
+            folosește ca implicită la livrare
+          </label>
 
           <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
             <button
@@ -261,65 +259,34 @@ export function BillingSection({ initial }: Props) {
         </form>
       )}
 
-      {initial.length === 0 && editingId === null && (
-        <div className="return-empty">
-          <h3>Nu ai date de firmă salvate.</h3>
-          <p>
-            Adaugă datele firmei o singură dată — la următoarele comenzi le
-            avem deja completate. Plata, factura și e-Factura ANAF se emit
-            automat după plasarea comenzii.
-          </p>
-          <button
-            type="button"
-            className="btn"
-            onClick={startNew}
-            style={{ background: "transparent", cursor: "pointer" }}
-          >
-            Adaugă firmă
-            <svg
-              className="arrow-svg"
-              width="16"
-              height="8"
-              viewBox="0 0 24 12"
-              aria-hidden="true"
-            >
-              <use href="#arrow-right" />
-            </svg>
-          </button>
-        </div>
-      )}
-
       {initial.length > 0 && (
         <div className="address-list">
-          {initial.map((p) => (
-            <article key={p.id} className="address-card">
+          {initial.map((a) => (
+            <article key={a.id} className="address-card">
               <div className="lines">
-                <strong>{p.company}</strong>
-                CUI {p.cui}
-                {p.reg_no ? ` · ${p.reg_no}` : ""}
-                {p.hq_address && (
+                <strong>{a.line1}</strong>
+                {a.line2 && (
                   <>
+                    {a.line2}
                     <br />
-                    {p.hq_address}
                   </>
                 )}
-                {p.iban && (
-                  <>
-                    <br />
-                    IBAN {p.iban}
-                  </>
-                )}
+                {a.city}, {a.county}
+                {a.zip ? ` · ${a.zip}` : ""}
               </div>
               <div className="badges">
-                <span className="badge">juridică</span>
+                <span className="badge">livrare</span>
+                {a.is_default && (
+                  <span className="badge is-default">implicită</span>
+                )}
               </div>
               <div className="actions">
                 <button
                   type="button"
                   className="icon-btn"
-                  aria-label="Editează firma"
+                  aria-label="Editează adresa"
                   title="Editează"
-                  onClick={() => startEdit(p)}
+                  onClick={() => startEdit(a)}
                 >
                   <svg
                     viewBox="0 0 16 16"
@@ -337,9 +304,9 @@ export function BillingSection({ initial }: Props) {
                 <button
                   type="button"
                   className="icon-btn"
-                  aria-label="Șterge firma"
+                  aria-label="Șterge adresa"
                   title="Șterge"
-                  onClick={() => onDelete(p.id)}
+                  onClick={() => onDelete(a.id)}
                 >
                   <svg
                     viewBox="0 0 16 16"

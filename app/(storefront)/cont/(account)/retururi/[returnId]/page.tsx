@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { BottleSvg } from "@/components/landing/bottle-svg";
+import { notFound, redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import {
-  getMockReturn,
+  getMyReturn,
   PRODUCT_STATE_LABEL,
   RESOLUTION_LABEL,
   RETURN_STATUS_LABEL,
-  type MockReturnStatus,
-} from "@/lib/mock-account";
+  type ReturnStatus,
+} from "@/lib/account/returns";
+import { formatRon } from "@/lib/wines";
+import { ronFromCents } from "@/lib/account/orders";
 
 const RO_DATETIME = new Intl.DateTimeFormat("ro-RO", {
   day: "numeric",
@@ -30,14 +32,14 @@ export async function generateMetadata({
   return { title: `Retur ${returnId} · Cont` };
 }
 
-const TIMELINE: { key: MockReturnStatus; label: string }[] = [
+const TIMELINE: { key: ReturnStatus; label: string }[] = [
   { key: "pending", label: "în analiză" },
   { key: "approved", label: "aprobat · AWB trimis" },
   { key: "in_transit", label: "în transport" },
   { key: "completed", label: "finalizat" },
 ];
 
-const STATUS_ORDER: Record<MockReturnStatus, number> = {
+const STATUS_ORDER: Record<ReturnStatus, number> = {
   pending: 0,
   approved: 1,
   in_transit: 2,
@@ -55,44 +57,29 @@ export default async function ReturnDetailPage({
   const { returnId } = await params;
   const sp = await searchParams;
   const justCreated = sp["just-created"] === "1";
-  const ret = getMockReturn(returnId);
 
-  // Just-created tickets aren't in MOCK_RETURNS yet — show confirmation view.
-  if (!ret && justCreated) {
-    return (
-      <>
-        <div className="eyebrow">retur · înregistrat</div>
-        <h1>{returnId}</h1>
-        <p className="lead-mono">
-          Mulțumim — am primit cererea ta. O vom analiza și îți răspundem prin
-          email în maxim 24h. Dacă e aprobată, primești și AWB-ul de retur tot
-          pe email.
-        </p>
+  const user = await getCurrentUser();
+  if (!user) redirect("/cont/login");
 
-        <section className="cont-section">
-          <div className="return-empty">
-            <h3>Cererea ta e în analiză.</h3>
-            <p>
-              Statusul curent: <strong>în analiză</strong>. Te ținem la curent
-              pe email pentru fiecare schimbare. Poți reveni oricând în{" "}
-              <Link
-                href="/cont/retururi"
-                style={{ color: "var(--ink-soft)" }}
-              >
-                Retururi
-              </Link>{" "}
-              ca să vezi statusul.
-            </p>
-            <Link href="/cont/retururi" className="btn">
-              ← înapoi la retururi
-            </Link>
-          </div>
-        </section>
-      </>
-    );
+  const ret = await getMyReturn(user.customerId, returnId);
+
+  if (!ret) {
+    if (justCreated) {
+      // Race window between insert + RLS read; show generic confirmation.
+      return (
+        <>
+          <div className="eyebrow">retur · înregistrat</div>
+          <h1>{returnId}</h1>
+          <p className="lead-mono">
+            Mulțumim — am primit cererea ta. O vom analiza și îți răspundem
+            prin email în maxim 24h. Dacă e aprobată, primești și AWB-ul de
+            retur tot pe email.
+          </p>
+        </>
+      );
+    }
+    notFound();
   }
-
-  if (!ret) notFound();
 
   const currentIdx = STATUS_ORDER[ret.status];
   const isRejected = ret.status === "rejected";
@@ -103,25 +90,27 @@ export default async function ReturnDetailPage({
 
       <div className="order-detail-head">
         <div>
-          <h1>{ret.returnNumber}</h1>
+          <h1>{ret.return_number}</h1>
           <div className="order-meta">
-            <span>
-              <strong>Comandă:</strong>{" "}
-              <Link
-                href={`/cont/comenzi/${encodeURIComponent(ret.orderNumber)}`}
-                style={{ color: "var(--ink-soft)" }}
-              >
-                {ret.orderNumber}
-              </Link>
-            </span>
+            {ret.order?.order_number && (
+              <span>
+                <strong>Comandă:</strong>{" "}
+                <Link
+                  href={`/cont/comenzi/${encodeURIComponent(ret.order.order_number)}`}
+                  style={{ color: "var(--ink-soft)" }}
+                >
+                  {ret.order.order_number}
+                </Link>
+              </span>
+            )}
             <span>
               <strong>Trimisă:</strong>{" "}
-              {RO_DATETIME.format(new Date(ret.createdAt))}
+              {RO_DATETIME.format(new Date(ret.created_at))}
             </span>
-            {ret.updatedAt && (
+            {ret.updated_at && ret.updated_at !== ret.created_at && (
               <span>
                 <strong>Actualizat:</strong>{" "}
-                {RO_DATETIME.format(new Date(ret.updatedAt))}
+                {RO_DATETIME.format(new Date(ret.updated_at))}
               </span>
             )}
           </div>
@@ -164,33 +153,33 @@ export default async function ReturnDetailPage({
 
       <section className="cont-section">
         <div className="cont-section-head">
-          <h2>Produs</h2>
+          <h2>
+            Produse ({ret.items.length})
+          </h2>
         </div>
-        <div className="order-item-row">
-          <div className="img">
-            <BottleSvg
-              color={ret.productBottleColor}
-              gama={ret.productGama}
-              code={ret.productCode}
-            />
-          </div>
-          <div className="body">
-            <div className="meta">
-              {ret.productGama} · {ret.productCode}
+        <div className="order-items-list">
+          {ret.items.map((it) => (
+            <div key={it.id} className="order-item-row">
+              <div className="body">
+                <div className="meta">{it.product_code} · cantitate {it.qty}</div>
+                <div className="name">{it.product_name}</div>
+                <div
+                  className="meta"
+                  style={{
+                    textTransform: "none",
+                    letterSpacing: "0.04em",
+                    fontSize: 11,
+                    marginTop: 2,
+                  }}
+                >
+                  stare: {PRODUCT_STATE_LABEL[ret.product_state]}
+                </div>
+              </div>
+              <div className="price">
+                {formatRon(ronFromCents(it.unit_price_cents * it.qty))}
+              </div>
             </div>
-            <div className="name">{ret.productName}</div>
-            <div
-              className="meta"
-              style={{
-                textTransform: "none",
-                letterSpacing: "0.04em",
-                fontSize: 11,
-                marginTop: 2,
-              }}
-            >
-              stare: {PRODUCT_STATE_LABEL[ret.productState]}
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
@@ -210,20 +199,22 @@ export default async function ReturnDetailPage({
             color: "var(--ink-soft)",
           }}
         >
-          <div>
-            <div
-              style={{
-                fontSize: 10,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: "var(--ink-mute)",
-                marginBottom: 4,
-              }}
-            >
-              Motiv invocat
+          {ret.reason && (
+            <div>
+              <div
+                style={{
+                  fontSize: 10,
+                  letterSpacing: "0.22em",
+                  textTransform: "uppercase",
+                  color: "var(--ink-mute)",
+                  marginBottom: 4,
+                }}
+              >
+                Motiv invocat
+              </div>
+              {ret.reason}
             </div>
-            {ret.reason}
-          </div>
+          )}
           <div>
             <div
               style={{

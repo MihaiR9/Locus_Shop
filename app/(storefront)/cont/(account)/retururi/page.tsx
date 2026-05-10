@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BottleSvg } from "@/components/landing/bottle-svg";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import {
-  MOCK_RETURNS,
+  getReturnPickerData,
+  listMyReturns,
   PRODUCT_STATE_LABEL,
   RETURN_STATUS_LABEL,
-  getEligibleReturnProducts,
-} from "@/lib/mock-account";
+} from "@/lib/account/returns";
 
 export const metadata: Metadata = {
   title: "Retururi · Cont",
@@ -18,12 +19,19 @@ const RO_DATE = new Intl.DateTimeFormat("ro-RO", {
   year: "numeric",
 });
 
-export default function ReturnsListPage() {
-  const returns = [...MOCK_RETURNS].sort(
-    (a, b) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+export default async function ReturnsListPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/cont/login");
+
+  const [returns, picker] = await Promise.all([
+    listMyReturns(user.customerId),
+    getReturnPickerData(user.customerId),
+  ]);
+
+  const eligibleCount = picker.eligible.reduce(
+    (s, g) => s + g.items.filter((i) => !i.alreadyReturned).length,
+    0,
   );
-  const eligibleCount = getEligibleReturnProducts().length;
 
   return (
     <>
@@ -77,9 +85,10 @@ export default function ReturnsListPage() {
           <div className="return-empty">
             <h3>Niciun retur până acum.</h3>
             <p>
-              Ai {eligibleCount} {eligibleCount === 1 ? "produs eligibil" : "produse eligibile"}{" "}
-              pentru retur. Inițiezi cererea în 3 pași — selectezi produsul,
-              alegi motivul, alegi rezolvarea.
+              Ai {eligibleCount}{" "}
+              {eligibleCount === 1 ? "produs eligibil" : "produse eligibile"}{" "}
+              pentru retur. Inițiezi cererea în 3 pași — selectezi comanda și
+              produsele, alegi motivul, alegi rezolvarea.
             </p>
             <Link href="/cont/retururi/nou" className="btn">
               Adaugă cerere de retur
@@ -98,33 +107,50 @@ export default function ReturnsListPage() {
 
         {returns.length > 0 && (
           <div>
-            {returns.map((r) => (
-              <Link
-                key={r.returnNumber}
-                href={`/cont/retururi/${encodeURIComponent(r.returnNumber)}`}
-                className="return-row"
-              >
-                <div className="img">
-                  <BottleSvg
-                    color={r.productBottleColor}
-                    gama={r.productGama}
-                    code={r.productCode}
-                  />
-                </div>
-                <div className="body">
-                  <div className="meta">
-                    {r.returnNumber} · {RO_DATE.format(new Date(r.createdAt))}
+            {returns.map((r) => {
+              const firstItem = r.items[0];
+              const itemsLabel =
+                r.items.length === 0
+                  ? "—"
+                  : r.items.length === 1
+                    ? `${firstItem.qty} × ${firstItem.product_name}`
+                    : `${firstItem.qty} × ${firstItem.product_name} + încă ${
+                        r.items.length - 1
+                      }`;
+              return (
+                <Link
+                  key={r.return_number}
+                  href={`/cont/retururi/${encodeURIComponent(r.return_number)}`}
+                  className="return-row"
+                >
+                  <div className="body">
+                    <div className="meta">
+                      {r.return_number} ·{" "}
+                      {RO_DATE.format(new Date(r.created_at))}
+                      {r.order?.order_number
+                        ? ` · ${r.order.order_number}`
+                        : ""}
+                    </div>
+                    <div className="number">{itemsLabel}</div>
+                    <div className="product">
+                      {PRODUCT_STATE_LABEL[r.product_state]}
+                    </div>
                   </div>
-                  <div className="number">{r.productName}</div>
-                  <div className="product">
-                    {r.productGama} · {r.productCode} · {PRODUCT_STATE_LABEL[r.productState]}
-                  </div>
-                </div>
-                <span className="status-pill" data-status={r.status === "rejected" ? "cancelled" : r.status === "completed" ? "delivered" : "shipped"}>
-                  {RETURN_STATUS_LABEL[r.status]}
-                </span>
-              </Link>
-            ))}
+                  <span
+                    className="status-pill"
+                    data-status={
+                      r.status === "rejected"
+                        ? "cancelled"
+                        : r.status === "completed"
+                          ? "delivered"
+                          : "shipped"
+                    }
+                  >
+                    {RETURN_STATUS_LABEL[r.status]}
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>

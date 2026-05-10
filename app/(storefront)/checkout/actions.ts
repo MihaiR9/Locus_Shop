@@ -1,6 +1,7 @@
 "use server";
 
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import type { Json } from "@/lib/supabase/database.types";
 import { getStripe, getSiteUrl } from "@/lib/stripe/server";
 import type {
@@ -139,20 +140,19 @@ export async function createOrder(
 
   const totalCents = Math.max(0, subtotalCents - discountCents + shippingCents);
 
-  // ── 4. Extract guest email from billing/shipping ────────────────
+  // ── 4. Extract guest email from billing/shipping (or use logged-in)
+  const currentUser = await getCurrentUser();
   const guestEmail =
-    "email" in input.billing
+    currentUser?.email ??
+    ("email" in input.billing
       ? input.billing.email
       : "email" in input.shipping
         ? (input.shipping as { email: string }).email
-        : null;
+        : "");
 
   // ── 5. Call the create_order Postgres function (atomic) ─────────
   const { data: rpcData, error: rpcError } = await supabase.rpc("create_order", {
     p_idempotency_key: input.idempotencyKey,
-    // Cast to Json: items / shipping / billing are JSON-shaped already
-    // (no Date / functions / undefined). Supabase JsonB columns expect
-    // the generated `Json` type.
     p_items: input.items as unknown as Json,
     p_shipping: input.shipping as unknown as Json,
     p_billing: input.billing as unknown as Json,
@@ -163,7 +163,7 @@ export async function createOrder(
     p_discount_cents: discountCents,
     p_total_cents: totalCents,
     p_guest_email: guestEmail,
-    p_customer_id: null, // guest checkout for now; Pas 7 wires logged-in user
+    p_customer_id: (currentUser?.customerId ?? null) as unknown as string,
   });
 
   if (rpcError) {

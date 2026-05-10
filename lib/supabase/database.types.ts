@@ -252,18 +252,9 @@ export type Database = {
         Relationships: []
       }
       order_counters: {
-        Row: {
-          year: number
-          last_seq: number
-        }
-        Insert: {
-          year: number
-          last_seq?: number
-        }
-        Update: {
-          year?: number
-          last_seq?: number
-        }
+        Row: { last_seq: number; year: number }
+        Insert: { last_seq?: number; year: number }
+        Update: { last_seq?: number; year?: number }
         Relationships: []
       }
       order_events: {
@@ -433,21 +424,9 @@ export type Database = {
         ]
       }
       processed_events: {
-        Row: {
-          event_id: string
-          processed_at: string
-          source: string
-        }
-        Insert: {
-          event_id: string
-          processed_at?: string
-          source: string
-        }
-        Update: {
-          event_id?: string
-          processed_at?: string
-          source?: string
-        }
+        Row: { event_id: string; processed_at: string; source: string }
+        Insert: { event_id: string; processed_at?: string; source: string }
+        Update: { event_id?: string; processed_at?: string; source?: string }
         Relationships: []
       }
       product_images: {
@@ -566,6 +545,114 @@ export type Database = {
         }
         Relationships: []
       }
+      return_counters: {
+        Row: { seq: number; year: number }
+        Insert: { seq?: number; year: number }
+        Update: { seq?: number; year?: number }
+        Relationships: []
+      }
+      return_items: {
+        Row: {
+          id: string
+          order_item_id: string
+          product_code: string
+          product_name: string
+          qty: number
+          return_id: string
+          unit_price_cents: number
+        }
+        Insert: {
+          id?: string
+          order_item_id: string
+          product_code: string
+          product_name: string
+          qty: number
+          return_id: string
+          unit_price_cents: number
+        }
+        Update: {
+          id?: string
+          order_item_id?: string
+          product_code?: string
+          product_name?: string
+          qty?: number
+          return_id?: string
+          unit_price_cents?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "return_items_order_item_id_fkey"
+            columns: ["order_item_id"]
+            isOneToOne: false
+            referencedRelation: "order_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "return_items_return_id_fkey"
+            columns: ["return_id"]
+            isOneToOne: false
+            referencedRelation: "returns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      returns: {
+        Row: {
+          created_at: string
+          customer_id: string
+          iban: string | null
+          id: string
+          order_id: string
+          product_state: Database["public"]["Enums"]["return_product_state"]
+          reason: string | null
+          resolution: Database["public"]["Enums"]["return_resolution"]
+          return_number: string
+          status: Database["public"]["Enums"]["return_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          iban?: string | null
+          id?: string
+          order_id: string
+          product_state: Database["public"]["Enums"]["return_product_state"]
+          reason?: string | null
+          resolution: Database["public"]["Enums"]["return_resolution"]
+          return_number: string
+          status?: Database["public"]["Enums"]["return_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          iban?: string | null
+          id?: string
+          order_id?: string
+          product_state?: Database["public"]["Enums"]["return_product_state"]
+          reason?: string | null
+          resolution?: Database["public"]["Enums"]["return_resolution"]
+          return_number?: string
+          status?: Database["public"]["Enums"]["return_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "returns_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "returns_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       variants: {
         Row: {
           id: string
@@ -596,16 +683,14 @@ export type Database = {
         ]
       }
     }
-    Views: {
-      [_ in never]: never
-    }
+    Views: { [_ in never]: never }
     Functions: {
       create_order: {
         Args: {
           p_billing: Json
-          p_customer_id: string | null
+          p_customer_id: string
           p_discount_cents: number
-          p_guest_email: string | null
+          p_guest_email: string
           p_idempotency_key: string
           p_items: Json
           p_payment_method: Database["public"]["Enums"]["pay_method_t"]
@@ -615,11 +700,9 @@ export type Database = {
           p_subtotal_cents: number
           p_total_cents: number
         }
-        Returns: {
-          id: string
-          order_number: string
-        }[]
+        Returns: { id: string; order_number: string }[]
       }
+      next_return_number: { Args: { p_year: number }; Returns: string }
     }
     Enums: {
       address_kind_t: "shipping" | "billing"
@@ -640,159 +723,18 @@ export type Database = {
         | "failed"
         | "refunded"
         | "partial_refund"
+      return_product_state: "sigilat" | "deteriorat" | "neconform"
+      return_resolution: "rambursare" | "inlocuire" | "voucher"
+      return_status:
+        | "pending"
+        | "approved"
+        | "in_transit"
+        | "completed"
+        | "rejected"
       ship_method_t: "curier" | "ridicare"
       sweetness_t: "sec" | "demisec" | "dulce"
       wine_type_t: "alb" | "rosu" | "rose"
     }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+    CompositeTypes: { [_ in never]: never }
   }
 }
-
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
-
-export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
-    }
-    ? R
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
-
-export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
-
-export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
-
-export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
-
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
-
-export const Constants = {
-  public: {
-    Enums: {
-      address_kind_t: ["shipping", "billing"],
-      bill_type_t: ["fizica", "juridica"],
-      bottle_color_t: ["white", "red", "rose"],
-      gama_t: ["cuvinte", "semne", "pauze"],
-      order_status_t: [
-        "pending_payment",
-        "paid",
-        "shipped",
-        "delivered",
-        "cancelled",
-        "refunded",
-      ],
-      pay_method_t: ["card-online", "card-livrare", "ramburs"],
-      pay_status_t: [
-        "pending",
-        "succeeded",
-        "failed",
-        "refunded",
-        "partial_refund",
-      ],
-      ship_method_t: ["curier", "ridicare"],
-      sweetness_t: ["sec", "demisec", "dulce"],
-      wine_type_t: ["alb", "rosu", "rose"],
-    },
-  },
-} as const

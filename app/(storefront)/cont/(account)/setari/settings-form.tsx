@@ -1,11 +1,26 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import type { MockUser } from "@/lib/mock-account";
+import { useState, useTransition, type FormEvent } from "react";
+import {
+  updateName,
+  updatePhone,
+  updateMarketing,
+  requestEmailChange,
+  requestPasswordChange,
+} from "./actions";
 
 type Field = "email" | "password" | "phone" | "name";
 
-export function SettingsForm({ user }: { user: MockUser }) {
+type SettingsUser = {
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  marketingOptIn: boolean;
+};
+
+export function SettingsForm({ user }: { user: SettingsUser }) {
+  const [, startTransition] = useTransition();
   const [editing, setEditing] = useState<Field | null>(null);
   const [emailNew, setEmailNew] = useState("");
   const [pwdCurrent, setPwdCurrent] = useState("");
@@ -26,47 +41,41 @@ export function SettingsForm({ user }: { user: MockUser }) {
     setPwdConfirm("");
   }
 
+  function flash(msg: string) {
+    setMessage(msg);
+    setTimeout(() => setMessage(null), 5000);
+  }
+
   function onSubmit(field: Field, e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMessage(null);
-
-    if (field === "email") {
-      if (!emailNew.includes("@")) {
-        setMessage("Adresă de email invalidă.");
-        return;
-      }
-    }
-    if (field === "password") {
-      if (pwdNew.length < 8) {
-        setMessage("Parola nouă trebuie să aibă minim 8 caractere.");
-        return;
-      }
-      if (pwdNew !== pwdConfirm) {
-        setMessage("Confirmarea parolei nu se potrivește.");
-        return;
-      }
-    }
-
     setPending(true);
-    // TODO: real server action — Supabase Auth (updateUser / sendOtp)
-    setTimeout(() => {
-      setPending(false);
-      if (field === "email") {
-        setMessage(
-          `Ți-am trimis un link de confirmare la ${emailNew}. Schimbarea devine activă după ce confirmi.`,
-        );
+
+    startTransition(async () => {
+      let res:
+        | { ok: true; message?: string }
+        | { ok: false; error: string }
+        | null = null;
+
+      if (field === "name") {
+        res = await updateName({ firstName, lastName });
+      } else if (field === "email") {
+        res = await requestEmailChange(emailNew);
       } else if (field === "password") {
-        setMessage(
-          "Ți-am trimis un email cu link de confirmare pentru schimbarea parolei.",
-        );
+        res = await requestPasswordChange();
       } else if (field === "phone") {
-        setMessage("Telefon actualizat.");
-      } else if (field === "name") {
-        setMessage("Numele a fost actualizat.");
+        res = await updatePhone(phone);
       }
+
+      setPending(false);
+      if (!res) return;
+      if (!res.ok) {
+        setMessage(res.error);
+        return;
+      }
+      flash(res.message ?? "Salvat.");
       reset();
-      setTimeout(() => setMessage(null), 5000);
-    }, 500);
+    });
   }
 
   return (
@@ -354,13 +363,17 @@ export function SettingsForm({ user }: { user: MockUser }) {
                 type="checkbox"
                 checked={marketing}
                 onChange={(e) => {
-                  setMarketing(e.target.checked);
-                  setMessage(
-                    e.target.checked
-                      ? "Te-ai abonat la newsletter."
-                      : "Te-ai dezabonat de la newsletter.",
-                  );
-                  setTimeout(() => setMessage(null), 3000);
+                  const next = e.target.checked;
+                  setMarketing(next);
+                  startTransition(async () => {
+                    const res = await updateMarketing(next);
+                    if (!res.ok) {
+                      setMarketing(!next);
+                      setMessage(res.error);
+                      return;
+                    }
+                    flash(res.message ?? "Salvat.");
+                  });
                 }}
               />
               {marketing ? "abonat" : "dezabonat"}

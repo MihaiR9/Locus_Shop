@@ -3612,6 +3612,27 @@
   background: rgba(170,34,51,0.05);
 }
 
+/* ── Order totals (detail page) ── */
+.order-totals-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  color: var(--ink-soft);
+  padding: 8px 0;
+}
+.order-total-final {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 24px;
+  color: var(--ink);
+}
+
 /* ── Standalone auth shell (login + signup) ── */
 .auth-header {
   display: flex;

@@ -1,13 +1,28 @@
 import type { Metadata } from "next";
-import { MOCK_ADDRESSES } from "@/lib/mock-account";
-import { AddAddressButton } from "./add-address-button";
-import { EditAddressButton } from "./edit-address-button";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { AddressesSection, type AddressRow } from "./addresses-section";
 
 export const metadata: Metadata = {
   title: "Adrese · Cont",
 };
 
-export default function AddressesPage() {
+export default async function AddressesPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/cont/login");
+
+  const supabase = await getSupabaseServerClient();
+  const { data } = await supabase
+    .from("addresses")
+    .select("id, line1, line2, city, county, zip, is_default")
+    .eq("customer_id", user.customerId)
+    .eq("kind", "shipping")
+    .order("is_default", { ascending: false })
+    .order("id", { ascending: true });
+
+  const addresses: AddressRow[] = data ?? [];
+
   return (
     <>
       <div className="eyebrow">livrare</div>
@@ -17,39 +32,7 @@ export default function AddressesPage() {
         precompletată la checkout — o poți schimba oricând.
       </p>
 
-      <section className="cont-section">
-        <div className="cont-section-head">
-          <h2>{MOCK_ADDRESSES.length} adrese salvate</h2>
-          <AddAddressButton />
-        </div>
-
-        <div className="address-list">
-          {MOCK_ADDRESSES.map((addr) => (
-            <article key={addr.id} className="address-card">
-              <div className="lines">
-                <strong>{addr.line1}</strong>
-                {addr.line2 && (
-                  <>
-                    {addr.line2}
-                    <br />
-                  </>
-                )}
-                {addr.city}, {addr.county}
-                {addr.zip ? ` · ${addr.zip}` : ""}
-              </div>
-              <div className="badges">
-                <span className="badge">livrare</span>
-                {addr.isDefault && (
-                  <span className="badge is-default">implicită</span>
-                )}
-              </div>
-              <div className="actions">
-                <EditAddressButton addressId={addr.id} />
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+      <AddressesSection initial={addresses} />
 
       <p
         style={{

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { BottleSvg } from "@/components/landing/bottle-svg";
-import { type ReturnPickerOrder } from "@/lib/mock-account";
+import { type ReturnPickerOrder } from "@/lib/account/returns";
 import { formatRon } from "@/lib/wines";
+import { submitReturnRequest } from "./actions";
 
 type Props = {
   eligibleOrders: ReturnPickerOrder[];
@@ -36,11 +37,12 @@ export function ReturnWizard({
   preselectedOrder,
 }: Props) {
   const router = useRouter();
+  const [, startTransition] = useTransition();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [selectedOrderNumber, setSelectedOrderNumber] = useState<string | null>(
     preselectedOrder ?? null,
   );
-  const [selectedCodes, setSelectedCodes] = useState<Set<string>>(new Set());
+  const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(new Set());
   const [productState, setProductState] =
     useState<typeof STATES[number]["value"]>("sigilat");
   const [explain, setExplain] = useState("");
@@ -51,15 +53,16 @@ export function ReturnWizard({
   const [error, setError] = useState<string | null>(null);
 
   const selectedOrder =
-    eligibleOrders.find((g) => g.order.orderNumber === selectedOrderNumber) ||
-    null;
+    eligibleOrders.find(
+      (g) => g.order.order_number === selectedOrderNumber,
+    ) || null;
 
-  function toggleCode(code: string) {
+  function toggleItem(orderItemId: string) {
     setError(null);
-    setSelectedCodes((prev) => {
+    setSelectedItemIds((prev) => {
       const next = new Set(prev);
-      if (next.has(code)) next.delete(code);
-      else next.add(code);
+      if (next.has(orderItemId)) next.delete(orderItemId);
+      else next.add(orderItemId);
       return next;
     });
   }
@@ -67,12 +70,12 @@ export function ReturnWizard({
   function pickOrder(orderNumber: string) {
     setError(null);
     setSelectedOrderNumber(orderNumber);
-    setSelectedCodes(new Set());
+    setSelectedItemIds(new Set());
   }
 
   function changeOrder() {
     setSelectedOrderNumber(null);
-    setSelectedCodes(new Set());
+    setSelectedItemIds(new Set());
     setError(null);
   }
 
@@ -82,7 +85,7 @@ export function ReturnWizard({
       if (!selectedOrder) {
         return setError("Alege o comandă din care vrei să returnezi.");
       }
-      if (selectedCodes.size === 0) {
+      if (selectedItemIds.size === 0) {
         return setError("Bifează cel puțin un produs din comandă.");
       }
       setStep(2);
@@ -109,18 +112,26 @@ export function ReturnWizard({
         "Pentru rambursare, completează un IBAN valid (sau alege voucher).",
       );
     }
+    if (!selectedOrder) return;
     setSubmitting(true);
-    // TODO: real server action — INSERT into returns + email admin
-    const ticket =
-      "RET-" +
-      new Date().getFullYear() +
-      "-" +
-      String(Math.floor(Math.random() * 999) + 2).padStart(3, "0");
-    setTimeout(() => {
+
+    startTransition(async () => {
+      const res = await submitReturnRequest({
+        orderNumber: selectedOrder.order.order_number,
+        orderItemIds: Array.from(selectedItemIds),
+        productState,
+        resolution,
+        reason: explain,
+        iban,
+      });
+      if (!res.ok) {
+        setSubmitting(false);
+        return setError(res.error);
+      }
       router.push(
-        `/cont/retururi/${encodeURIComponent(ticket)}?just-created=1`,
+        `/cont/retururi/${encodeURIComponent(res.returnNumber)}?just-created=1`,
       );
-    }, 600);
+    });
   }
 
   return (
@@ -201,19 +212,19 @@ export function ReturnWizard({
                 const elig = g.eligibility;
                 return (
                   <div
-                    key={g.order.orderNumber}
+                    key={g.order.order_number}
                     className="wizard-order-group"
                   >
                     <button
                       type="button"
                       className="order-head"
-                      onClick={() => pickOrder(g.order.orderNumber)}
+                      onClick={() => pickOrder(g.order.order_number)}
                     >
                       <div>
                         <div className="meta">
-                          comanda · {RO_DATE.format(new Date(g.order.createdAt))}
+                          comanda · {RO_DATE.format(new Date(g.order.created_at))}
                         </div>
-                        <div className="num">{g.order.orderNumber}</div>
+                        <div className="num">{g.order.order_number}</div>
                       </div>
                       <div className="right">
                         {elig.eligible &&
@@ -239,15 +250,15 @@ export function ReturnWizard({
                         : "—";
                     return (
                       <div
-                        key={g.order.orderNumber}
+                        key={g.order.order_number}
                         className="wizard-order-group is-ineligible"
                       >
                         <div className="order-head" style={{ cursor: "default" }}>
                           <div>
                             <div className="meta">
-                              comanda · {RO_DATE.format(new Date(g.order.createdAt))}
+                              comanda · {RO_DATE.format(new Date(g.order.created_at))}
                             </div>
-                            <div className="num">{g.order.orderNumber}</div>
+                            <div className="num">{g.order.order_number}</div>
                           </div>
                           <div className="right is-warn">indisponibilă</div>
                         </div>
@@ -296,7 +307,7 @@ export function ReturnWizard({
                       letterSpacing: "-0.005em",
                     }}
                   >
-                    {selectedOrder.order.orderNumber}
+                    {selectedOrder.order.order_number}
                     {selectedOrder.eligibility.eligible && (
                       <span
                         style={{
@@ -335,7 +346,7 @@ export function ReturnWizard({
 
               <div className="wizard-reason">
                 {selectedOrder.items.map((it) => {
-                  const checked = selectedCodes.has(it.code);
+                  const checked = selectedItemIds.has(it.orderItemId);
                   return (
                     <label
                       key={it.code}
@@ -349,7 +360,7 @@ export function ReturnWizard({
                         type="checkbox"
                         checked={checked}
                         disabled={it.alreadyReturned}
-                        onChange={() => toggleCode(it.code)}
+                        onChange={() => toggleItem(it.orderItemId)}
                       />
                       <div style={{ width: 56, marginTop: -2 }}>
                         <BottleSvg
@@ -414,9 +425,9 @@ export function ReturnWizard({
               marginBottom: 20,
             }}
           >
-            Pentru {selectedCodes.size}{" "}
-            {selectedCodes.size === 1 ? "produs" : "produse"} din comanda{" "}
-            <strong>{selectedOrder.order.orderNumber}</strong>.
+            Pentru {selectedItemIds.size}{" "}
+            {selectedItemIds.size === 1 ? "produs" : "produse"} din comanda{" "}
+            <strong>{selectedOrder.order.order_number}</strong>.
           </p>
 
           <div className="wizard-reason">
@@ -515,9 +526,9 @@ export function ReturnWizard({
               marginBottom: 20,
             }}
           >
-            Pentru {selectedCodes.size}{" "}
-            {selectedCodes.size === 1 ? "produs" : "produse"} din{" "}
-            <strong>{selectedOrder.order.orderNumber}</strong>.
+            Pentru {selectedItemIds.size}{" "}
+            {selectedItemIds.size === 1 ? "produs" : "produse"} din{" "}
+            <strong>{selectedOrder.order.order_number}</strong>.
           </p>
 
           <div className="wizard-reason">
@@ -624,7 +635,7 @@ export function ReturnWizard({
           onClick={next}
           disabled={
             submitting ||
-            (step === 1 && (!selectedOrder || selectedCodes.size === 0))
+            (step === 1 && (!selectedOrder || selectedItemIds.size === 0))
           }
         >
           {submitting
