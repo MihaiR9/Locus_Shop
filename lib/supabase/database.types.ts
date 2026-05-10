@@ -251,6 +251,21 @@ export type Database = {
         }
         Relationships: []
       }
+      order_counters: {
+        Row: {
+          year: number
+          last_seq: number
+        }
+        Insert: {
+          year: number
+          last_seq?: number
+        }
+        Update: {
+          year?: number
+          last_seq?: number
+        }
+        Relationships: []
+      }
       order_events: {
         Row: {
           created_at: string
