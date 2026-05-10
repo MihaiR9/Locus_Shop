@@ -20,3 +20,6 @@ tsconfig.tsbuildinfo
 .claude/skills/*/iteration-*/
 .claude/skills/*/workspace/
 .claude/agent-memory/
+
+# MCP config — conține Supabase Personal Access Token
+.mcp.json
