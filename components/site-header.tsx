@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { CartButton } from "@/components/cart/cart-button";
+import { AccountMenu } from "@/components/auth/account-menu";
 
 type NavItem = {
   href: string;
@@ -149,22 +150,7 @@ export function SiteHeader() {
                   EN
                 </span>
               </div>
-              <Link
-                href="/cont"
-                className="account-btn"
-                aria-label="Contul meu"
-              >
-                <svg
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.2"
-                  aria-hidden="true"
-                >
-                  <circle cx="8" cy="6" r="2.5" />
-                  <path d="M3 14 C3.5 11 5.5 10 8 10 C10.5 10 12.5 11 13 14" />
-                </svg>
-              </Link>
+              <AccountMenu />
               <CartButton />
               <ThemeToggle />
               <button

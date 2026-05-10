@@ -3612,6 +3612,175 @@
   background: rgba(170,34,51,0.05);
 }
 
+/* ── Standalone auth shell (login + signup) ── */
+.auth-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px var(--px);
+  border-bottom: 1px solid var(--line);
+}
+.auth-brand .brand-img {
+  height: 40px;
+  width: auto;
+}
+[data-theme="dark"] .auth-brand .brand-img {
+  filter: invert(1) brightness(1.4);
+}
+.auth-main {
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(40px, 6vw, 80px) var(--px);
+}
+.auth-footer-mini {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  padding: 32px var(--px);
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-mute);
+}
+.auth-footer-mini a { color: var(--ink-soft); }
+.auth-footer-mini a:hover { color: var(--ink); }
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+}
+.auth-card-title {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(28px, 3.4vw, 36px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-align: center;
+  margin-bottom: 24px;
+}
+.auth-helper {
+  text-align: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--ink-mute);
+  margin: 18px 0 8px 0;
+}
+.auth-help-link {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.auth-help-link a {
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.auth-help-link a:hover { color: var(--ink); }
+
+.auth-social-row {
+  display: flex;
+  gap: 10px;
+}
+.auth-social-row > * { flex: 1; }
+
+/* ── Account dropdown (header) ── */
+.account-dropdown-wrap {
+  position: relative;
+  display: inline-block;
+}
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition:
+    opacity var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
+  z-index: 100;
+}
+.account-dropdown-wrap.is-open .account-dropdown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.account-dropdown-msg {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  padding: 10px 12px 14px 12px;
+}
+.account-dropdown-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 14px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.account-dropdown-cta.primary {
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
+}
+.account-dropdown-cta.primary:hover { background: var(--vie); border-color: var(--vie); }
+.account-dropdown-cta.secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.account-dropdown-cta.secondary:hover { border-color: var(--ink); }
+
+/* ── Monochrome social tile (Google, Phone) ── */
+.btn-social-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+.btn-social-tile:hover { border-color: var(--ink); background: var(--surface); }
+.btn-social-tile svg {
+  width: 18px;
+  height: 18px;
+  color: var(--ink);
+}
+
 /* ── Layout cu sidebar ── */
 .cont-shell {
   max-width: var(--container);
