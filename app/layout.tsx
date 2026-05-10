@@ -2,14 +2,7 @@ import type { Metadata } from "next";
 import { Italiana, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeScript } from "@/components/theme-script";
-import { FilmGrain } from "@/components/film-grain";
 import { SvgSprite } from "@/components/svg-sprite";
-import { SiteHeader } from "@/components/site-header";
-import { HeaderScrollEffect } from "@/components/header-scroll";
-import { CartDrawer } from "@/components/cart/cart-drawer";
-import { AgeGate } from "@/components/legal/age-gate";
-import { CookieBanner } from "@/components/legal/cookie-banner";
-import { ConsentScripts } from "@/components/legal/consent-scripts";
 
 const italiana = Italiana({
   variable: "--font-serif",
@@ -34,6 +27,15 @@ export const metadata: Metadata = {
     "Vinuri din Buciumeni, între Panciu și Nicorești. Origine, timp, măsură.",
 };
 
+/**
+ * Root layout — minimal. Conține doar shell HTML, fonturi globale și
+ * ThemeScript (rulează înainte de paint pentru a evita flash-ul de temă).
+ *
+ * UI-ul concret (header, drawer, banner, age gate) trăiește în layout-urile
+ * de route group:
+ *   - app/(storefront)/layout.tsx → public site
+ *   - app/(admin)/admin/layout.tsx → admin dashboard (sidebar, fără chrome public)
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -42,6 +44,7 @@ export default function RootLayout({
   return (
     <html
       lang="ro"
+      data-theme="light"
       className={`${italiana.variable} ${ibmPlexMono.variable} antialiased`}
       suppressHydrationWarning
     >
@@ -50,14 +53,7 @@ export default function RootLayout({
       </head>
       <body className="bg-bg text-ink font-mono" suppressHydrationWarning>
         <SvgSprite />
-        <FilmGrain />
-        <SiteHeader />
-        <HeaderScrollEffect />
         {children}
-        <CartDrawer />
-        <AgeGate />
-        <CookieBanner />
-        <ConsentScripts />
       </body>
     </html>
   );

@@ -4634,3 +4634,262 @@
 .partner-form-success-note { color: var(--ink-mute) !important; font-size: 12px !important; margin-top: 18px !important; }
 .partner-form-success a { color: var(--ink); border-bottom: 1px solid var(--line); }
 .partner-form-success a:hover { border-bottom-color: var(--ink); }
+
+/* ================================================================
+   ADMIN SHELL (Faza 1.8 — placeholder înainte de Supabase Auth)
+================================================================ */
+.admin-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: var(--bg);
+}
+@media (max-width: 720px) {
+  .admin-shell { grid-template-columns: 1fr; }
+}
+
+/* ── Sidebar ── */
+.admin-sidebar {
+  background: var(--bg-alt);
+  border-right: 1px solid var(--line);
+  padding: clamp(20px, 2.4vw, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3vw, 36px);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+@media (max-width: 720px) {
+  .admin-sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
+}
+.admin-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+.admin-brand-mark {
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 22px;
+  border-radius: 50%;
+}
+.admin-brand-text {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.admin-brand-text strong {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--ink);
+  font-weight: 400;
+}
+.admin-brand-text em {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  font-style: normal;
+}
+
+.admin-nav { display: flex; flex-direction: column; gap: 2px; }
+.admin-nav-link {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding: 12px 14px;
+  border-radius: 0;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  text-decoration: none;
+}
+.admin-nav-link:hover {
+  background: color-mix(in oklab, var(--ink) 5%, transparent);
+  color: var(--ink);
+}
+
+.admin-footer-info {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.admin-back-link {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  text-decoration: none;
+  transition: color var(--t-fast) var(--ease);
+}
+.admin-back-link:hover { color: var(--ink); }
+.admin-version {
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* ── Main ── */
+.admin-main {
+  padding: clamp(28px, 4vw, 56px);
+  min-width: 0;
+  background: var(--bg);
+}
+.admin-page-head { margin-bottom: clamp(28px, 4vw, 48px); max-width: 60ch; }
+.admin-page-head .eyebrow { margin-bottom: 16px; }
+.admin-page-head h1 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(40px, 5vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  font-weight: 400;
+  margin-bottom: 18px;
+}
+.admin-page-head p {
+  font-family: var(--font-mono), monospace;
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--ink-soft);
+}
+.admin-page-head p strong { color: var(--ink); font-weight: 500; }
+
+/* Cards grid */
+.admin-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: clamp(36px, 5vw, 64px);
+}
+@media (max-width: 1100px) { .admin-cards { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 540px)  { .admin-cards { grid-template-columns: 1fr; } }
+
+.admin-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: clamp(20px, 2.4vw, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.admin-card-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.admin-card-value {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(36px, 4vw, 56px);
+  line-height: 1;
+  color: var(--ink);
+  font-weight: 400;
+}
+.admin-card-note {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: var(--ink-mute);
+  letter-spacing: 0.04em;
+  margin-top: auto;
+}
+
+/* Roadmap */
+.admin-roadmap {
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  padding: clamp(24px, 3vw, 36px);
+  max-width: 720px;
+}
+.admin-roadmap h2 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(22px, 2vw, 28px);
+  color: var(--ink);
+  font-weight: 400;
+  margin-bottom: 18px;
+}
+.admin-roadmap ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.admin-roadmap li {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+  padding-left: 16px;
+  position: relative;
+}
+.admin-roadmap li::before {
+  content: "·";
+  position: absolute;
+  left: 0;
+  color: var(--vie);
+  font-weight: 700;
+}
+
+/* ── Login mock ── */
+.admin-login-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 4vw, 64px);
+  background: var(--bg-alt);
+}
+.admin-login-card {
+  max-width: 460px;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: clamp(32px, 4vw, 56px);
+  text-align: center;
+}
+.admin-login-card h1 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(36px, 4vw, 56px);
+  line-height: 1;
+  color: var(--ink);
+  font-weight: 400;
+  margin-bottom: 18px;
+}
+.admin-login-card p {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+}
+.admin-login-card p strong { color: var(--ink); font-weight: 500; }
+.admin-login-btn {
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.admin-login-note {
+  font-size: 11px !important;
+  color: var(--ink-mute) !important;
+  margin-top: 16px;
+}
+.admin-login-note code {
+  font-family: var(--font-mono), monospace;
+  background: var(--bg-alt);
+  padding: 2px 6px;
+  font-size: 10px;
+}
