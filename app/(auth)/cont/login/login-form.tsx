@@ -1,22 +1,25 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useTransition, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { GoogleButton, PhoneButton } from "@/components/auth/google-button";
+import {
+  loginWithEmail,
+  startGoogleOAuth,
+  startPhoneOtp,
+  verifyPhoneOtp,
+} from "@/app/(auth)/cont/auth-actions";
 
 type Method = "email" | "phone";
 type Stage = "input" | "phone-code" | "email-sent" | "phone-done";
 
-/**
- * Login form (front-only stub).
- * Real wiring lands in Pas 7 backend:
- *  - email   → supabase.auth.signInWithOtp({ email })
- *  - google  → supabase.auth.signInWithOAuth({ provider: "google" })
- *  - phone   → supabase.auth.signInWithOtp({ phone }) + verifyOtp
- */
 export function LoginForm() {
+  const router = useRouter();
+  const [, startTransition] = useTransition();
   const [method, setMethod] = useState<Method>("email");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [normalizedPhone, setNormalizedPhone] = useState("");
   const [code, setCode] = useState("");
   const [stage, setStage] = useState<Stage>("input");
   const [pending, setPending] = useState(false);
@@ -30,17 +33,14 @@ export function LoginForm() {
 
   function onEmail(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!email.includes("@")) {
-      setError("Adresă de email invalidă.");
-      return;
-    }
     setError(null);
     setPending(true);
-    // TODO: supabase.auth.signInWithOtp({ email })
-    setTimeout(() => {
+    startTransition(async () => {
+      const res = await loginWithEmail(email);
       setPending(false);
+      if (!res.ok) return setError(res.error);
       setStage("email-sent");
-    }, 500);
+    });
   }
 
   function startPhone() {
@@ -57,40 +57,42 @@ export function LoginForm() {
 
   function onPhone(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const clean = phone.replace(/\s+/g, "");
-    if (!/^(\+?40)?0?7\d{8}$/.test(clean)) {
-      setError("Număr de telefon invalid (ex: 0752 232 912).");
-      return;
-    }
     setError(null);
     setPending(true);
-    // TODO: supabase.auth.signInWithOtp({ phone })
-    setTimeout(() => {
+    startTransition(async () => {
+      const res = await startPhoneOtp(phone);
       setPending(false);
+      if (!res.ok) return setError(res.error);
+      if (res.phone) setNormalizedPhone(res.phone);
       setStage("phone-code");
-    }, 500);
+    });
   }
 
   function onCode(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!/^\d{6}$/.test(code)) {
-      setError("Codul are 6 cifre.");
-      return;
-    }
     setError(null);
     setPending(true);
-    // TODO: supabase.auth.verifyOtp({ phone, token: code, type: "sms" })
-    setTimeout(() => {
+    startTransition(async () => {
+      const res = await verifyPhoneOtp({ phone: normalizedPhone, code });
       setPending(false);
+      if (!res.ok) return setError(res.error);
       setStage("phone-done");
-    }, 500);
+      router.push("/cont");
+      router.refresh();
+    });
   }
 
   function onGoogle() {
-    // TODO: supabase.auth.signInWithOAuth({ provider: "google" })
-    alert(
-      "Conectarea cu Google va fi activă după setarea OAuth în Supabase (Pas 7 backend).",
-    );
+    setError(null);
+    setPending(true);
+    startTransition(async () => {
+      const res = await startGoogleOAuth();
+      if ("error" in res) {
+        setPending(false);
+        return setError(res.error);
+      }
+      window.location.href = res.url;
+    });
   }
 
   // ─── Email sent confirmation ────────────────────────────────

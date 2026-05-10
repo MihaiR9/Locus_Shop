@@ -30,7 +30,13 @@ const NAV_LINKS: NavItem[] = [
   { href: "/parteneri", label: "Parteneri" },
 ];
 
-export function SiteHeader() {
+type SessionUser = { firstName: string; fullName: string };
+
+export function SiteHeader({
+  sessionUser,
+}: {
+  sessionUser?: SessionUser | null;
+}) {
   const [open, setOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -150,7 +156,7 @@ export function SiteHeader() {
                   EN
                 </span>
               </div>
-              <AccountMenu />
+              <AccountMenu sessionUser={sessionUser ?? null} />
               <CartButton />
               <ThemeToggle />
               <button

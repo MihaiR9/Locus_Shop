@@ -2,20 +2,24 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { logoutAction } from "@/app/(auth)/cont/auth-actions";
+
+type SessionUser = { firstName: string; fullName: string };
 
 /**
  * Account icon dropdown for the site header. Click → toggle.
- * Shows two CTAs: "Intră în cont" (login) + "Cont nou" (signup).
  *
- * When Supabase Auth is wired up (Pas 7 backend), this becomes a
- * client-only check on the session and renders different links for
- * logged-in users (Comenzi, Setări, Ieșire).
+ * Two states:
+ *  - logged out: "Intră în cont" + "Cont nou" CTAs (eMAG-style)
+ *  - logged in:  greeting + Comenzi / Retururi / Adrese / Setări / Ieșire
+ *
+ * The session is resolved server-side in the storefront layout and passed
+ * down as `sessionUser`. No client-side getUser() roundtrip on every page.
  */
-export function AccountMenu() {
+export function AccountMenu({ sessionUser }: { sessionUser: SessionUser | null }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
-  // Close on outside click + Escape.
   useEffect(() => {
     if (!open) return;
     function onDocClick(e: MouseEvent) {
@@ -40,7 +44,7 @@ export function AccountMenu() {
       <button
         type="button"
         className="account-btn"
-        aria-label="Contul meu"
+        aria-label={sessionUser ? "Contul tău" : "Conectează-te"}
         aria-haspopup="true"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
@@ -58,26 +62,80 @@ export function AccountMenu() {
       </button>
 
       <div className="account-dropdown" role="menu" aria-hidden={!open}>
-        <div className="account-dropdown-msg">
-          Intră în contul tău Locus și vezi comenzile, retururile și
-          adresele salvate.
-        </div>
-        <Link
-          href="/cont/login"
-          className="account-dropdown-cta primary"
-          role="menuitem"
-          onClick={() => setOpen(false)}
-        >
-          Intră în cont
-        </Link>
-        <Link
-          href="/cont/signup"
-          className="account-dropdown-cta secondary"
-          role="menuitem"
-          onClick={() => setOpen(false)}
-        >
-          Cont nou
-        </Link>
+        {sessionUser ? (
+          <>
+            <div className="account-dropdown-msg">
+              Bună,{" "}
+              <strong style={{ color: "var(--ink)" }}>
+                {sessionUser.firstName || sessionUser.fullName || "client"}
+              </strong>
+              .
+            </div>
+            <Link
+              href="/cont"
+              className="account-dropdown-cta primary"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+            >
+              Contul meu
+            </Link>
+            <Link
+              href="/cont/comenzi"
+              className="account-dropdown-cta secondary"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              style={{ letterSpacing: "0.16em" }}
+            >
+              Comenzi
+            </Link>
+            <Link
+              href="/cont/setari"
+              className="account-dropdown-cta secondary"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              style={{ letterSpacing: "0.16em" }}
+            >
+              Setări
+            </Link>
+            <form action={logoutAction}>
+              <button
+                type="submit"
+                className="account-dropdown-cta secondary"
+                role="menuitem"
+                style={{
+                  width: "100%",
+                  letterSpacing: "0.16em",
+                  background: "transparent",
+                }}
+              >
+                Ieșire
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <div className="account-dropdown-msg">
+              Intră în contul tău Locus și vezi comenzile, retururile și
+              adresele salvate.
+            </div>
+            <Link
+              href="/cont/login"
+              className="account-dropdown-cta primary"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+            >
+              Intră în cont
+            </Link>
+            <Link
+              href="/cont/signup"
+              className="account-dropdown-cta secondary"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+            >
+              Cont nou
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

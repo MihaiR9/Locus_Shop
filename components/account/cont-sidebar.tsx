@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { MockUser } from "@/lib/mock-account";
+import { logoutAction } from "@/app/(auth)/cont/auth-actions";
 
 const NAV = [
   { href: "/cont", label: "Acasă cont" },
@@ -13,7 +13,9 @@ const NAV = [
   { href: "/cont/setari", label: "Setări" },
 ];
 
-export function ContSidebar({ user }: { user: MockUser }) {
+type SidebarUser = { firstName: string; email: string };
+
+export function ContSidebar({ user }: { user: SidebarUser }) {
   const pathname = usePathname();
 
   function isActive(href: string): boolean {
@@ -24,7 +26,7 @@ export function ContSidebar({ user }: { user: MockUser }) {
   return (
     <aside className="cont-sidebar" aria-label="Navigare cont">
       <div className="cont-sidebar-greeting">
-        bună, {user.firstName}.
+        bună, {user.firstName || "client"}.
       </div>
       <div className="cont-sidebar-email">{user.email}</div>
 
@@ -40,16 +42,11 @@ export function ContSidebar({ user }: { user: MockUser }) {
         ))}
       </nav>
 
-      <button
-        type="button"
-        className="cont-sidebar-logout"
-        onClick={() => {
-          // TODO: real logout via Supabase auth.signOut() — for now, no-op.
-          alert("Logout va fi implementat când conectăm Supabase Auth.");
-        }}
-      >
-        Ieșire
-      </button>
+      <form action={logoutAction}>
+        <button type="submit" className="cont-sidebar-logout">
+          Ieșire
+        </button>
+      </form>
     </aside>
   );
 }

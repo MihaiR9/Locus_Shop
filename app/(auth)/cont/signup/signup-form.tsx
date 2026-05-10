@@ -1,21 +1,22 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { GoogleButton, PhoneButton } from "@/components/auth/google-button";
+import {
+  signupWithEmail,
+  startGoogleOAuth,
+  startPhoneOtp,
+  verifyPhoneOtp,
+} from "@/app/(auth)/cont/auth-actions";
 
 type Method = "email" | "phone";
 type Stage = "form" | "phone-input" | "phone-code" | "email-sent" | "phone-done";
 
-/**
- * Signup form (front-only stub).
- * Real wiring lands in Pas 7 backend:
- *  - email   → supabase.auth.signInWithOtp({ email, options: { data: {firstName, lastName, phone, marketing} } })
- *              + insert into customers on first auth callback
- *  - google  → supabase.auth.signInWithOAuth({ provider: "google" })
- *  - phone   → supabase.auth.signInWithOtp({ phone }) + verifyOtp
- */
 export function SignupForm() {
+  const router = useRouter();
+  const [, startTransition] = useTransition();
   const [method, setMethod] = useState<Method>("email");
   const [stage, setStage] = useState<Stage>("form");
 
@@ -29,6 +30,7 @@ export function SignupForm() {
 
   // phone path
   const [phone, setPhone] = useState("");
+  const [normalizedPhone, setNormalizedPhone] = useState("");
   const [code, setCode] = useState("");
 
   // shared
@@ -38,9 +40,6 @@ export function SignupForm() {
   function onEmail(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    if (firstName.trim().length < 2) return setError("Prenumele e prea scurt.");
-    if (lastName.trim().length < 2) return setError("Numele e prea scurt.");
-    if (!email.includes("@")) return setError("Adresă de email invalidă.");
     if (phoneOnEmail) {
       const clean = phoneOnEmail.replace(/\s+/g, "");
       if (!/^(\+?40)?0?7\d{8}$/.test(clean)) {
@@ -50,11 +49,18 @@ export function SignupForm() {
     if (!acceptedTerms) return setError("Trebuie să accepți Termenii și Politica de confidențialitate.");
 
     setPending(true);
-    // TODO: supabase.auth.signInWithOtp({ email, options: { data: { firstName, lastName, phone, marketing } } })
-    setTimeout(() => {
+    startTransition(async () => {
+      const res = await signupWithEmail({
+        email,
+        firstName,
+        lastName,
+        phone: phoneOnEmail,
+        marketing,
+      });
       setPending(false);
+      if (!res.ok) return setError(res.error);
       setStage("email-sent");
-    }, 600);
+    });
   }
 
   function startPhone() {
@@ -72,35 +78,41 @@ export function SignupForm() {
   function onPhone(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    const clean = phone.replace(/\s+/g, "");
-    if (!/^(\+?40)?0?7\d{8}$/.test(clean)) {
-      return setError("Număr de telefon invalid (ex: 0752 232 912).");
-    }
     setPending(true);
-    // TODO: supabase.auth.signInWithOtp({ phone })
-    setTimeout(() => {
+    startTransition(async () => {
+      const res = await startPhoneOtp(phone);
       setPending(false);
+      if (!res.ok) return setError(res.error);
+      if (res.phone) setNormalizedPhone(res.phone);
       setStage("phone-code");
-    }, 500);
+    });
   }
 
   function onPhoneCode(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    if (!/^\d{6}$/.test(code)) return setError("Codul are 6 cifre.");
     setPending(true);
-    // TODO: supabase.auth.verifyOtp({ phone, token: code, type: "sms" })
-    setTimeout(() => {
+    startTransition(async () => {
+      const res = await verifyPhoneOtp({ phone: normalizedPhone, code });
       setPending(false);
+      if (!res.ok) return setError(res.error);
       setStage("phone-done");
-    }, 500);
+      router.push("/cont");
+      router.refresh();
+    });
   }
 
   function onGoogle() {
-    // TODO: supabase.auth.signInWithOAuth({ provider: "google" })
-    alert(
-      "Crearea contului cu Google va fi activă după setarea OAuth în Supabase (Pas 7 backend).",
-    );
+    setError(null);
+    setPending(true);
+    startTransition(async () => {
+      const res = await startGoogleOAuth();
+      if ("error" in res) {
+        setPending(false);
+        return setError(res.error);
+      }
+      window.location.href = res.url;
+    });
   }
 
   // ─── Success states ──────────────────────────────────────────
