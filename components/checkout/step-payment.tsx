@@ -32,7 +32,7 @@ export function StepPayment() {
     <section className="step-card is-saved" id="step-3">
       <header className="step-head">
         <div className="step-head-title">
-          <span className="step-num" aria-hidden="true">03</span>
+          <span className="checkout-step-num" aria-hidden="true">3</span>
           <h2 className="h3">Cum vrei să achiți.</h2>
         </div>
         <span className="step-secured" aria-label="Plată securizată">
