@@ -2,6 +2,7 @@
 
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Json } from "@/lib/supabase/database.types";
+import { getStripe, getSiteUrl } from "@/lib/stripe/server";
 import type {
   Billing,
   PaymentMethod,
@@ -25,6 +26,8 @@ export type CreateOrderResult =
       orderId: string;
       orderNumber: string;
       totalCents: number;
+      /** Set ONLY when payment === "card-online". Client redirects here. */
+      stripeSessionUrl?: string;
     }
   | { ok: false; error: string };
 
@@ -173,11 +176,118 @@ export async function createOrder(
   if (!row?.id || !row?.order_number) {
     return { ok: false, error: "Răspuns invalid de la server." };
   }
+  const orderId = row.id as string;
+  const orderNumber = row.order_number as string;
+
+  // ── 6. For card-online: create Stripe Checkout Session ──────────
+  // For card-livrare or ramburs: skip; order stays pending_payment until
+  // marked manually after delivery.
+  let stripeSessionUrl: string | undefined;
+  if (input.payment === "card-online") {
+    try {
+      const stripe = getStripe();
+
+      // Build line_items inline (price_data) — no need to pre-create
+      // products in Stripe. Item totals already in cents (RON).
+      const lineItems = input.items.map((it) => {
+        const p = byCode.get(it.code)!;
+        return {
+          quantity: it.qty,
+          price_data: {
+            currency: "ron",
+            unit_amount: p.price_cents,
+            product_data: {
+              name: p.name,
+              metadata: { code: p.code },
+            },
+          },
+        };
+      });
+
+      // Shipping as a separate line so the receipt is honest.
+      if (shippingCents > 0) {
+        lineItems.push({
+          quantity: 1,
+          price_data: {
+            currency: "ron",
+            unit_amount: shippingCents,
+            product_data: {
+              name: "Transport curier",
+              metadata: { code: "SHIPPING" },
+            },
+          },
+        });
+      }
+
+      // Discount via Stripe Coupon would be ideal, but for simplicity
+      // we bake it into a negative line item via discounts[]. Stripe
+      // doesn't allow negative price_data; we use `discounts` with
+      // an inline coupon created on-the-fly.
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        // Default ui_mode is hosted (Stripe-hosted checkout page), which
+        // is what we want — minimizes our PCI scope to SAQ-A.
+        line_items: lineItems,
+        ...(discountCents > 0 && {
+          discounts: [
+            {
+              coupon: (
+                await stripe.coupons.create({
+                  amount_off: discountCents,
+                  currency: "ron",
+                  duration: "once",
+                  name:
+                    input.couponCode?.toUpperCase() ?? "Voucher Domeniul Locus",
+                })
+              ).id,
+            },
+          ],
+        }),
+        customer_email: guestEmail ?? undefined,
+        success_url: `${getSiteUrl()}/checkout/success?id=${encodeURIComponent(orderNumber)}&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${getSiteUrl()}/checkout?cancelled=${encodeURIComponent(orderNumber)}`,
+        metadata: {
+          order_id: orderId,
+          order_number: orderNumber,
+          idempotency_key: input.idempotencyKey,
+        },
+        payment_intent_data: {
+          metadata: {
+            order_id: orderId,
+            order_number: orderNumber,
+          },
+        },
+        // Stripe will retry idempotently on the same key — same order
+        // creating two Stripe sessions would otherwise be possible.
+        // (Note: this is Stripe's idempotency, separate from our DB key.)
+      }, {
+        idempotencyKey: `session-${input.idempotencyKey}`,
+      });
+
+      // Persist the Stripe session id on the order so the webhook can
+      // reconcile (and we can show it in admin / customer history).
+      await supabase
+        .from("orders")
+        .update({ stripe_session_id: session.id })
+        .eq("id", orderId);
+
+      stripeSessionUrl = session.url ?? undefined;
+    } catch (err) {
+      // Order is already created in DB. Surface the failure but don't
+      // delete the order — admin can retry the Stripe attach later.
+      console.error("[createOrder] Stripe session creation failed", err);
+      return {
+        ok: false,
+        error: "Plata online e momentan indisponibilă. Comanda nu a fost trimisă.",
+      };
+    }
+  }
 
   return {
     ok: true,
-    orderId: row.id as string,
-    orderNumber: row.order_number as string,
+    orderId,
+    orderNumber,
     totalCents,
+    stripeSessionUrl,
   };
 }

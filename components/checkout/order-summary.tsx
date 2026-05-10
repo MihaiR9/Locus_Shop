@@ -96,11 +96,19 @@ export function OrderSummary() {
         return;
       }
 
-      // Success — clear local state, persist last order # for /success
-      // page (it'll re-fetch the order from DB to render the recap).
       sessionStorage.setItem("locus-last-order", result.orderNumber);
       clearCart();
       reset();
+
+      // For card-online, the action created a Stripe Checkout Session
+      // and returned its hosted URL. Redirect there; Stripe will redirect
+      // back to /checkout/success?id=...&session_id=... after payment.
+      if (result.stripeSessionUrl) {
+        window.location.href = result.stripeSessionUrl;
+        return;
+      }
+
+      // Otherwise (card-livrare / ramburs): straight to confirmation.
       router.push(
         "/checkout/success?id=" + encodeURIComponent(result.orderNumber),
       );
