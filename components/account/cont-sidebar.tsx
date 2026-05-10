@@ -7,8 +7,10 @@ import type { MockUser } from "@/lib/mock-account";
 const NAV = [
   { href: "/cont", label: "Acasă cont" },
   { href: "/cont/comenzi", label: "Comenzi" },
+  { href: "/cont/retururi", label: "Retururi" },
   { href: "/cont/adrese", label: "Adrese" },
-  { href: "/cont/profil", label: "Profil" },
+  { href: "/cont/facturare", label: "Date facturare" },
+  { href: "/cont/setari", label: "Setări" },
 ];
 
 export function ContSidebar({ user }: { user: MockUser }) {

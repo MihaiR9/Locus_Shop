@@ -15,12 +15,25 @@ export type MockUser = {
 
 export type MockAddress = {
   id: string;
-  kind: "shipping" | "billing";
   line1: string;
   line2?: string;
   city: string;
   county: string;
   zip: string;
+  isDefault: boolean;
+};
+
+export type MockBillingProfile = {
+  id: string;
+  type: "fizica" | "juridica";
+  // juridica
+  company?: string;
+  cui?: string;
+  regNo?: string;
+  iban?: string;
+  hqAddress?: string;
+  // fizica (used as label only — CNP not stored)
+  fullName?: string;
   isDefault: boolean;
 };
 
@@ -59,6 +72,28 @@ export type MockOrder = {
   items: MockOrderItem[];
 };
 
+export type MockReturnStatus =
+  | "pending"
+  | "approved"
+  | "in_transit"
+  | "completed"
+  | "rejected";
+
+export type MockReturn = {
+  returnNumber: string;
+  orderNumber: string;
+  productCode: string;
+  productName: string;
+  productGama: Gama;
+  productBottleColor: BottleColor;
+  productState: "sigilat" | "deteriorat" | "neconform";
+  resolution: "rambursare" | "inlocuire" | "voucher";
+  reason: string;
+  status: MockReturnStatus;
+  createdAt: string;
+  updatedAt?: string;
+};
+
 // ─── Static mock — no actual DB calls ────────────────────────────
 
 export const MOCK_USER: MockUser = {
@@ -74,7 +109,6 @@ export const MOCK_USER: MockUser = {
 export const MOCK_ADDRESSES: MockAddress[] = [
   {
     id: "addr-001",
-    kind: "shipping",
     line1: "Bulevardul Bucureștii Noi 25",
     line2: "Bloc Marmura, Sc 1, Et 1, Ap. D115",
     city: "București (Sectorul 1)",
@@ -84,12 +118,20 @@ export const MOCK_ADDRESSES: MockAddress[] = [
   },
   {
     id: "addr-002",
-    kind: "shipping",
     line1: "Str. Morilor nr. 213",
     city: "Galați",
     county: "Galați",
     zip: "800001",
     isDefault: false,
+  },
+];
+
+export const MOCK_BILLING_PROFILES: MockBillingProfile[] = [
+  {
+    id: "bill-001",
+    type: "fizica",
+    fullName: "Mihai Roșcăneanu",
+    isDefault: true,
   },
 ];
 
@@ -165,9 +207,31 @@ export const MOCK_ORDERS: MockOrder[] = [
   },
 ];
 
+export const MOCK_RETURNS: MockReturn[] = [
+  {
+    returnNumber: "RET-2026-001",
+    orderNumber: "LOC-2026-00012",
+    productCode: "LS02",
+    productName: "Fetească Neagră",
+    productGama: "semne",
+    productBottleColor: "red",
+    productState: "deteriorat",
+    resolution: "inlocuire",
+    reason:
+      "Sticla a sosit cu eticheta umedă și dopul deplasat — pare că a stat în poziție culcată într-un ambalaj insuficient.",
+    status: "approved",
+    createdAt: "2026-05-06T11:20:00Z",
+    updatedAt: "2026-05-07T09:14:00Z",
+  },
+];
+
 // ─── Lookup helpers ──────────────────────────────────────────────
 export function getMockOrder(orderNumber: string): MockOrder | undefined {
   return MOCK_ORDERS.find((o) => o.orderNumber === orderNumber);
+}
+
+export function getMockReturn(returnNumber: string): MockReturn | undefined {
+  return MOCK_RETURNS.find((r) => r.returnNumber === returnNumber);
 }
 
 // ─── Return eligibility ──────────────────────────────────────────
@@ -202,6 +266,121 @@ export function returnEligibilityFor(order: MockOrder): ReturnEligibility {
   return { eligible: true, daysLeft };
 }
 
+/**
+ * Flat list of products eligible for a NEW return: deduped by
+ * (orderNumber, productCode), only from delivered orders within the
+ * 14-day window, AND not already in an open return request.
+ */
+export type EligibleReturnProduct = {
+  orderNumber: string;
+  deliveredAt: string;
+  daysLeft: number;
+  code: string;
+  name: string;
+  gama: Gama;
+  bottleColor: BottleColor;
+  qty: number;
+  unitPriceRon: number;
+};
+
+/**
+ * Grouped picker data: every order with its eligibility and items, each
+ * marked as already-returned or not. Used by the return wizard step 1
+ * to show: pick an order → pick which items to return (partial returns).
+ */
+export type ReturnPickerItem = {
+  code: string;
+  name: string;
+  gama: Gama;
+  bottleColor: BottleColor;
+  qty: number;
+  unitPriceRon: number;
+  alreadyReturned: boolean;
+};
+
+export type ReturnPickerOrder = {
+  order: MockOrder;
+  eligibility: ReturnEligibility;
+  items: ReturnPickerItem[];
+};
+
+export function getReturnPickerData(): {
+  eligible: ReturnPickerOrder[];
+  ineligible: ReturnPickerOrder[];
+} {
+  const alreadyReturned = new Set(
+    MOCK_RETURNS.map((r) => `${r.orderNumber}::${r.productCode}`),
+  );
+
+  const eligible: ReturnPickerOrder[] = [];
+  const ineligible: ReturnPickerOrder[] = [];
+
+  // Skip orders that don't make sense in the picker (never reached delivery).
+  const SKIP: MockOrderStatus[] = ["pending_payment", "cancelled", "refunded"];
+
+  for (const order of MOCK_ORDERS) {
+    if (SKIP.includes(order.status)) continue;
+
+    const elig = returnEligibilityFor(order);
+    const items: ReturnPickerItem[] = order.items.map((it) => ({
+      ...it,
+      alreadyReturned: alreadyReturned.has(`${order.orderNumber}::${it.code}`),
+    }));
+
+    const hasReturnableItem = items.some((i) => !i.alreadyReturned);
+
+    if (elig.eligible && hasReturnableItem) {
+      eligible.push({ order, eligibility: elig, items });
+    } else {
+      ineligible.push({ order, eligibility: elig, items });
+    }
+  }
+
+  eligible.sort(
+    (a, b) =>
+      new Date(b.order.deliveredAt!).getTime() -
+      new Date(a.order.deliveredAt!).getTime(),
+  );
+  ineligible.sort(
+    (a, b) =>
+      new Date(b.order.createdAt).getTime() -
+      new Date(a.order.createdAt).getTime(),
+  );
+
+  return { eligible, ineligible };
+}
+
+export function getEligibleReturnProducts(): EligibleReturnProduct[] {
+  // Build a set of already-returned (order, code) pairs so we don't
+  // offer the same line twice (for now — partial-quantity returns
+  // aren't supported in this UI).
+  const alreadyReturned = new Set(
+    MOCK_RETURNS.map((r) => `${r.orderNumber}::${r.productCode}`),
+  );
+
+  const out: EligibleReturnProduct[] = [];
+  for (const order of MOCK_ORDERS) {
+    const elig = returnEligibilityFor(order);
+    if (!elig.eligible) continue;
+    for (const item of order.items) {
+      const key = `${order.orderNumber}::${item.code}`;
+      if (alreadyReturned.has(key)) continue;
+      out.push({
+        orderNumber: order.orderNumber,
+        deliveredAt: order.deliveredAt!, // safe: eligible implies delivered
+        daysLeft: elig.daysLeft,
+        code: item.code,
+        name: item.name,
+        gama: item.gama,
+        bottleColor: item.bottleColor,
+        qty: item.qty,
+        unitPriceRon: item.unitPriceRon,
+      });
+    }
+  }
+  return out;
+}
+
 // ─── Status display ──────────────────────────────────────────────
 export const STATUS_LABEL: Record<MockOrderStatus, string> = {
   pending_payment: "în așteptare",
@@ -210,4 +389,24 @@ export const STATUS_LABEL: Record<MockOrderStatus, string> = {
   delivered: "livrată",
   cancelled: "anulată",
   refunded: "returnată",
+};
+
+export const RETURN_STATUS_LABEL: Record<MockReturnStatus, string> = {
+  pending: "în analiză",
+  approved: "aprobat",
+  in_transit: "în transport",
+  completed: "finalizat",
+  rejected: "respins",
+};
+
+export const PRODUCT_STATE_LABEL: Record<MockReturn["productState"], string> = {
+  sigilat: "sticla sigilată (nedeschisă)",
+  deteriorat: "sticla deteriorată la livrare",
+  neconform: "vinul nu corespunde descrierii",
+};
+
+export const RESOLUTION_LABEL: Record<MockReturn["resolution"], string> = {
+  rambursare: "rambursare integrală",
+  inlocuire: "înlocuire (același vin)",
+  voucher: "voucher pentru altă comandă",
 };

@@ -3,11 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BottleSvg } from "@/components/landing/bottle-svg";
 import { formatRon } from "@/lib/wines";
-import {
-  getMockOrder,
-  returnEligibilityFor,
-  STATUS_LABEL,
-} from "@/lib/mock-account";
+import { getMockOrder, STATUS_LABEL } from "@/lib/mock-account";
 
 const RO_DATETIME = new Intl.DateTimeFormat("ro-RO", {
   day: "numeric",
@@ -36,8 +32,6 @@ export default async function OrderDetailPage({
   const { orderNumber } = await params;
   const order = getMockOrder(orderNumber);
   if (!order) notFound();
-
-  const ret = returnEligibilityFor(order);
 
   // Timeline points: created → paid → shipped → delivered (each may be pending)
   const timeline = [
@@ -199,28 +193,7 @@ export default async function OrderDetailPage({
           <h2>Acțiuni</h2>
         </div>
 
-        {ret.eligible ? (
-          <div className="return-eligibility is-eligible">
-            <strong>Returul e disponibil.</strong> Mai ai {ret.daysLeft}{" "}
-            {ret.daysLeft === 1 ? "zi" : "zile"} din termenul de 14 zile (OUG 34/2014).
-          </div>
-        ) : (
-          <div className="return-eligibility">
-            <strong>Returul nu e disponibil.</strong> {ret.reason}
-          </div>
-        )}
-
         <div className="order-actions">
-          <Link
-            href={`/cont/comenzi/${encodeURIComponent(order.orderNumber)}/retur`}
-            className={ret.eligible ? "" : "disabled"}
-            aria-disabled={!ret.eligible}
-          >
-            Inițiază retur
-            <svg className="arrow-svg" width="16" height="8" viewBox="0 0 24 12" aria-hidden="true">
-              <use href="#arrow-right" />
-            </svg>
-          </Link>
           <button type="button" disabled title="Disponibil după integrarea Smartbill">
             Descarcă factura
           </button>

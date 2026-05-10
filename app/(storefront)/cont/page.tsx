@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { OrderCard } from "@/components/account/order-card";
-import { MOCK_ORDERS, MOCK_USER } from "@/lib/mock-account";
+import { MOCK_ORDERS, MOCK_RETURNS, MOCK_USER } from "@/lib/mock-account";
 import { formatRon } from "@/lib/wines";
 
 export const metadata: Metadata = {
@@ -14,6 +14,9 @@ export default function ContDashboardPage() {
     .filter((o) => o.status !== "cancelled" && o.status !== "refunded")
     .reduce((s, o) => s + o.totalRon, 0);
   const ordersCount = MOCK_ORDERS.filter((o) => o.status !== "cancelled").length;
+  const openReturnsCount = MOCK_RETURNS.filter(
+    (r) => r.status !== "completed" && r.status !== "rejected",
+  ).length;
   const memberSince = new Date(MOCK_USER.createdAt).toLocaleDateString("ro-RO", {
     month: "long",
     year: "numeric",
@@ -59,9 +62,28 @@ export default function ContDashboardPage() {
             din {memberSince}
           </span>
         </div>
-        <Link href="/shop" className="cont-quick-tile">
-          <span className="label">Comandă din nou</span>
-          <span className="value">vinurile</span>
+        <Link href="/cont/retururi" className="cont-quick-tile">
+          <span className="label">Retururi</span>
+          <span className="value">
+            {openReturnsCount > 0 ? openReturnsCount : "—"}
+          </span>
+          <span
+            style={{
+              marginTop: "auto",
+              paddingTop: 16,
+              fontFamily: "var(--font-mono), monospace",
+              fontSize: 10,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "var(--ink-mute)",
+            }}
+          >
+            {openReturnsCount > 0
+              ? openReturnsCount === 1
+                ? "în curs"
+                : "în curs"
+              : "niciun retur"}
+          </span>
           <svg
             className="arrow-svg"
             width="16"
