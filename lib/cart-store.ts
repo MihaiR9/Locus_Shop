@@ -103,17 +103,44 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: "locus-cart",
+      // Bump when CartLine shape changes. Old persisted state with a
+      // mismatched version gets discarded by `migrate` returning {}.
+      version: 2,
       storage: createJSONStorage(() => localStorage),
       partialize: (s) => ({ items: s.items }),
+      migrate: (persisted, version) => {
+        // v1 stored items as Record<code, number>. Drop and start fresh
+        // — we don't have enough info to reconstruct CartLine snapshots
+        // from a bare qty.
+        if (version < 2) return { items: {} };
+        return persisted as { items: CartItems };
+      },
     },
   ),
 );
 
 // ─── Selectors ──────────────────────────────────────────────────────
 
+// All selectors guard against malformed entries — if persist hydration
+// races with the consumer (or a stale tab writes invalid state), we
+// return safe defaults instead of NaN / undefined-property crashes.
+
+function isValidLine(x: unknown): x is CartLine {
+  return (
+    typeof x === "object" &&
+    x !== null &&
+    typeof (x as CartLine).qty === "number" &&
+    typeof (x as CartLine).priceRon === "number" &&
+    typeof (x as CartLine).code === "string"
+  );
+}
+
 export function selectCount(s: CartStore): number {
   let n = 0;
-  for (const k in s.items) n += s.items[k].qty;
+  for (const k in s.items) {
+    const it = s.items[k];
+    if (isValidLine(it)) n += it.qty;
+  }
   return n;
 }
 
@@ -121,12 +148,12 @@ export function selectSubtotalRon(s: CartStore): number {
   let total = 0;
   for (const k in s.items) {
     const it = s.items[k];
-    total += it.priceRon * it.qty;
+    if (isValidLine(it)) total += it.priceRon * it.qty;
   }
   return total;
 }
 
 /** Stable list of cart lines — read snapshot fields directly. */
 export function selectLines(s: CartStore): CartLine[] {
-  return Object.values(s.items);
+  return Object.values(s.items).filter(isValidLine);
 }
