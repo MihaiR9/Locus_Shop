@@ -72,6 +72,12 @@ export default function TermsPage() {
         Livrarea către persoane minore este interzisă. Curierul poate solicita
         actul de identitate la livrare.
       </p>
+      <p>
+        Costuri, durate și acoperire detaliate în{" "}
+        <Link href="/livrare">Politica de livrare</Link>. Pașii de comandă și
+        întrebări frecvente — în{" "}
+        <Link href="/cum-cumperi">Cum cumperi</Link>.
+      </p>
 
       <h2>5. Dreptul de retragere (retur)</h2>
       <p>

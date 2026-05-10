@@ -41,16 +41,21 @@ export function Footer() {
           <ul>
             <li><Link href="/">Acasă</Link></li>
             <li><Link href="/despre">Despre noi</Link></li>
-            <li><Link href="/#vinuri">Vinuri</Link></li>
-            <li><Link href="/#locul">Locul</Link></li>
+            <li><Link href="/shop">Shop</Link></li>
+            <li><Link href="/parteneri">Parteneri</Link></li>
             <li><Link href="/contact">Contact</Link></li>
+          </ul>
+          <h4 style={{ marginTop: 32 }}>Cumpără</h4>
+          <ul>
+            <li><Link href="/cum-cumperi">Cum cumperi</Link></li>
+            <li><Link href="/livrare">Livrare</Link></li>
+            <li><Link href="/retur">Retur</Link></li>
           </ul>
           <h4 style={{ marginTop: 32 }}>Legal</h4>
           <ul>
             <li><Link href="/termeni">Termeni</Link></li>
             <li><Link href="/confidentialitate">Confidențialitate</Link></li>
             <li><Link href="/cookies">Cookies</Link></li>
-            <li><Link href="/retur">Retur</Link></li>
           </ul>
         </div>
 

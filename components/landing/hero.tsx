@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { HeroPager } from "@/components/landing/hero-pager";
 
@@ -41,15 +42,26 @@ export function Hero() {
           </h1>
 
           <div className="hero-cta-row">
-            <a href="#locul" className="hero-cta">
-              <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-                <use href="#star8" />
-              </svg>
-              Descoperă locul
-              <svg width="16" height="8" viewBox="0 0 24 12" aria-hidden="true">
-                <use href="#arrow-right" />
-              </svg>
-            </a>
+            <div className="hero-ctas">
+              <a href="#locul" className="hero-cta">
+                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                  <use href="#star8" />
+                </svg>
+                Descoperă locul
+                <svg width="16" height="8" viewBox="0 0 24 12" aria-hidden="true">
+                  <use href="#arrow-right" />
+                </svg>
+              </a>
+              <Link href="/shop" className="hero-cta hero-cta--secondary">
+                <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">
+                  <use href="#diamond" />
+                </svg>
+                Shop
+                <svg width="16" height="8" viewBox="0 0 24 12" aria-hidden="true">
+                  <use href="#arrow-right" />
+                </svg>
+              </Link>
+            </div>
 
             <HeroPager />
           </div>
