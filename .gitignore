@@ -20,6 +20,7 @@ tsconfig.tsbuildinfo
 .claude/skills/*/iteration-*/
 .claude/skills/*/workspace/
 .claude/agent-memory/
+.claude/scheduled_tasks.lock
 
 # MCP config — conține Supabase Personal Access Token
 .mcp.json
