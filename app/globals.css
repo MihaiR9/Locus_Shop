@@ -794,10 +794,10 @@
 }
 .shop-hero .eyebrow { justify-content: center; margin-bottom: 24px; }
 .shop-hero-title {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-bellefair), Georgia, serif;
   font-size: clamp(56px, 10vw, 128px);
   line-height: 0.96;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.06em;
   color: var(--ink);
   font-weight: 400;
   margin-bottom: 28px;
@@ -865,7 +865,7 @@
   font-family: var(--font-mono), monospace;
   font-size: clamp(56px, 7vw, 112px);
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.06em;
   color: var(--ink);
   margin-bottom: 14px;
   font-weight: 500;
@@ -951,6 +951,11 @@
   50% { opacity: 0.55; transform: scale(1.1); }
 }
 .locul-text .h2 {
+  font-family: var(--font-bellefair), Georgia, serif;
+  font-size: clamp(56px, 7vw, 112px);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.06em;
   color: var(--ink);
   margin-bottom: 28px;
 }
@@ -1001,6 +1006,11 @@
   text-align: center;
 }
 .vinuri-head .display {
+  font-family: var(--font-bellefair), Georgia, serif;
+  font-size: clamp(56px, 7vw, 112px);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.06em;
   margin: 16px auto 24px;
   max-width: 14ch;
 }
@@ -1039,9 +1049,9 @@
   font-family: var(--font-mono), monospace;
   font-size: clamp(28px, 3.6vw, 48px);
   line-height: 1.05;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.03em;
   color: var(--ink);
-  font-weight: 500;
+  font-weight: 700;
   text-transform: lowercase;
 }
 .gama .gama-body { color: var(--ink-soft); }
@@ -1150,7 +1160,14 @@
   gap: 32px;
   flex-wrap: wrap;
 }
-.colectia-head .h2 { max-width: 14ch; }
+.colectia-head .h2 {
+  font-family: var(--font-bellefair), Georgia, serif;
+  font-size: clamp(56px, 7vw, 112px);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  max-width: 14ch;
+}
 .filters {
   display: flex;
   flex-wrap: wrap;
@@ -1228,12 +1245,12 @@
 }
 .wine:hover .wine-bottle svg { transform: translateY(-6px) rotate(-1deg); }
 .wine-name {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-mono), monospace;
   font-size: clamp(22px, 2vw, 28px);
   line-height: 1.05;
   color: var(--ink);
-  letter-spacing: -0.005em;
-  font-weight: 400;
+  letter-spacing: -0.03em;
+  font-weight: 700;
 }
 .wine-meta {
   display: grid;
@@ -1382,6 +1399,11 @@
 }
 .despre-text .eyebrow { margin-bottom: 24px; }
 .despre-text .h2 {
+  font-family: var(--font-bellefair), Georgia, serif;
+  font-size: clamp(56px, 7vw, 112px);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: -0.06em;
   color: var(--ink);
   margin-bottom: 32px;
   max-width: 16ch;
@@ -1417,9 +1439,10 @@
 }
 .newsletter-text { max-width: 56ch; }
 .newsletter h3 {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-bellefair), Georgia, serif;
   font-size: clamp(28px, 3vw, 40px);
   line-height: 1.1;
+  letter-spacing: -0.06em;
   margin-bottom: 12px;
   font-weight: 400;
 }
@@ -2477,17 +2500,7 @@
   pointer-events: none;
 }
 .gama-hero-watermark {
-  position: absolute;
-  right: clamp(-30px, -3vw, 0px);
-  bottom: 12vh;
-  z-index: 1;
-  font-family: var(--font-serif), Georgia, serif;
-  font-size: clamp(120px, 22vw, 360px);
-  line-height: 1;
-  color: rgba(232, 225, 218, 0.06);
-  pointer-events: none;
-  user-select: none;
-  letter-spacing: -0.04em;
+  display: none;
 }
 .gama-hero-content {
   position: relative;
@@ -2513,8 +2526,8 @@
   font-family: var(--font-mono), monospace;
   font-size: clamp(48px, 8vw, 128px);
   line-height: 1;
-  letter-spacing: -0.005em;
-  font-weight: 500;
+  letter-spacing: -0.06em;
+  font-weight: 700;
   text-transform: lowercase;
 }
 .gama-hero-title .line {
@@ -3008,7 +3021,7 @@
   margin-bottom: 28px;
 }
 .despre-hero h1 {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-bellefair), Georgia, serif;
   font-size: clamp(56px, 9vw, 144px);
   line-height: 0.95;
   letter-spacing: -0.025em;
@@ -3056,12 +3069,12 @@
   opacity: 0.6;
 }
 .despre-card .word {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-mono), monospace;
   font-size: clamp(48px, 6vw, 88px);
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.06em;
   color: var(--ink);
-  font-weight: 400;
+  font-weight: 500;
   margin-bottom: 20px;
   transition: letter-spacing var(--t-slow) var(--ease);
 }
@@ -3104,7 +3117,7 @@
   margin: 0 auto;
 }
 .despre-cta h2 {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-bellefair), Georgia, serif;
   font-size: clamp(40px, 5vw, 72px);
   line-height: 1;
   letter-spacing: -0.02em;
@@ -3141,10 +3154,10 @@
   margin-bottom: 24px;
 }
 .contact-hero h1 {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-bellefair), Georgia, serif;
   font-size: clamp(48px, 7vw, 112px);
   line-height: 1;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.06em;
   color: var(--ink);
   font-weight: 400;
   margin-bottom: 24px;
@@ -3321,12 +3334,12 @@
   margin-bottom: 4px;
 }
 .contact-info-value {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-bellefair), Georgia, serif;
   font-size: 22px;
   line-height: 1.3;
   color: var(--ink);
   font-weight: 400;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.06em;
 }
 .contact-info-value a {
   color: inherit;
@@ -5493,6 +5506,10 @@
 }
 .livrare-section-head .eyebrow { justify-content: center; margin-bottom: 18px; }
 .livrare-section-head .h2 { font-weight: 400; color: var(--ink); margin-bottom: 18px; }
+.parteneri-page .livrare-section-head .h2 {
+  font-family: var(--font-bellefair), Georgia, serif;
+  letter-spacing: -0.06em;
+}
 .livrare-section-head .lead {
   font-family: var(--font-mono), monospace;
   font-size: clamp(13px, 1.05vw, 15px);
@@ -5922,10 +5939,10 @@
 }
 .parteneri-hero .eyebrow { justify-content: center; margin-bottom: 24px; }
 .parteneri-title {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-bellefair), Georgia, serif;
   font-size: clamp(56px, 10vw, 128px);
   line-height: 0.96;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.06em;
   color: var(--ink);
   font-weight: 400;
   margin-bottom: 28px;
@@ -6002,19 +6019,20 @@
   gap: 14px;
 }
 .parteneri-value-num {
-  font-family: var(--font-serif), Georgia, serif;
-  font-size: clamp(32px, 3.5vw, 48px);
+  font-family: var(--font-mono), monospace;
+  font-size: clamp(20px, 1.8vw, 26px);
   line-height: 1;
   color: var(--ink-mute);
-  letter-spacing: -0.025em;
+  letter-spacing: -0.04em;
+  font-weight: 400;
 }
 .parteneri-value-title {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-bellefair), Georgia, serif;
   font-size: clamp(20px, 1.8vw, 26px);
   line-height: 1.2;
   color: var(--ink);
   font-weight: 400;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.04em;
 }
 .parteneri-value-body {
   font-family: var(--font-mono), monospace;
@@ -6030,8 +6048,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  border: 1px solid var(--line);
 }
 @media (max-width: 920px) { .parteneri-flow-list { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 540px) { .parteneri-flow-list { grid-template-columns: 1fr; } }
@@ -6060,10 +6077,11 @@
   color: var(--ink-mute);
 }
 .parteneri-flow-title {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-bellefair), Georgia, serif;
   font-size: clamp(20px, 1.6vw, 24px);
   color: var(--ink);
   font-weight: 400;
+  letter-spacing: -0.04em;
   margin-bottom: 6px;
 }
 .parteneri-flow-text {
@@ -6077,7 +6095,8 @@
 .parteneri-segments-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 0;
+  border: 1px solid var(--line);
 }
 @media (max-width: 920px) { .parteneri-segments-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 540px) { .parteneri-segments-grid { grid-template-columns: 1fr; } }
@@ -6087,15 +6106,24 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  border: 1px solid var(--line);
+  border-right: 1px solid var(--line);
+}
+.parteneri-segment:last-child { border-right: none; }
+@media (max-width: 920px) {
+  .parteneri-segment:nth-child(2) { border-right: none; }
+  .parteneri-segment:nth-child(1), .parteneri-segment:nth-child(2) { border-bottom: 1px solid var(--line); }
+}
+@media (max-width: 540px) {
+  .parteneri-segment { border-right: none; border-bottom: 1px solid var(--line); }
+  .parteneri-segment:last-child { border-bottom: none; }
 }
 .parteneri-segment h3 {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-bellefair), Georgia, serif;
   font-size: clamp(20px, 1.7vw, 24px);
   line-height: 1.2;
   color: var(--ink);
   font-weight: 400;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.04em;
 }
 .parteneri-segment p {
   font-family: var(--font-mono), monospace;
@@ -6107,13 +6135,21 @@
 /* ── Catalog block ── */
 .parteneri-catalog {
   background: var(--vie);
-  padding: clamp(40px, 5vw, 72px) clamp(28px, 4vw, 56px);
+  padding: clamp(40px, 5vw, 72px) var(--px);
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
 }
 .parteneri-catalog-inner {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
   gap: clamp(28px, 4vw, 56px);
   align-items: center;
+  max-width: var(--container);
+  margin: 0 auto;
 }
 @media (max-width: 720px) {
   .parteneri-catalog-inner { grid-template-columns: 1fr; }
@@ -6124,7 +6160,9 @@
 }
 .parteneri-catalog .eyebrow::before { background: rgba(235, 225, 218, 0.5) !important; opacity: 1 !important; }
 .parteneri-catalog .h2 {
+  font-family: var(--font-bellefair), Georgia, serif;
   font-weight: 400;
+  letter-spacing: -0.06em;
   color: var(--pamant);
   margin-bottom: 18px;
 }

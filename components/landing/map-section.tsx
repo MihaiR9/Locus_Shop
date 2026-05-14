@@ -117,7 +117,7 @@ export function MapSection() {
             Locul
           </div>
           <h2 className="h2">
-            Un punct precis, între Panciu și Nicorești.
+            Un punct precis, între Panciu și&nbsp;Nicorești.
           </h2>
           <p>
             Centrul de Vinificație Buciumeni stă pe o coamă de deal, în județul

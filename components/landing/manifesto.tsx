@@ -2,17 +2,17 @@ import { Reveal } from "@/components/reveal";
 
 const PILLARS = [
   {
-    word: "Origine",
+    word: "origine",
     sub: "teritoriu",
     body: "Vinurile noastre se nasc la granița dintre Panciu și Nicorești — două arealuri viticole istorice, cu relief, sol și lumină proprii. Locul lor exact contează la fel de mult ca soiul.",
   },
   {
-    word: "Timp",
+    word: "timp",
     sub: "viață",
     body: "Răbdarea e singurul ingredient pe care nu-l putem grăbi. Cules la maturitate deplină, vinificat fără urgență, păstrat până când vinul își găsește singur echilibrul.",
   },
   {
-    word: "Măsură",
+    word: "măsură",
     sub: "atenție",
     body: "Intervenția umană e discretă — o mână care orientează, nu una care impune. Fiecare gest e cântărit, fiecare detaliu observat. Restul îl face locul.",
   },

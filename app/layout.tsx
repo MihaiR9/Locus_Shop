@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Italiana, IBM_Plex_Mono } from "next/font/google";
+import { Italiana, IBM_Plex_Mono, Bellefair } from "next/font/google";
 import "./globals.css";
 import { ThemeScript } from "@/components/theme-script";
 import { SvgSprite } from "@/components/svg-sprite";
@@ -14,7 +14,14 @@ const italiana = Italiana({
 const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "700"],
+  display: "swap",
+});
+
+const bellefair = Bellefair({
+  variable: "--font-bellefair",
+  subsets: ["latin"],
+  weight: "400",
   display: "swap",
 });
 
@@ -45,7 +52,7 @@ export default function RootLayout({
     <html
       lang="ro"
       data-theme="light"
-      className={`${italiana.variable} ${ibmPlexMono.variable} antialiased`}
+      className={`${italiana.variable} ${ibmPlexMono.variable} ${bellefair.variable} antialiased`}
       suppressHydrationWarning
     >
       <head>

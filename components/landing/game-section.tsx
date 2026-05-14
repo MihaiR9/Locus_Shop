@@ -22,7 +22,7 @@ export function GameSection() {
     <section className="vinuri" id="vinuri" aria-label="Game de vin">
       <Reveal as="div" className="vinuri-head">
         <div className="eyebrow">trei game · același loc</div>
-        <h2 className="display">vinul vorbește.</h2>
+        <h2 className="display">Vinul vorbește.</h2>
         <p className="lead">
           Trei feluri în care vinul vorbește. Trei game, același loc, aceeași
           mână de om.
