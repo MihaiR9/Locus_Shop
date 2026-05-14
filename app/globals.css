@@ -862,13 +862,13 @@
   margin: 0 auto;
 }
 .manifesto-item .word {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-mono), monospace;
   font-size: clamp(56px, 7vw, 112px);
   line-height: 1;
   letter-spacing: -0.02em;
   color: var(--ink);
   margin-bottom: 14px;
-  font-weight: 400;
+  font-weight: 500;
   transition: letter-spacing var(--t-slow) var(--ease);
 }
 .manifesto-item:hover .word { letter-spacing: 0.005em; }
