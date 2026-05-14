@@ -24,3 +24,6 @@ tsconfig.tsbuildinfo
 
 # MCP config — conține Supabase Personal Access Token
 .mcp.json
+
+# Scratch debugging utilities (ad-hoc tests, log parsers)
+_scripts/

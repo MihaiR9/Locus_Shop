@@ -3368,6 +3368,7 @@
 ---------------------------------------------------------------- */
 .cont-page {
   padding-top: 72px;
+  min-height: calc(100vh - 72px);
 }
 
 /* ── Login ── */
@@ -3610,6 +3611,44 @@
   padding: 10px 14px;
   border: 1px solid rgba(170,34,51,0.3);
   background: rgba(170,34,51,0.05);
+}
+
+.auth-no-account {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+.auth-no-account p {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  margin: 0;
+}
+.auth-no-account strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+.auth-no-account-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  padding-top: 2px;
+}
+.auth-no-account-cta:hover .arrow-svg {
+  transform: translateX(4px);
+}
+.auth-no-account-cta .arrow-svg {
+  transition: transform var(--t-fast) var(--ease);
 }
 
 /* ── Order totals (detail page) ── */

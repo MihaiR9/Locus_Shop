@@ -2,7 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { GoogleButton, PhoneButton } from "@/components/auth/google-button";
 import {
   signupWithEmail,
@@ -16,6 +16,7 @@ type Stage = "form" | "phone-input" | "phone-code" | "email-sent" | "phone-done"
 
 export function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
   const [method, setMethod] = useState<Method>("email");
   const [stage, setStage] = useState<Stage>("form");
@@ -23,7 +24,7 @@ export function SignupForm() {
   // email path
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => searchParams.get("email") ?? "");
   const [phoneOnEmail, setPhoneOnEmail] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [marketing, setMarketing] = useState(true);

@@ -6,7 +6,7 @@ import { getSupabaseServerClient } from "@/lib/supabase/server";
 
 type Result =
   | { ok: true; nextStage?: "code"; phone?: string }
-  | { ok: false; error: string };
+  | { ok: false; error: string; code?: "no_account" };
 
 async function getOrigin() {
   const h = await headers();
@@ -26,11 +26,25 @@ export async function loginWithEmail(email: string): Promise<Result> {
     email: clean,
     options: {
       emailRedirectTo: `${origin}/auth/callback?next=/cont`,
-      shouldCreateUser: true,
+      shouldCreateUser: false,
     },
   });
 
-  if (error) return { ok: false, error: error.message };
+  if (error) {
+    const msg = error.message.toLowerCase();
+    if (
+      msg.includes("signups not allowed") ||
+      msg.includes("user not found") ||
+      error.code === "otp_disabled"
+    ) {
+      return {
+        ok: false,
+        error: "Nu există cont cu această adresă.",
+        code: "no_account",
+      };
+    }
+    return { ok: false, error: error.message };
+  }
   return { ok: true };
 }
 

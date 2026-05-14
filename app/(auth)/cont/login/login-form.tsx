@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { GoogleButton, PhoneButton } from "@/components/auth/google-button";
 import {
@@ -24,21 +25,27 @@ export function LoginForm() {
   const [stage, setStage] = useState<Stage>("input");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [noAccount, setNoAccount] = useState(false);
 
   function reset() {
     setStage("input");
     setError(null);
+    setNoAccount(false);
     setCode("");
   }
 
   function onEmail(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    setNoAccount(false);
     setPending(true);
     startTransition(async () => {
       const res = await loginWithEmail(email);
       setPending(false);
-      if (!res.ok) return setError(res.error);
+      if (!res.ok) {
+        if (res.code === "no_account") setNoAccount(true);
+        return setError(res.error);
+      }
       setStage("email-sent");
     });
   }
@@ -270,12 +277,33 @@ export function LoginForm() {
             required
             autoComplete="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (noAccount) {
+                setNoAccount(false);
+                setError(null);
+              }
+            }}
             disabled={pending}
           />
         </div>
-        {error && <div className="auth-error">{error}</div>}
-        <button type="submit" disabled={pending || !email.trim()}>
+        {noAccount ? (
+          <div className="auth-no-account">
+            <p>Nu există cont cu adresa <strong>{email}</strong>.</p>
+            <Link
+              href={`/cont/signup?email=${encodeURIComponent(email)}`}
+              className="auth-no-account-cta"
+            >
+              Creează cont nou
+              <svg className="arrow-svg" width="16" height="8" viewBox="0 0 24 12" aria-hidden="true">
+                <use href="#arrow-right" />
+              </svg>
+            </Link>
+          </div>
+        ) : error ? (
+          <div className="auth-error">{error}</div>
+        ) : null}
+        <button type="submit" disabled={pending || !email.trim() || noAccount}>
           {pending ? "se trimite…" : "Continuă"}
           {!pending && (
             <svg className="arrow-svg" width="16" height="8" viewBox="0 0 24 12" aria-hidden="true">
