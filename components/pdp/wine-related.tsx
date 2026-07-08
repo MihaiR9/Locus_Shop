@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BottleSvg } from "@/components/landing/bottle-svg";
+import { ProductBottle } from "@/components/landing/product-bottle";
 import type { Wine } from "@/lib/wines";
 
 export function WineRelated({ wines }: { wines: Wine[] }) {
@@ -17,7 +17,13 @@ export function WineRelated({ wines }: { wines: Wine[] }) {
         {wines.map((r) => (
           <Link key={r.code} href={`/vinuri/${r.slug}`} className="related-card">
             <div className="img">
-              <BottleSvg color={r.bottleColor} gama={r.gama} code={r.code} />
+              <ProductBottle
+                code={r.code}
+                name={r.name}
+                gama={r.gama}
+                color={r.bottleColor}
+                size={200}
+              />
             </div>
             <div className="head">
               <span>

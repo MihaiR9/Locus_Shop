@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
-import { BottleSvg } from "@/components/landing/bottle-svg";
+import { ProductBottle } from "@/components/landing/product-bottle";
 import { useCartStore } from "@/lib/cart-store";
 import { formatRon } from "@/lib/wines";
 
@@ -98,10 +98,12 @@ export function CartDrawer() {
               {lines.map((line) => (
                 <li key={line.code} className="cart-item">
                   <div className="cart-item-img">
-                    <BottleSvg
-                      color={line.bottleColor}
-                      gama={line.gama}
+                    <ProductBottle
                       code={line.code}
+                      name={line.name}
+                      gama={line.gama}
+                      color={line.bottleColor}
+                      size={120}
                     />
                   </div>
                   <div className="cart-item-body">

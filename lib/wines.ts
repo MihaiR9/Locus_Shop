@@ -54,3 +54,18 @@ export function metaLine(w: Pick<Wine, "type" | "sweetness">): string {
 export function abvLabel(w: Pick<Wine, "abv">): string {
   return `${w.abv.toString().replace(".", ",")}% VOL`;
 }
+
+// Photo mapping: cuvinte are per-code shots; semne share one gama shot.
+// pauze rămâne fără poză → fallback la BottleSvg.
+const PRODUCT_PHOTO: Record<string, string> = {
+  LC01: "/photos/products/cuvinte-feteasca-regala.png",
+  LC02: "/photos/products/cuvinte-feteasca-neagra.png",
+  LC04: "/photos/products/cuvinte-riesling-italian.png",
+  LS01: "/photos/products/semne.png",
+  LS02: "/photos/products/semne.png",
+  LS04: "/photos/products/semne.png",
+};
+
+export function productPhoto(code: string): string | null {
+  return PRODUCT_PHOTO[code] ?? null;
+}

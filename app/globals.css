@@ -1238,12 +1238,17 @@
   transition: background var(--t-base) var(--ease);
 }
 .wine:hover .wine-bottle { background: var(--surface); }
-.wine-bottle svg {
+.wine-bottle svg,
+.wine-bottle .product-photo {
   height: 78%;
+  width: auto;
+  max-width: 78%;
+  object-fit: contain;
   filter: drop-shadow(0 14px 28px rgba(26, 26, 26, 0.18));
   transition: transform var(--t-slow) var(--ease);
 }
-.wine:hover .wine-bottle svg { transform: translateY(-6px) rotate(-1deg); }
+.wine:hover .wine-bottle svg,
+.wine:hover .wine-bottle .product-photo { transform: translateY(-6px) rotate(-1deg); }
 .wine-name {
   font-family: var(--font-mono), monospace;
   font-size: clamp(22px, 2vw, 28px);
@@ -1754,8 +1759,12 @@
   justify-content: center;
   flex-shrink: 0;
 }
-.cart-item-img svg {
+.cart-item-img svg,
+.cart-item-img .product-photo {
   height: 88%;
+  width: auto;
+  max-width: 88%;
+  object-fit: contain;
 }
 .cart-item-body {
   display: flex;
@@ -1962,11 +1971,15 @@
 }
 .gallery-thumb.is-active { border-color: var(--ink); }
 .gallery-thumb:hover { border-color: var(--ink-soft); }
-.gallery-thumb svg {
+.gallery-thumb svg,
+.gallery-thumb .product-photo {
   position: absolute;
   inset: 0;
   margin: auto;
   height: 84%;
+  width: auto;
+  max-width: 84%;
+  object-fit: contain;
 }
 .gallery-thumb .ctx {
   position: absolute;
@@ -1995,13 +2008,18 @@
   inset: 0;
   transition: opacity var(--t-base) var(--ease);
 }
-.gallery-main svg.bottle {
+.gallery-main svg.bottle,
+.gallery-main .bottle.product-photo {
   position: relative;
   height: 86%;
+  width: auto;
+  max-width: 86%;
+  object-fit: contain;
   filter: drop-shadow(0 24px 50px rgba(26, 26, 26, 0.25));
   transition: transform var(--t-slow) var(--ease);
 }
-.gallery-main:hover svg.bottle {
+.gallery-main:hover svg.bottle,
+.gallery-main:hover .bottle.product-photo {
   transform: translateY(-8px) rotate(-1deg);
 }
 
@@ -2372,11 +2390,16 @@
   align-items: center;
   justify-content: center;
 }
-.related-card .img svg {
+.related-card .img svg,
+.related-card .img .product-photo {
   height: 78%;
+  width: auto;
+  max-width: 78%;
+  object-fit: contain;
   transition: transform var(--t-slow) var(--ease);
 }
-.related-card:hover .img svg {
+.related-card:hover .img svg,
+.related-card:hover .img .product-photo {
   transform: translateY(-6px);
 }
 .related-card .head {
@@ -4182,7 +4205,8 @@
   border: 1px solid var(--line);
   display: flex; align-items: center; justify-content: center;
 }
-.order-item-row .img svg { height: 86%; }
+.order-item-row .img svg,
+.order-item-row .img .product-photo { height: 86%; width: auto; max-width: 86%; object-fit: contain; }
 .order-item-row .body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .order-item-row .name {
   font-family: var(--font-serif), Georgia, serif;
@@ -5297,7 +5321,8 @@
   position: relative;
   flex-shrink: 0;
 }
-.sum-img svg { height: 86%; width: auto; }
+.sum-img svg,
+.sum-img .product-photo { height: 86%; width: auto; max-width: 86%; object-fit: contain; }
 .sum-img .qty {
   position: absolute; top: -7px; right: -7px;
   width: 22px; height: 22px;

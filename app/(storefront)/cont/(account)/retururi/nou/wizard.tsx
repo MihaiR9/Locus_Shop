@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { BottleSvg } from "@/components/landing/bottle-svg";
+import { ProductBottle } from "@/components/landing/product-bottle";
 import { type ReturnPickerOrder } from "@/lib/account/returns";
 import { formatRon } from "@/lib/wines";
 import { submitReturnRequest } from "./actions";
@@ -363,10 +363,12 @@ export function ReturnWizard({
                         onChange={() => toggleItem(it.orderItemId)}
                       />
                       <div style={{ width: 56, marginTop: -2 }}>
-                        <BottleSvg
-                          color={it.bottleColor}
-                          gama={it.gama}
+                        <ProductBottle
                           code={it.code}
+                          name={it.name}
+                          gama={it.gama}
+                          color={it.bottleColor}
+                          size={56}
                         />
                       </div>
                       <span>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { BottleSvg } from "@/components/landing/bottle-svg";
+import { ProductBottle } from "@/components/landing/product-bottle";
 import { useCartStore } from "@/lib/cart-store";
 import { useCheckoutStore } from "@/lib/checkout-store";
 import { formatRon } from "@/lib/wines";
@@ -137,10 +137,12 @@ export function OrderSummary() {
             lines.map((line) => (
               <div key={line.code} className="sum-item">
                 <div className="sum-img">
-                  <BottleSvg
-                    color={line.bottleColor}
-                    gama={line.gama}
+                  <ProductBottle
                     code={line.code}
+                    name={line.name}
+                    gama={line.gama}
+                    color={line.bottleColor}
+                    size={100}
                   />
                   <span className="qty">{line.qty}</span>
                 </div>

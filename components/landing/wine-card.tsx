@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BottleSvg } from "@/components/landing/bottle-svg";
+import { ProductBottle } from "@/components/landing/product-bottle";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { metaLine, type Wine } from "@/lib/wines";
 
@@ -24,7 +24,13 @@ export function WineCard({ wine }: { wine: Wine }) {
         <span>{wine.year}</span>
       </div>
       <div className="wine-bottle">
-        <BottleSvg color={wine.bottleColor} gama={wine.gama} code={wine.code} />
+        <ProductBottle
+          code={wine.code}
+          name={wine.name}
+          gama={wine.gama}
+          color={wine.bottleColor}
+          size={320}
+        />
       </div>
       <h3 className="wine-name">{wine.name}</h3>
       <div className="wine-meta">

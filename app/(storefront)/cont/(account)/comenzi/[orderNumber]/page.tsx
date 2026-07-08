@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { BottleSvg } from "@/components/landing/bottle-svg";
+import { ProductBottle } from "@/components/landing/product-bottle";
 import { formatRon } from "@/lib/wines";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import {
@@ -115,10 +115,12 @@ export default async function OrderDetailPage({
           {order.items.map((item) => (
             <div key={item.id} className="order-item-row">
               <div className="img">
-                <BottleSvg
-                  color={item.product?.bottle_color ?? "white"}
-                  gama={item.product?.gama ?? "cuvinte"}
+                <ProductBottle
                   code={item.code}
+                  name={item.name}
+                  gama={item.product?.gama ?? "cuvinte"}
+                  color={item.product?.bottle_color ?? "white"}
+                  size={120}
                 />
               </div>
               <div className="body">
