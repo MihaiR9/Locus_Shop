@@ -27,3 +27,6 @@ tsconfig.tsbuildinfo
 
 # Scratch debugging utilities (ad-hoc tests, log parsers)
 _scripts/
+
+# Surse originale poze produse (versiuni optimizate sunt în public/photos/products/)
+Assets/
