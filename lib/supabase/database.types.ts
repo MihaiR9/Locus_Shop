@@ -682,6 +682,55 @@ export type Database = {
           },
         ]
       }
+      collections: {
+        Row: {
+          id: string
+          slug: string
+          name: string
+          description: string | null
+          hero_image: string | null
+          active: boolean
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          name: string
+          description?: string | null
+          hero_image?: string | null
+          active?: boolean
+          sort_order?: number
+        }
+        Update: {
+          slug?: string
+          name?: string
+          description?: string | null
+          hero_image?: string | null
+          active?: boolean
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      collection_products: {
+        Row: {
+          collection_id: string
+          product_id: string
+          sort_order: number
+        }
+        Insert: {
+          collection_id: string
+          product_id: string
+          sort_order?: number
+        }
+        Update: {
+          collection_id?: string
+          product_id?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
     }
     Views: { [_ in never]: never }
     Functions: {
@@ -703,6 +752,15 @@ export type Database = {
         Returns: { id: string; order_number: string }[]
       }
       next_return_number: { Args: { p_year: number }; Returns: string }
+      decrement_stock_for_order: {
+        Args: { p_order_id: string }
+        Returns: undefined
+      }
+      restore_stock_for_order: {
+        Args: { p_order_id: string }
+        Returns: undefined
+      }
+      is_admin: { Args: Record<string, never>; Returns: boolean }
     }
     Enums: {
       address_kind_t: "shipping" | "billing"

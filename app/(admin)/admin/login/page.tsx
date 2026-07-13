@@ -1,29 +1,35 @@
 import type { Metadata } from "next";
-import { LoginMockButton } from "./login-mock-button";
+import { redirect } from "next/navigation";
+import { AdminLoginForm } from "./login-form";
+import { getCurrentAdmin } from "@/lib/auth/current-admin";
 
 export const metadata: Metadata = {
   title: "Admin · Login",
+  robots: { index: false, follow: false },
 };
 
-export default function AdminLoginPage() {
+export default async function AdminLoginPage() {
+  const admin = await getCurrentAdmin();
+  if (admin) redirect("/admin");
+
   return (
-    <div className="admin-login-shell">
+    <main className="admin-login-shell">
       <div className="admin-login-card">
-        <div className="eyebrow" style={{ justifyContent: "center", marginBottom: 18 }}>
-          Domeniul Locus · Admin
+        <div className="admin-login-brand">
+          <span className="admin-brand-mark">L</span>
+          <span>Locus Admin</span>
         </div>
-        <h1>Autentificare.</h1>
-        <p>
-          Mock login pentru dezvoltare. La <strong>Faza 2</strong> înlocuim
-          cu Supabase magic link (email → click pe link-ul din inbox → autentificat).
+        <h1 className="admin-login-title">Autentificare</h1>
+        <p className="admin-login-sub">
+          Primești un email cu link magic. Click pe el și ai acces la panou.
         </p>
 
-        <LoginMockButton />
+        <AdminLoginForm />
 
         <p className="admin-login-note">
-          Cookie-ul <code>locus-admin-session</code> este placeholder. NU în prod.
+          Doar utilizatorii cu rol <code>admin</code> pot intra.
         </p>
       </div>
-    </div>
+    </main>
   );
 }

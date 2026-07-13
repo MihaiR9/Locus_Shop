@@ -1,10 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
 const PREVIEW_COOKIE = "locus-preview";
 const PREVIEW_MAX_AGE = 60 * 60 * 24 * 30; // 30 zile
 
 /**
- * Proxy (fost `middleware.ts` în Next 15). Două responsabilități:
+ * Proxy (fost `middleware.ts` în Next 15). Trei responsabilități:
  *
  * 1. **Coming-soon gate** — când `COMING_SOON=true`, orice request e
  *    rewrite-uit la `/coming-soon`. Excepții: pagina în sine, assets din
@@ -12,17 +13,21 @@ const PREVIEW_MAX_AGE = 60 * 60 * 24 * 30; // 30 zile
  *    Bypass echipă: `?preview=<COMING_SOON_PREVIEW_TOKEN>` pe orice URL
  *    setează cookie 30 zile.
  *
- * 2. **Auth gating pentru /admin/*** — check pe cookie `locus-admin-session`.
- *    Dacă lipsește, redirect la /admin/login. La Faza 2: Supabase session +
- *    role check (`auth.users.app_metadata.role === 'admin'`).
+ * 2. **Sesiune Supabase refresh** — `getUser()` reînnoiește tokens și
+ *    setează cookies noi în response.
+ *
+ * 3. **Auth gating pentru /admin/*** — verifică `app_metadata.role === "admin"`
+ *    pe sesiunea Supabase. Fără rol → redirect la `/admin/login`.
  */
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
 
   // ─── 1) COMING-SOON GATE ─────────────────────────────────────
   if (process.env.COMING_SOON === "true") {
     const isWhitelisted =
       pathname === "/coming-soon" ||
+      pathname.startsWith("/admin") ||
+      pathname.startsWith("/auth/callback") ||
       pathname.startsWith("/photos") ||
       pathname.startsWith("/brand") ||
       pathname === "/favicon.ico" ||
@@ -34,7 +39,6 @@ export function proxy(req: NextRequest) {
       const token = process.env.COMING_SOON_PREVIEW_TOKEN;
       const previewParam = searchParams.get("preview");
 
-      // Preview link → set cookie + curăță param.
       if (token && previewParam && previewParam === token) {
         const cleanUrl = req.nextUrl.clone();
         cleanUrl.searchParams.delete("preview");
@@ -59,21 +63,53 @@ export function proxy(req: NextRequest) {
     }
   }
 
-  // ─── 2) ADMIN AUTH GATE ──────────────────────────────────────
+  // ─── 2 + 3) SUPABASE SESSION + ADMIN GATE ────────────────────
+  // Restul aplicației (storefront, /cont) nu are nevoie de auth în
+  // middleware — server components apelează `getCurrentUser()` direct.
+  // Doar /admin/* trebuie protejat aici + reînnoire tokens per request.
   if (!pathname.startsWith("/admin")) return NextResponse.next();
   if (pathname === "/admin/login") return NextResponse.next();
+  if (pathname.startsWith("/admin/auth/callback")) return NextResponse.next();
 
-  const session = req.cookies.get("locus-admin-session");
-  if (session?.value) return NextResponse.next();
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !anonKey) {
+    // Env-uri lipsă → nu putem verifica, redirect la login.
+    const loginUrl = req.nextUrl.clone();
+    loginUrl.pathname = "/admin/login";
+    return NextResponse.redirect(loginUrl);
+  }
 
-  const url = req.nextUrl.clone();
-  url.pathname = "/admin/login";
-  url.searchParams.set("redirect", pathname);
-  return NextResponse.redirect(url);
+  const res = NextResponse.next();
+  const supabase = createServerClient(url, anonKey, {
+    cookies: {
+      getAll() {
+        return req.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          res.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const role = (user?.app_metadata as { role?: string } | undefined)?.role;
+
+  if (!user || role !== "admin") {
+    const loginUrl = req.nextUrl.clone();
+    loginUrl.pathname = "/admin/login";
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return res;
 }
 
 export const config = {
-  // Rulează pe tot — coming-soon gate trebuie să vadă toate rutele.
-  // Excludem doar internals și optimized image endpoint (perf).
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

@@ -128,12 +128,26 @@ async function handleSessionPaid(event: Stripe.Event) {
     },
   });
 
+  // ── Decrement stoc atomic (SELECT FOR UPDATE via RPC) ─────────
+  // Idempotency e garantată la nivel de webhook prin processed_events;
+  // dacă Stripe retrimite același event, e blocat înainte de acest apel.
+  const { error: stockErr } = await supabase.rpc("decrement_stock_for_order", {
+    p_order_id: orderId,
+  });
+  if (stockErr) {
+    // Nu abandon — logăm și mergem mai departe. Manual reconcile în admin.
+    console.error("[stripe-webhook] decrement stoc a esuat", orderId, stockErr);
+    await supabase.from("order_events").insert({
+      order_id: orderId,
+      type: "stock_decrement_failed",
+      payload: { error: stockErr.message ?? String(stockErr) },
+    });
+  }
+
   // ── Send confirmation emails (Pas 6) ──────────────────────────
-  // Fetch the order + line items for the email payload. We've just
-  // written `paid` above, so this read sees fresh data.
   await sendOrderEmails(orderId);
 
-  // TODO Pas 9: trigger Smartbill invoice + Sameday AWB
+  // TODO Pas 9: trigger FGO invoice + FanCourier AWB
 }
 
 /**
@@ -272,6 +286,35 @@ async function handleChargeRefunded(event: Stripe.Event) {
 
   const supabase = getSupabaseAdminClient();
   const isPartial = charge.amount_refunded < charge.amount;
+
+  // Verifică dacă refund-ul a fost deja procesat de admin server action
+  // (server action face UPDATE imediat pentru dev local fără Stripe CLI).
+  // Dacă payment_status e deja refunded/partial_refund → skip totul, admin
+  // a făcut deja restore stoc dacă era cazul.
+  const { data: existing } = await supabase
+    .from("orders")
+    .select("payment_status")
+    .eq("id", orderId)
+    .maybeSingle();
+
+  const alreadyProcessed =
+    existing?.payment_status === "refunded" ||
+    existing?.payment_status === "partial_refund";
+
+  if (alreadyProcessed) {
+    // Doar log webhook-ul primit ca event, dar nu duplica UPDATE / stoc.
+    await supabase.from("order_events").insert({
+      order_id: orderId,
+      type: "refund_webhook_ack",
+      payload: {
+        stripe_event_id: event.id,
+        charge_id: charge.id,
+        note: "already processed by admin",
+      },
+    });
+    return;
+  }
+
   await supabase
     .from("orders")
     .update({
@@ -288,4 +331,18 @@ async function handleChargeRefunded(event: Stripe.Event) {
       amount_refunded: charge.amount_refunded,
     },
   });
+
+  if (!isPartial) {
+    const { error: restoreErr } = await supabase.rpc("restore_stock_for_order", {
+      p_order_id: orderId,
+    });
+    if (restoreErr) {
+      console.error("[stripe-webhook] restore stoc a esuat", orderId, restoreErr);
+      await supabase.from("order_events").insert({
+        order_id: orderId,
+        type: "stock_restore_failed",
+        payload: { error: restoreErr.message ?? String(restoreErr) },
+      });
+    }
+  }
 }

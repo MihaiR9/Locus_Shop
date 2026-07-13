@@ -1,0 +1,227 @@
+/* Admin scope — reset stilistic. Fundal alb, font Inter, sidebar negru brand.
+   Forțează Inter pe TOT ce e sub .admin-scope ca să bată moștenirea `font-mono`
+   de pe body (folosit de site-ul public). */
+
+.admin-scope,
+.admin-scope *:not(code):not(pre):not(kbd):not(samp) {
+  font-family:
+    var(--font-inter),
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+}
+
+.admin-scope code,
+.admin-scope pre,
+.admin-scope kbd,
+.admin-scope samp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.admin-scope {
+  min-height: 100vh;
+  background: #ffffff;
+  color: #111111;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+}
+
+.admin-scope *:not(input):not(textarea):not(select) {
+  border-color: #e4e4e7;
+}
+
+/* Reset headings — bătrân browser default + site-ul public suprascrie h1/h2/h3
+   cu Italiana/Bellefair prin selectori specifici. Aici forțăm Inter cu size
+   explicit ca să nu moștenească nimic ciudat. */
+.admin-scope h1,
+.admin-scope h2,
+.admin-scope h3,
+.admin-scope h4 {
+  font-family: var(--font-inter), sans-serif;
+  color: #0a0a0a;
+}
+.admin-scope h1 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+.admin-scope h2 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+}
+.admin-scope h3 {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.admin-scope h4 {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* ─── App shell (după login) ─── */
+.admin-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.admin-sidebar {
+  display: flex;
+  flex-direction: column;
+  background: #1a1a1a; /* --pivnita, negru brand */
+  color: #e4e4e7;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.admin-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #3e4336; /* --vie */
+  color: #ffffff;
+  font-family: Georgia, serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.admin-content {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  min-width: 0;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 32px;
+  min-width: 0;
+  background: #ffffff;
+}
+
+/* ─── Login page (public admin route) ─── */
+.admin-public-shell,
+.admin-login-shell {
+  min-height: 100vh;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 400px;
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.04),
+    0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.admin-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #52525b;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.admin-login-title {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #0a0a0a;
+  letter-spacing: -0.025em;
+  margin: 0 0 6px 0;
+}
+
+.admin-login-sub {
+  font-size: 13px;
+  color: #71717a;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+}
+
+.admin-login-note {
+  font-size: 11px;
+  color: #a1a1aa;
+  margin: 20px 0 0 0;
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid #f4f4f5;
+}
+
+.admin-login-note code {
+  background: #f4f4f5;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  color: #18181b;
+}
+
+/* ─── Page primitives (folosite de fiecare pagină din admin) ─── */
+.admin-page-head {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.admin-page-title {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #0a0a0a;
+  margin: 0;
+}
+
+.admin-page-sub {
+  font-size: 13px;
+  color: #71717a;
+  margin: 4px 0 0 0;
+}
+
+.admin-card {
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.admin-placeholder {
+  background: #ffffff;
+  border: 1px dashed #d4d4d8;
+  border-radius: 10px;
+  padding: 48px 24px;
+  text-align: center;
+  color: #71717a;
+  font-size: 13px;
+}
