@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domeniul Locus — un loc. un timp. un vin.</title>
+<meta name="description" content="Domeniul Locus — vinuri din Buciumeni, între Panciu și Nicorești. Gamele cuvinte, semne și pauze.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DOMENIUL LOCUS — landing v6
+   Restructurare v5: semicerc rotativ cu 4 secțiuni
+   (Welcome · Cuvinte · Semne · Pauze) — gamele deschid
+   pagini dedicate, nu drawer.
+   Paletă brandbook: Pământ / Nisip / Piatră / Vie / Stejar / Pivniță
+   ============================================================ */
+:root{
+  --pamant:  #EBE1DA;
+  --nisip:   #CBBEAE;
+  --piatra:  #A89D8D;
+  --vie:     #3E4336;
+  --stejar:  #4A3C2D;
+  --pivnita: #1A1A1A;
+
+  --bg:        var(--pamant);
+  --ink:       var(--pivnita);
+  --ink-soft:  var(--stejar);
+  --ink-mute:  var(--piatra);
+  --line:      rgba(74,60,45,.16);
+  --auriu:     #8B7841;
+
+  --serif:  'Italiana', serif;
+  --cormo:  'Cormorant Garamond', serif;
+  --belle:  'Bellefair', serif;
+  --mono:   'IBM Plex Mono', monospace;
+
+  --ease:   cubic-bezier(.22,.61,.36,1);
+  --n: 4;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--mono);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .9s var(--ease);
+}
+img{max-width:100%;user-select:none;-webkit-user-drag:none}
+a{color:inherit;text-decoration:none}
+button{font:inherit}
+::selection{background:var(--ink);color:var(--bg)}
+
+/* ---------- film grain ---------- */
+.grain{
+  position:fixed;inset:0;z-index:1000;pointer-events:none;opacity:.05;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- chrome: logo + nav ---------- */
+.chrome{position:fixed;inset:0 0 auto 0;z-index:70;pointer-events:none;transition:opacity .3s}
+.chrome > *{pointer-events:auto}
+.brand{position:absolute;top:20px;left:26px;display:block}
+.brand-clip{display:block;overflow:hidden}
+.brand-logo{
+  height:clamp(68px,7vw,88px);width:auto;display:block;
+  clip-path:inset(0 100% 0 0);
+  animation:logoReveal 1.2s var(--ease) .2s forwards;
+}
+@keyframes logoReveal{
+  0%{clip-path:inset(0 100% 0 0);opacity:0}
+  55%{opacity:1}
+  100%{clip-path:inset(0 0 0 0);opacity:1}
+}
+.nav{
+  position:absolute;top:44px;right:36px;
+  display:flex;align-items:center;gap:30px;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.nav a{position:relative;padding:4px 0}
+.nav a:not(.nav-shop)::after{
+  content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;
+  background:var(--ink);transform:scaleX(0);transform-origin:right;
+  transition:transform .45s var(--ease);
+}
+.nav a:not(.nav-shop):hover::after{transform:scaleX(1);transform-origin:left}
+.nav-shop{
+  position:relative;isolation:isolate;overflow:hidden;
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:12px 28px;border:1px solid var(--ink);border-radius:999px;
+}
+.nav-shop span{position:relative;z-index:1;font-size:9.5px;letter-spacing:.22em;color:var(--ink);transition:color .5s var(--ease)}
+.nav-shop::after{
+  content:"";position:absolute;inset:0;background:var(--ink);z-index:0;
+  transform:translateY(101%);transition:transform .5s var(--ease);
+}
+.nav-shop:hover::after{transform:translateY(0)}
+.nav-shop:hover span{color:var(--bg)}
+.lang{display:flex;gap:8px;align-items:center;color:var(--ink-mute)}
+.lang b{font-weight:500;color:var(--ink);border-bottom:1px solid currentColor;padding-bottom:3px}
+.lang span:not(b){opacity:.55}
+
+/* ---------- rotating semicircle nav (4 stații) ---------- */
+.arc-wrap{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  width:clamp(760px,72vw,1180px);z-index:60;pointer-events:none;
+}
+.arc-wrap svg{display:block;width:100%;height:auto;overflow:visible}
+.arc-ring{fill:none;stroke:var(--line);stroke-width:1}
+.arc-item circle{
+  fill:var(--ink-mute);
+  transform-box:fill-box;transform-origin:center;
+  transition:transform .6s var(--ease),fill .6s var(--ease);
+  pointer-events:auto;cursor:pointer;
+}
+.arc-item text{
+  font-family:var(--mono);font-size:14px;letter-spacing:2.4px;
+  text-transform:uppercase;fill:var(--ink-mute);
+  transition:fill .6s var(--ease),opacity .6s var(--ease);
+  opacity:.7;pointer-events:auto;cursor:pointer;
+}
+.arc-item.is-active circle{fill:var(--ink);transform:scale(2.2)}
+.arc-item.is-active text{fill:var(--ink);opacity:1}
+.arc-pointer{fill:none;stroke:var(--ink);stroke-width:1}
+
+/* ---------- stage / horizontal track ---------- */
+.stage{position:relative;width:100%;height:100svh;overflow:hidden}
+.track{position:relative;display:flex;height:100%;width:calc(var(--n) * 100vw);will-change:transform}
+.panel{
+  position:relative;flex:0 0 100vw;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.line-svg{position:absolute;top:0;left:0;z-index:2;pointer-events:none;overflow:visible}
+.line-path{fill:none;stroke:var(--auriu);stroke-width:2.6;stroke-linecap:round;stroke-dasharray:1 17;opacity:.6;animation:antsMove 46s linear infinite}
+.line-node{fill:var(--auriu);opacity:.55;transition:r .5s var(--ease),fill .5s var(--ease),opacity .5s var(--ease)}
+.line-node.is-active{fill:var(--ink);opacity:1}
+@keyframes antsMove{to{stroke-dashoffset:-306px}}
+.mega-backdrop{
+  position:absolute;left:6vw;bottom:-.12em;
+  font-family:var(--belle);font-weight:400;white-space:nowrap;
+  font-size:clamp(220px,26vw,400px);line-height:.9;
+  color:var(--ink);opacity:.075;z-index:1;
+  will-change:transform;pointer-events:none;
+}
+
+/* ---------- center block ---------- */
+.center{
+  position:relative;z-index:5;text-align:center;
+  display:flex;flex-direction:column;align-items:center;
+  transform:translateY(4vh);
+  will-change:transform,opacity;
+}
+a.center{cursor:pointer}
+.gama-logo{
+  height:clamp(36px,4.4vw,50px);width:auto;
+  margin-top:32px;margin-bottom:22px;opacity:.9;
+}
+.dot{
+  position:relative;width:106px;height:106px;border-radius:50%;
+  background:var(--dot,#CBBEAE);
+  border:1px solid rgba(26,26,26,.12);
+  box-shadow:inset 0 -14px 30px rgba(26,26,26,.08), 0 18px 44px rgba(26,26,26,.10);
+  animation:breath 5.5s ease-in-out infinite;
+}
+.dot::before{
+  content:"";position:absolute;left:50%;top:50%;
+  width:172%;height:172%;transform:translate(-50%,-50%);
+  border-radius:50%;background:var(--dot,#CBBEAE);
+  filter:blur(30px);opacity:.38;z-index:-1;
+}
+.dot::after{
+  content:"";position:absolute;inset:-14px;border-radius:50%;
+  border:1px solid var(--line);
+  opacity:0;transform:scale(.85);
+  transition:opacity .8s var(--ease),transform .8s var(--ease);
+}
+.panel.is-active .dot::after{opacity:1;transform:scale(1)}
+@keyframes breath{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.045)}
+}
+.title{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(48px,7.4vw,94px);line-height:1.0;
+  letter-spacing:.01em;margin-top:0;
+  max-width:14ch;
+}
+.sub{
+  margin-top:18px;
+  font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.sub em{font-family:var(--cormo);font-style:italic;text-transform:none;letter-spacing:.05em;font-size:14px}
+.enter-cue{
+  margin-top:26px;display:inline-flex;align-items:center;gap:12px;
+  font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-mute);
+  opacity:0;transform:translateY(6px);
+  transition:opacity .7s var(--ease) .15s,transform .7s var(--ease) .15s;
+}
+.enter-cue::after{content:"\2192";font-family:var(--cormo);font-size:16px;letter-spacing:0;transition:transform .4s var(--ease)}
+.panel.is-active .enter-cue{opacity:1;transform:translateY(0)}
+a.center:hover .enter-cue::after{transform:translateX(6px)}
+
+/* ---------- collage layer ---------- */
+.collage{position:absolute;inset:0;z-index:1;pointer-events:none}
+.c-bottle{
+  position:absolute;bottom:-5vh;height:60vh;width:auto;
+  filter:drop-shadow(0 30px 40px rgba(26,26,26,.16));
+  will-change:transform;
+}
+.pos-r .c-bottle{left:62%}
+.pos-l .c-bottle{right:64%}
+.c-trio{
+  position:absolute;left:57%;bottom:-4vh;
+  display:flex;align-items:flex-end;
+  filter:drop-shadow(0 30px 40px rgba(26,26,26,.16));
+  will-change:transform;
+}
+.c-trio img{width:auto}
+.c-trio img:nth-child(1){height:46vh;margin-right:-2.4vw}
+.c-trio img:nth-child(2){height:57vh;position:relative;z-index:1}
+.c-trio img:nth-child(3){height:44vh;margin-left:-2.4vw}
+.c-mark{
+  position:absolute;width:36px;height:36px;opacity:.8;
+  animation:spin 60s linear infinite;
+}
+.pos-r .c-mark{left:16vw;bottom:34vh}
+.pos-l .c-mark{right:16vw;bottom:34vh}
+.c-curbe{
+  position:absolute;left:50%;bottom:-8vh;transform:translateX(-50%);
+  width:min(96vw,1500px);opacity:.32;
+}
+.c-simbol{
+  position:absolute;width:58px;height:58px;
+  left:20vw;bottom:36vh;
+  animation:spin 90s linear infinite;
+}
+.c-semn{position:absolute;opacity:.65;height:120px;width:auto}
+.pos-l .c-semn{left:14vw;bottom:38vh}
+.c-pauze{
+  position:absolute;left:50%;bottom:13vh;transform:translateX(-50%);
+  height:21vh;width:auto;opacity:.78;
+}
+.c-note{
+  position:absolute;left:50%;bottom:7.5vh;transform:translateX(-50%);
+  font-family:var(--cormo);font-style:italic;font-weight:300;
+  font-size:18px;color:var(--ink-soft);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- fixed hud ---------- */
+.hint{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
+  z-index:65;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink-mute);display:flex;align-items:center;gap:16px;
+  white-space:nowrap;transition:opacity .3s;
+}
+.hint::before,.hint::after{content:"";width:26px;height:1px;background:var(--line)}
+.progress{
+  position:fixed;left:0;bottom:0;z-index:66;height:2px;width:100%;
+  background:var(--line);transition:opacity .3s;
+}
+.progress i{
+  display:block;height:100%;width:100%;background:var(--ink);
+  transform:scaleX(0);transform-origin:left;
+}
+.counter{
+  position:fixed;right:36px;bottom:22px;z-index:65;
+  font-family:var(--belle);font-size:20px;letter-spacing:.08em;
+  color:var(--ink-soft);transition:opacity .3s;
+}
+.counter span{color:var(--ink-mute);font-size:14px}
+.legal{
+  position:fixed;left:36px;bottom:24px;z-index:65;
+  font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-mute);transition:opacity .3s;
+}
+
+/* ---------- custom cursor ---------- */
+.cursor{
+  position:fixed;top:0;left:0;z-index:1001;pointer-events:none;
+  width:10px;height:10px;border-radius:99px;background:var(--ink);
+  transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center;
+  transition:width .35s var(--ease),height .35s var(--ease),background .35s var(--ease),opacity .3s;
+  opacity:0;
+}
+.cursor small{
+  font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--bg);opacity:0;white-space:nowrap;transition:opacity .3s var(--ease) .1s;
+}
+.cursor.is-on{opacity:1}
+.cursor.is-hover{width:132px;height:34px;background:var(--ink)}
+.cursor.is-hover small{opacity:1}
+@media (pointer:coarse){.cursor{display:none}}
+
+/* ============================================================
+   VERTICAL FALLBACK — mobile & prefers-reduced-motion
+   ============================================================ */
+html.is-vertical .stage{height:auto;overflow:visible}
+html.is-vertical .track{display:block;width:100%}
+html.is-vertical .panel{width:100%;min-height:100svh}
+html.is-vertical .arc-wrap,
+html.is-vertical .line-svg,
+html.is-vertical .mega-backdrop,
+html.is-vertical .hint,
+html.is-vertical .progress{display:none}
+html.is-vertical .center{transform:none}
+html.is-vertical .enter-cue{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .dot,.c-mark,.c-simbol,.line-path{animation:none}
+  body{transition:none}
+  .brand-logo{animation:none;clip-path:none;opacity:1}
+}
+@media (max-width:768px){
+  .nav{gap:12px;right:20px;top:26px;font-size:9px;flex-wrap:wrap;justify-content:flex-end;max-width:62vw}
+  .nav-shop{padding:9px 18px}
+  .brand{top:18px;left:18px}
+  .brand-logo{height:52px}
+  .dot{width:82px;height:82px}
+  .gama-logo{height:32px;margin-top:22px;margin-bottom:16px}
+  .title{font-size:clamp(38px,11vw,58px)}
+  .c-bottle{height:44vh}
+  .pos-r .c-bottle{left:56%}
+  .pos-l .c-bottle{right:52%}
+  .c-trio{left:50%;transform:translateX(-50%)}
+  .c-trio img:nth-child(1){height:32vh}
+  .c-trio img:nth-child(2){height:40vh}
+  .c-trio img:nth-child(3){height:30vh}
+  .counter{right:18px}
+  .legal{left:18px;max-width:46vw}
+  .c-simbol{width:40px;height:40px;left:7vw;bottom:auto;top:17vh}
+  .c-mark{bottom:6vh}
+  .pos-r .c-mark{left:10vw}
+  .pos-l .c-mark{right:10vw}
+  .c-semn{height:76px;bottom:auto;top:17vh}
+  .pos-l .c-semn{left:8vw}
+  .c-pauze{height:16vh}
+}
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><small>trage &rarr;</small></div>
+
+<!-- chrome -->
+<header class="chrome">
+  <a class="brand" href="landing-v6.html" aria-label="Domeniul Locus">
+    <span class="brand-clip"><img class="brand-logo" src="assets/logos/locus.png" alt="Domeniul Locus"></span>
+  </a>
+  <nav class="nav" aria-label="Navigație principală">
+    <a href="#" data-goto="0">Home</a>
+    <a href="#">Despre</a>
+    <a href="#">Contact</a>
+    <a href="#" class="nav-shop"><span>Shop Now</span></a>
+    <span class="lang" aria-label="Limbă"><b>RO</b><span aria-hidden="true">/</span><span title="în curând">EN</span></span>
+  </nav>
+</header>
+
+<!-- rotating semicircle — built by JS -->
+<div class="arc-wrap" aria-hidden="true">
+  <svg id="arc" viewBox="0 0 1400 380"></svg>
+</div>
+
+<!-- ============ horizontal stage ============ -->
+<main class="stage" id="stage">
+  <div class="track" id="track">
+
+    <svg class="line-svg" id="lineSvg" aria-hidden="true"></svg>
+    <span class="mega-backdrop" id="megaBackdrop" aria-hidden="true">Un loc unde timpul își găsește propriul ritm și fiecare sticlă poartă mărturia răbdării noastre. Vinuri născute din grija pentru locul, pentru moment și pentru cei care le vor gusta.</span>
+
+    <!-- 01 · Welcome -->
+    <section class="panel" data-label="buciumeni" data-color="#CBBEAE" aria-label="Bun venit">
+      <div class="collage">
+        <img class="c-curbe" src="assets/graphics/curbe-nivel.png" alt="">
+        <img class="c-simbol" src="assets/graphics/simbol-auriu.png" alt="">
+      </div>
+      <div class="center">
+        <span class="dot" style="--dot:#CBBEAE" role="img" aria-label="Punct de reper Buciumeni"></span>
+        <img class="gama-logo" src="assets/logos/locus.png" alt="Domeniul Locus">
+        <h1 class="title">Vinurile din Buciumeni</h1>
+        <p class="sub">Panciu &middot; Nicore&#537;ti &middot; 45.98&deg;N</p>
+      </div>
+    </section>
+
+    <!-- 02 · Cuvinte -->
+    <section class="panel pos-r" data-label="cuvinte" data-color="#CBBEAE" aria-label="Gama cuvinte">
+      <div class="collage">
+        <div class="c-trio">
+          <img src="assets/bottles/cuvinte-feteasca-neagra.png" alt="">
+          <img src="assets/bottles/cuvinte-feteasca-regala.png" alt="">
+          <img src="assets/bottles/cuvinte-riesling.png" alt="">
+        </div>
+        <img class="c-mark" src="assets/graphics/simbol-negru.png" alt="">
+      </div>
+      <a class="center" href="landing-v6-cuvinte.html" aria-label="Deschide gama cuvinte">
+        <span class="dot" style="--dot:#CBBEAE"></span>
+        <img class="gama-logo" src="assets/logos/locus-cuvinte.png" alt="Locus — gama cuvinte">
+        <h2 class="title">Cuvinte</h2>
+        <p class="sub">Gama de baz&#259; &middot; trei vinuri &middot; <em>din grija zilei</em></p>
+        <span class="enter-cue">intr&#259; &icirc;n gam&#259;</span>
+      </a>
+    </section>
+
+    <!-- 03 · Semne -->
+    <section class="panel pos-l" data-label="semne" data-color="#3E4336" aria-label="Gama semne">
+      <div class="collage">
+        <img class="c-bottle" src="assets/bottles/semne.png" alt="">
+        <img class="c-semn" src="assets/graphics/semne-1.png" alt="">
+      </div>
+      <a class="center" href="landing-v6-semne.html" aria-label="Deschide gama semne">
+        <span class="dot" style="--dot:#3E4336"></span>
+        <img class="gama-logo" src="assets/logos/locus-semne.png" alt="Locus — gama semne">
+        <h2 class="title">Semne</h2>
+        <p class="sub">Gama premium &middot; trei vinuri &middot; <em>pentru mesele care merit&#259; timp</em></p>
+        <span class="enter-cue">intr&#259; &icirc;n gam&#259;</span>
+      </a>
+    </section>
+
+    <!-- 04 · Pauze -->
+    <section class="panel" data-label="pauze" data-color="#4A3C2D" aria-label="Pauze — rezerve în pregătire">
+      <div class="collage">
+        <img class="c-curbe" src="assets/graphics/curbe-nivel.png" alt="">
+        <img class="c-pauze" src="assets/logos/locus-pauze.png" alt="">
+        <span class="c-note">&icirc;n preg&#259;tire</span>
+      </div>
+      <a class="center" href="landing-v6-pauze.html" aria-label="Deschide gama pauze">
+        <span class="dot" style="--dot:#4A3C2D"></span>
+        <img class="gama-logo" src="assets/logos/locus-pauze.png" alt="Locus — gama pauze">
+        <h2 class="title">Pauze</h2>
+        <p class="sub">Rezerve &middot; <em>&icirc;n preg&#259;tire</em></p>
+        <span class="enter-cue">vezi capitolul</span>
+      </a>
+    </section>
+
+  </div>
+</main>
+
+<!-- fixed hud -->
+<p class="hint">trage sau scrolleaz&#259;</p>
+<div class="progress" aria-hidden="true"><i id="pbar"></i></div>
+<p class="counter"><b id="cnow">01</b> <span>/ 04</span></p>
+<p class="legal">consum responsabil &middot; con&#539;ine sulfi&#539;i</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Draggable.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+  var N = panels.length;
+  var track = document.getElementById('track');
+  var stage = document.getElementById('stage');
+  var pbar  = document.getElementById('pbar');
+  var cnow  = document.getElementById('cnow');
+  var BASE  = '#EBE1DA';
+
+  /* ---------- color helpers ---------- */
+  function hex2rgb(h){h=h.replace('#','');return[parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
+  function mix(a,b,t){
+    var A=hex2rgb(a),B=hex2rgb(b);
+    return 'rgb('+Math.round(A[0]+(B[0]-A[0])*t)+','+Math.round(A[1]+(B[1]-A[1])*t)+','+Math.round(A[2]+(B[2]-A[2])*t)+')';
+  }
+  var tints = panels.map(function(p){return mix(BASE, p.dataset.color, 0.09);});
+
+  /* ---------- build the semicircle nav (SVG, 4 stații) ---------- */
+  var SVGNS='http://www.w3.org/2000/svg';
+  var svg = document.getElementById('arc');
+  var CX=700, CY=-150, R=470, STEP=17;
+  var wheel = document.createElementNS(SVGNS,'g');
+
+  var ring = document.createElementNS(SVGNS,'circle');
+  ring.setAttribute('cx',CX); ring.setAttribute('cy',CY); ring.setAttribute('r',R);
+  ring.setAttribute('class','arc-ring');
+  svg.appendChild(ring);
+
+  var ptr = document.createElementNS(SVGNS,'line');
+  ptr.setAttribute('x1',CX); ptr.setAttribute('y1',R+CY-18);
+  ptr.setAttribute('x2',CX); ptr.setAttribute('y2',R+CY-10);
+  ptr.setAttribute('class','arc-pointer');
+  svg.appendChild(ptr);
+
+  var items=[];
+  panels.forEach(function(p,i){
+    var g = document.createElementNS(SVGNS,'g');
+    g.setAttribute('class','arc-item');
+    g.setAttribute('transform','rotate('+(-i*STEP)+' '+CX+' '+CY+')');
+
+    var c = document.createElementNS(SVGNS,'circle');
+    c.setAttribute('cx',CX); c.setAttribute('cy',CY+R); c.setAttribute('r',3.5);
+    g.appendChild(c);
+
+    var t = document.createElementNS(SVGNS,'text');
+    t.setAttribute('x',CX); t.setAttribute('y',CY+R+40);
+    t.setAttribute('text-anchor','middle');
+    t.textContent = p.dataset.label;
+    g.appendChild(t);
+
+    g.addEventListener('click',function(){goTo(i);});
+    wheel.appendChild(g);
+    items.push(g);
+  });
+  svg.appendChild(wheel);
+
+  /* ---------- environment ---------- */
+  var reduced  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var small    = window.matchMedia('(max-width: 768px)').matches;
+  var vertical = reduced || small || typeof gsap === 'undefined';
+
+  var active = -1;
+  function setActive(i){
+    if(i===active) return;
+    active = i;
+    items.forEach(function(g,k){g.classList.toggle('is-active',k===i);});
+    panels.forEach(function(p,k){p.classList.toggle('is-active',k===i);});
+    lineNodes.forEach(function(c,k){c.classList.toggle('is-active',k===i);});
+    cnow.textContent = (i+1<10?'0':'')+(i+1);
+    if(typeof gsap!=='undefined' && !reduced){
+      gsap.to(document.body,{backgroundColor:tints[i],duration:1,ease:'power2.out',overwrite:'auto'});
+    }else{
+      document.body.style.backgroundColor = tints[i];
+    }
+  }
+
+  /* =====================================================
+     VERTICAL fallback (mobile / reduced motion)
+     ===================================================== */
+  var lineNodes = [];
+  if(vertical){
+    document.documentElement.classList.add('is-vertical');
+    setActive(0);
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting) setActive(panels.indexOf(e.target));
+      });
+    },{threshold:.55});
+    panels.forEach(function(p){io.observe(p);});
+    document.querySelectorAll('[data-goto]').forEach(function(a){
+      a.addEventListener('click',function(ev){
+        ev.preventDefault();
+        panels[+a.dataset.goto].scrollIntoView({behavior: reduced?'auto':'smooth'});
+      });
+    });
+    return;
+  }
+
+  /* =====================================================
+     HORIZONTAL mode — GSAP pin + scrub + drag
+     ===================================================== */
+  gsap.registerPlugin(ScrollTrigger, Draggable);
+
+  var maxX = function(){return (N-1)*window.innerWidth;};
+
+  /* ---------- continuous dotted spine ---------- */
+  var lineSvg = document.getElementById('lineSvg');
+  var lineClipRect = null;
+  var lineTotalW = 0;
+
+  function catmullRom2bezier(pts){
+    if(pts.length<2) return '';
+    var d = 'M'+pts[0].x+','+pts[0].y+' ';
+    for(var i=0;i<pts.length-1;i++){
+      var p0 = pts[i-1] || pts[i];
+      var p1 = pts[i];
+      var p2 = pts[i+1];
+      var p3 = pts[i+2] || p2;
+      var c1x = p1.x + (p2.x - p0.x)/6;
+      var c1y = p1.y + (p2.y - p0.y)/6;
+      var c2x = p2.x - (p3.x - p1.x)/6;
+      var c2y = p2.y - (p3.y - p1.y)/6;
+      d += 'C'+c1x+','+c1y+' '+c2x+','+c2y+' '+p2.x+','+p2.y+' ';
+    }
+    return d;
+  }
+
+  function buildLine(){
+    var trackRect = track.getBoundingClientRect();
+    var W = Math.round(track.scrollWidth || (N*window.innerWidth));
+    var H = Math.round(stage.clientHeight);
+    lineSvg.setAttribute('width', W);
+    lineSvg.setAttribute('height', H);
+    lineSvg.setAttribute('viewBox','0 0 '+W+' '+H);
+    lineSvg.innerHTML='';
+    lineNodes = [];
+
+    var pts = panels.map(function(p){
+      var d = p.querySelector('.dot');
+      var r = d.getBoundingClientRect();
+      return { x: r.left - trackRect.left + r.width/2, y: r.top - trackRect.top + r.height/2 };
+    });
+
+    var defs = document.createElementNS(SVGNS,'defs');
+    var clip = document.createElementNS(SVGNS,'clipPath');
+    clip.setAttribute('id','lineClip');
+    clip.setAttribute('clipPathUnits','userSpaceOnUse');
+    lineClipRect = document.createElementNS(SVGNS,'rect');
+    lineClipRect.setAttribute('x',0); lineClipRect.setAttribute('y',0);
+    lineClipRect.setAttribute('width',0); lineClipRect.setAttribute('height',H);
+    clip.appendChild(lineClipRect);
+    defs.appendChild(clip);
+    lineSvg.appendChild(defs);
+
+    var g = document.createElementNS(SVGNS,'g');
+    g.setAttribute('clip-path','url(#lineClip)');
+
+    var path = document.createElementNS(SVGNS,'path');
+    path.setAttribute('d', catmullRom2bezier(pts));
+    path.setAttribute('class','line-path');
+    g.appendChild(path);
+
+    lineNodes = pts.map(function(pt,k){
+      var c = document.createElementNS(SVGNS,'circle');
+      c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); c.setAttribute('r', 5);
+      c.setAttribute('class','line-node'+(k===active?' is-active':''));
+      g.appendChild(c);
+      return c;
+    });
+
+    lineSvg.appendChild(g);
+    lineTotalW = W;
+  }
+
+  /* per-panel parallax setters */
+  var setBottle=[], setCenter=[], setCenterO=[];
+  panels.forEach(function(p){
+    var bt = p.querySelector('.c-bottle') || p.querySelector('.c-trio') || p.querySelector('.c-pauze') || p.querySelector('.c-simbol');
+    var ct = p.querySelector('.center');
+    setBottle.push(bt? gsap.quickSetter(bt,'x','px') : null);
+    setCenter.push(gsap.quickSetter(ct,'x','px'));
+    setCenterO.push(gsap.quickSetter(ct,'opacity'));
+  });
+  var setMegaX = gsap.quickSetter(document.getElementById('megaBackdrop'),'x','px');
+
+  var st;
+  gsap.to(track,{
+    x:function(){return -maxX();},
+    ease:'none',
+    scrollTrigger:{
+      id:'hscroll',
+      trigger:stage,
+      start:'top top',
+      end:function(){return '+='+ maxX()*1.15;},
+      pin:true,
+      scrub:1,
+      invalidateOnRefresh:true,
+      snap:{
+        snapTo:1/(N-1),
+        duration:{min:.35,max:.9},
+        ease:'power2.inOut',
+        delay:.05,
+        inertia:false
+      },
+      onUpdate:function(self){
+        var p = self.progress;
+        var cont = p*(N-1);
+
+        gsap.set(wheel,{rotation:cont*STEP, svgOrigin:CX+' '+CY});
+        pbar.style.transform = 'scaleX('+p+')';
+        setActive(Math.round(cont));
+        setMegaX(p*maxX()*0.35);
+        if(lineClipRect) lineClipRect.setAttribute('width', p*lineTotalW);
+
+        for(var k=0;k<N;k++){
+          var doff = k - cont;
+          items[k].style.opacity = Math.max(0, 1 - Math.abs(doff)*0.42);
+        }
+
+        for(var i=0;i<N;i++){
+          var off = i - cont;
+          if(Math.abs(off)>1.4) continue;
+          if(setBottle[i]) setBottle[i](off*52);
+          setCenter[i](off*-64);
+          var o = 1 - Math.min(1, Math.abs(off)*1.15);
+          setCenterO[i](Math.max(0,o));
+        }
+      }
+    }
+  });
+  st = ScrollTrigger.getById('hscroll');
+  buildLine();
+  setActive(0);
+  items.forEach(function(g,k){ g.style.opacity = Math.max(0, 1 - Math.abs(k)*0.42); });
+
+  /* ---------- drag to scroll (proxy) ---------- */
+  var proxy = document.createElement('div');
+  var startScroll = 0;
+  var dragMoved = false;
+  Draggable.create(proxy,{
+    type:'x',
+    trigger:stage,
+    onPress:function(){
+      startScroll = st.scroll();
+      dragMoved = false;
+      gsap.set(proxy,{x:0});
+      this.update();
+      document.body.style.cursor='grabbing';
+    },
+    onDrag:function(){
+      if(Math.abs(this.x)>6) dragMoved = true;
+      var ratio = (st.end - st.start)/maxX();
+      st.scroll(startScroll - this.x*ratio);
+    },
+    onRelease:function(){document.body.style.cursor='';}
+  });
+
+  /* nu naviga la gamă dacă gestul a fost drag, nu click */
+  document.querySelectorAll('a.center').forEach(function(a){
+    a.addEventListener('click',function(e){
+      if(dragMoved) e.preventDefault();
+    });
+  });
+
+  /* ---------- horizontal trackpad wheel ---------- */
+  window.addEventListener('wheel',function(e){
+    if(Math.abs(e.deltaX)>Math.abs(e.deltaY)){
+      window.scrollBy(0,e.deltaX);
+    }
+  },{passive:true});
+
+  /* ---------- keyboard ---------- */
+  window.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight') goTo(Math.min(N-1,active+1));
+    if(e.key==='ArrowLeft')  goTo(Math.max(0,active-1));
+  });
+
+  /* ---------- goto section ---------- */
+  function goTo(i){
+    var y = st.start + (st.end - st.start)*(i/(N-1));
+    window.scrollTo({top:y,behavior:'smooth'});
+  }
+  window.goTo = goTo;
+  document.querySelectorAll('[data-goto]').forEach(function(a){
+    a.addEventListener('click',function(ev){ev.preventDefault();goTo(+a.dataset.goto);});
+  });
+
+  /* ---------- custom cursor ---------- */
+  var cur = document.querySelector('.cursor');
+  var curSmall = cur.querySelector('small');
+  if(window.matchMedia('(pointer:fine)').matches){
+    var cx=0,cy=0,tx=0,ty=0;
+    window.addEventListener('mousemove',function(e){
+      tx=e.clientX; ty=e.clientY;
+      cur.classList.add('is-on');
+    });
+    gsap.ticker.add(function(){
+      cx += (tx-cx)*.18; cy += (ty-cy)*.18;
+      cur.style.transform='translate('+ (cx-cur.offsetWidth/2) +'px,'+ (cy-cur.offsetHeight/2) +'px)';
+    });
+    document.querySelectorAll('a.center').forEach(function(d){
+      d.addEventListener('mouseenter',function(){cur.classList.add('is-hover');curSmall.textContent='vezi gama';});
+      d.addEventListener('mouseleave',function(){cur.classList.remove('is-hover');curSmall.textContent='trage →';});
+    });
+  }
+
+  /* ---------- resize ---------- */
+  var rid;
+  window.addEventListener('resize',function(){
+    clearTimeout(rid);
+    rid=setTimeout(function(){
+      ScrollTrigger.refresh();
+      buildLine();
+    },200);
+  });
+
+})();
+</script>
+</body>
+</html>
