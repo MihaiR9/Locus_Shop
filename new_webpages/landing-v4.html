@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domeniul Locus — un loc. un timp. un vin.</title>
+<meta name="description" content="Domeniul Locus — vinuri din Buciumeni, între Panciu și Nicorești. Gamele cuvinte, semne și pauze.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DOMENIUL LOCUS — landing v4
+   Pattern: rotating semicircle nav + horizontal drag/scroll
+   Palette: editorial (#e7e4e2) — direcția new_webpages/
+   ============================================================ */
+:root{
+  --bg:        #e7e4e2;
+  --ink:       #1a1a1a;
+  --ink-soft:  #4a3c2d;
+  --ink-mute:  #8a7f70;
+  --line:      rgba(74,60,45,.16);
+  --auriu:     #a8874a;
+
+  --serif:  'Italiana', serif;
+  --cormo:  'Cormorant Garamond', serif;
+  --belle:  'Bellefair', serif;
+  --mono:   'IBM Plex Mono', monospace;
+
+  --ease:   cubic-bezier(.22,.61,.36,1);
+  --n: 8;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--mono);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  transition:background-color .9s var(--ease);
+}
+img{max-width:100%;user-select:none;-webkit-user-drag:none}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--ink);color:var(--bg)}
+
+/* ---------- film grain ---------- */
+.grain{
+  position:fixed;inset:0;z-index:1000;pointer-events:none;opacity:.05;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- chrome: logo, back, nav ---------- */
+.chrome{position:fixed;inset:0 0 auto 0;z-index:70;pointer-events:none}
+.chrome > *{pointer-events:auto}
+.back{
+  position:absolute;top:26px;left:26px;
+  font-family:var(--cormo);font-size:26px;line-height:1;font-weight:300;
+  color:var(--ink-soft);
+  display:flex;align-items:center;gap:14px;
+  transition:transform .4s var(--ease),color .4s var(--ease);
+}
+.back:hover{transform:translateX(-4px);color:var(--ink)}
+.back img{height:30px;width:auto;display:block}
+.nav{
+  position:absolute;top:32px;right:36px;
+  display:flex;align-items:center;gap:26px;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.nav a{position:relative;padding:4px 0}
+.nav a::after{
+  content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;
+  background:var(--ink);transform:scaleX(0);transform-origin:right;
+  transition:transform .45s var(--ease);
+}
+.nav a:hover::after{transform:scaleX(1);transform-origin:left}
+.lang{display:flex;gap:8px;align-items:center;color:var(--ink-mute)}
+.lang b{font-weight:500;color:var(--ink)}
+.lang span{opacity:.55}
+
+/* ---------- rotating semicircle nav ---------- */
+.arc-wrap{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  width:clamp(660px,64vw,1020px);z-index:60;pointer-events:none;
+}
+.arc-wrap svg{display:block;width:100%;height:auto;overflow:visible}
+.arc-ring{fill:none;stroke:var(--line);stroke-width:1}
+.arc-item circle{
+  fill:var(--ink-mute);
+  transform-box:fill-box;transform-origin:center;
+  transition:transform .6s var(--ease),fill .6s var(--ease);
+  pointer-events:auto;cursor:pointer;
+}
+.arc-item text{
+  font-family:var(--mono);font-size:9.5px;letter-spacing:2.2px;
+  text-transform:uppercase;fill:var(--ink-mute);
+  transition:fill .6s var(--ease),opacity .6s var(--ease);
+  opacity:.75;pointer-events:auto;cursor:pointer;
+}
+.arc-item.is-active circle{fill:var(--ink);transform:scale(2.1)}
+.arc-item.is-active text{fill:var(--ink);opacity:1}
+.arc-pointer{fill:none;stroke:var(--ink);stroke-width:1}
+
+/* ---------- stage / horizontal track ---------- */
+.stage{position:relative;width:100%;height:100svh;overflow:hidden}
+.track{display:flex;height:100%;width:calc(var(--n) * 100vw);will-change:transform}
+.panel{
+  position:relative;flex:0 0 100vw;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+
+/* ---------- center block ---------- */
+.center{
+  position:relative;z-index:5;text-align:center;
+  display:flex;flex-direction:column;align-items:center;
+  transform:translateY(4vh);
+  will-change:transform,opacity;
+}
+.dot{
+  position:relative;width:150px;height:150px;border-radius:50%;
+  background:var(--dot,#CBBEAE);
+  border:1px solid rgba(26,26,26,.12);
+  box-shadow:inset 0 -14px 30px rgba(26,26,26,.08), 0 18px 44px rgba(26,26,26,.10);
+  animation:breath 5.5s ease-in-out infinite;
+  cursor:none;
+}
+.dot::after{
+  content:"";position:absolute;inset:-14px;border-radius:50%;
+  border:1px solid var(--line);
+  opacity:0;transform:scale(.85);
+  transition:opacity .8s var(--ease),transform .8s var(--ease);
+}
+.panel.is-active .dot::after{opacity:1;transform:scale(1)}
+@keyframes breath{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.045)}
+}
+.title{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(42px,6.4vw,78px);line-height:1.02;
+  letter-spacing:.01em;margin-top:34px;
+  max-width:14ch;
+}
+.sub{
+  margin-top:18px;
+  font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.sub em{font-family:var(--cormo);font-style:italic;text-transform:none;letter-spacing:.05em;font-size:14px}
+
+/* ---------- collage layer ---------- */
+.collage{position:absolute;inset:0;z-index:1;pointer-events:none}
+.backdrop{
+  position:absolute;left:50%;bottom:-.14em;transform:translateX(-50%);
+  font-family:var(--belle);font-weight:400;
+  font-size:clamp(220px,36vw,480px);line-height:.9;
+  color:var(--ink);opacity:.07;white-space:nowrap;
+  will-change:transform;
+}
+.c-bottle{
+  position:absolute;bottom:-5vh;height:60vh;width:auto;
+  filter:drop-shadow(0 30px 40px rgba(26,26,26,.16));
+  will-change:transform;
+}
+.pos-r .c-bottle{left:62%}
+.pos-l .c-bottle{right:64%}
+.c-linie{
+  position:absolute;bottom:16vh;width:72vw;opacity:.5;
+  will-change:transform;
+}
+.pos-r .c-linie{left:-6vw}
+.pos-l .c-linie{right:-6vw;transform:scaleX(-1)}
+.c-mark{
+  position:absolute;width:36px;height:36px;opacity:.8;
+  animation:spin 60s linear infinite;
+}
+.pos-r .c-mark{left:16vw;bottom:34vh}
+.pos-l .c-mark{right:16vw;bottom:34vh}
+.c-gama{
+  position:absolute;bottom:7vh;height:20px;width:auto;opacity:.85;
+}
+.pos-r .c-gama{left:8vw}
+.pos-l .c-gama{right:8vw}
+.c-curbe{
+  position:absolute;left:50%;bottom:-8vh;transform:translateX(-50%);
+  width:min(96vw,1500px);opacity:.32;
+}
+.c-simbol{
+  position:absolute;width:58px;height:58px;
+  left:20vw;bottom:36vh;
+  animation:spin 90s linear infinite;
+}
+.c-semn{position:absolute;opacity:.65;height:120px;width:auto}
+.pos-r .c-semn{right:14vw;bottom:38vh}
+.pos-l .c-semn{left:14vw;bottom:38vh}
+.c-pauze{
+  position:absolute;left:50%;bottom:13vh;transform:translateX(-50%);
+  height:21vh;width:auto;opacity:.78;
+}
+.c-note{
+  position:absolute;left:50%;bottom:7.5vh;transform:translateX(-50%);
+  font-family:var(--cormo);font-style:italic;font-weight:300;
+  font-size:18px;color:var(--ink-soft);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- fixed hud: hint, progress, counter, legal ---------- */
+.hint{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
+  z-index:65;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink-mute);display:flex;align-items:center;gap:16px;
+  white-space:nowrap;
+}
+.hint::before,.hint::after{content:"";width:26px;height:1px;background:var(--line)}
+.progress{
+  position:fixed;left:0;bottom:0;z-index:66;height:2px;width:100%;
+  background:var(--line);
+}
+.progress i{
+  display:block;height:100%;width:100%;background:var(--ink);
+  transform:scaleX(0);transform-origin:left;
+}
+.counter{
+  position:fixed;right:36px;bottom:22px;z-index:65;
+  font-family:var(--belle);font-size:20px;letter-spacing:.08em;
+  color:var(--ink-soft);
+}
+.counter span{color:var(--ink-mute);font-size:14px}
+.legal{
+  position:fixed;left:36px;bottom:24px;z-index:65;
+  font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-mute);
+}
+
+/* ---------- custom cursor ---------- */
+.cursor{
+  position:fixed;top:0;left:0;z-index:1001;pointer-events:none;
+  width:10px;height:10px;border-radius:99px;background:var(--ink);
+  transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center;
+  transition:width .35s var(--ease),height .35s var(--ease),background .35s var(--ease);
+  opacity:0;
+}
+.cursor small{
+  font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--bg);opacity:0;white-space:nowrap;transition:opacity .3s var(--ease) .1s;
+}
+.cursor.is-on{opacity:1}
+.cursor.is-hover{width:118px;height:34px;background:var(--ink)}
+.cursor.is-hover small{opacity:1}
+@media (pointer:coarse){.cursor{display:none}}
+
+/* ============================================================
+   VERTICAL FALLBACK — mobile & prefers-reduced-motion
+   ============================================================ */
+html.is-vertical .stage{height:auto;overflow:visible}
+html.is-vertical .track{display:block;width:100%}
+html.is-vertical .panel{width:100%;min-height:100svh}
+html.is-vertical .arc-wrap,
+html.is-vertical .hint,
+html.is-vertical .progress{display:none}
+html.is-vertical .center{transform:none}
+@media (prefers-reduced-motion:reduce){
+  .dot,.c-mark,.c-simbol{animation:none}
+  body{transition:none}
+}
+@media (max-width:768px){
+  .nav{gap:14px;right:20px;top:22px;font-size:9px;flex-wrap:wrap;justify-content:flex-end;max-width:60vw}
+  .back{top:20px;left:18px}
+  .back img{height:24px}
+  .dot{width:110px;height:110px}
+  .title{font-size:clamp(34px,10vw,52px)}
+  .c-bottle{height:44vh}
+  .pos-r .c-bottle{left:56%}
+  .pos-l .c-bottle{right:52%}
+  .backdrop{font-size:56vw}
+  .counter{right:18px}
+  .legal{left:18px;max-width:46vw}
+  .c-gama{display:none}
+  .c-simbol{width:40px;height:40px;left:7vw;bottom:auto;top:17vh}
+  .c-mark{bottom:6vh}
+  .pos-r .c-mark{left:10vw}
+  .pos-l .c-mark{right:10vw}
+  .c-semn{height:76px;bottom:auto;top:17vh}
+  .pos-r .c-semn{right:8vw}
+  .pos-l .c-semn{left:8vw}
+  .c-pauze{height:16vh}
+}
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><small>trage &rarr;</small></div>
+
+<!-- chrome -->
+<header class="chrome">
+  <a class="back" href="landing-v3.html" aria-label="Înapoi la landing v3">
+    &lsaquo;
+    <img src="assets/logos/locus.png" alt="Domeniul Locus">
+  </a>
+  <nav class="nav" aria-label="Navigație principală">
+    <a href="#" data-goto="0">Home</a>
+    <a href="#">Despre</a>
+    <a href="#" data-goto="1">Colecție</a>
+    <a href="#">Contact</a>
+    <a href="#">Coș (0)</a>
+    <span class="lang" aria-label="Limbă"><b>RO</b><span aria-hidden="true">/</span><span title="în curând">EN</span></span>
+  </nav>
+</header>
+
+<!-- rotating semicircle — built by JS -->
+<div class="arc-wrap" aria-hidden="true">
+  <svg id="arc" viewBox="0 0 1400 300"></svg>
+</div>
+
+<!-- ============ horizontal stage ============ -->
+<main class="stage" id="stage">
+  <div class="track" id="track">
+
+    <!-- 01 · Welcome -->
+    <section class="panel" data-label="buciumeni" data-color="#CBBEAE" aria-label="Bun venit">
+      <div class="collage">
+        <span class="backdrop" aria-hidden="true">Locus</span>
+        <img class="c-curbe" src="assets/graphics/curbe-nivel.png" alt="">
+        <img class="c-simbol" src="assets/graphics/simbol-auriu.png" alt="">
+      </div>
+      <div class="center">
+        <span class="dot" style="--dot:#CBBEAE" role="img" aria-label="Punct de reper Buciumeni"></span>
+        <h1 class="title">Vinurile din Buciumeni</h1>
+        <p class="sub">Panciu &middot; Nicore&#537;ti &middot; 45.98&deg;N</p>
+      </div>
+    </section>
+
+    <!-- 02 · Cuvinte — Fetească Regală -->
+    <section class="panel pos-r" data-label="regală" data-color="#F5EDD9" aria-label="Fetească Regală, gama cuvinte">
+      <div class="collage">
+        <span class="backdrop" aria-hidden="true">Regal&#259;</span>
+        <img class="c-linie" src="assets/graphics/linie-punctata.png" alt="">
+        <img class="c-bottle" src="assets/bottles/cuvinte-feteasca-regala.png" alt="Sticlă de Fetească Regală, gama cuvinte">
+        <img class="c-mark" src="assets/graphics/simbol-negru.png" alt="">
+        <img class="c-gama" src="assets/logos/locus-cuvinte.png" alt="Locus — gama cuvinte">
+      </div>
+      <div class="center">
+        <span class="dot" style="--dot:#F5EDD9"></span>
+        <h2 class="title">Feteasc&#259; Regal&#259;</h2>
+        <p class="sub">LC01 &middot; Alb Demisec</p>
+      </div>
+    </section>
+
+    <!-- 03 · Cuvinte — Fetească Neagră -->
+    <section class="panel pos-l" data-label="neagră" data-color="#7A2E2E" aria-label="Fetească Neagră, gama cuvinte">
+      <div class="collage">
+        <span class="backdrop" aria-hidden="true">Neagr&#259;</span>
+        <img class="c-linie" src="assets/graphics/linie-punctata.png" alt="">
+        <img class="c-bottle" src="assets/bottles/cuvinte-feteasca-neagra.png" alt="Sticlă de Fetească Neagră, gama cuvinte">
+        <img class="c-mark" src="assets/graphics/simbol-negru.png" alt="">
+        <img class="c-gama" src="assets/logos/locus-cuvinte.png" alt="Locus — gama cuvinte">
+      </div>
+      <div class="center">
+        <span class="dot" style="--dot:#7A2E2E"></span>
+        <h2 class="title">Feteasc&#259; Neagr&#259;</h2>
+        <p class="sub">LC02 &middot; Ro&#537;u Demisec</p>
+      </div>
+    </section>
+
+    <!-- 04 · Cuvinte — Riesling Italian -->
+    <section class="panel pos-r" data-label="riesling" data-color="#D4B87A" aria-label="Riesling Italian, gama cuvinte">
+      <div class="collage">
+        <span class="backdrop" aria-hidden="true">Riesling</span>
+        <img class="c-linie" src="assets/graphics/linie-punctata.png" alt="">
+        <img class="c-bottle" src="assets/bottles/cuvinte-riesling.png" alt="Sticlă de Riesling Italian, gama cuvinte">
+        <img class="c-mark" src="assets/graphics/simbol-negru.png" alt="">
+        <img class="c-gama" src="assets/logos/locus-cuvinte.png" alt="Locus — gama cuvinte">
+      </div>
+      <div class="center">
+        <span class="dot" style="--dot:#D4B87A"></span>
+        <h2 class="title">Riesling Italian</h2>
+        <p class="sub">LC04 &middot; Alb Sec</p>
+      </div>
+    </section>
+
+    <!-- 05 · Semne — Fetească Regală -->
+    <section class="panel pos-l" data-label="semne regală" data-color="#EBE1DA" aria-label="Fetească Regală, gama semne">
+      <div class="collage">
+        <span class="backdrop" aria-hidden="true">Regal&#259;</span>
+        <img class="c-linie" src="assets/graphics/linie-punctata.png" alt="">
+        <img class="c-bottle" src="assets/bottles/semne.png" alt="Sticlă premium din gama semne">
+        <img class="c-semn" src="assets/graphics/semne-1.png" alt="">
+        <img class="c-gama" src="assets/logos/locus-semne.png" alt="Locus — gama semne">
+      </div>
+      <div class="center">
+        <span class="dot" style="--dot:#EBE1DA"></span>
+        <h2 class="title">Feteasc&#259; Regal&#259; <em style="font-family:var(--cormo);font-style:italic">&middot; Semne</em></h2>
+        <p class="sub">LS01 &middot; Alb Demisec</p>
+      </div>
+    </section>
+
+    <!-- 06 · Semne — Fetească Neagră -->
+    <section class="panel pos-r" data-label="semne neagră" data-color="#3E1F1F" aria-label="Fetească Neagră, gama semne">
+      <div class="collage">
+        <span class="backdrop" aria-hidden="true">Neagr&#259;</span>
+        <img class="c-linie" src="assets/graphics/linie-punctata.png" alt="">
+        <img class="c-bottle" src="assets/bottles/semne.png" alt="Sticlă premium din gama semne">
+        <img class="c-semn" src="assets/graphics/semne-2.png" alt="">
+        <img class="c-gama" src="assets/logos/locus-semne.png" alt="Locus — gama semne">
+      </div>
+      <div class="center">
+        <span class="dot" style="--dot:#3E1F1F"></span>
+        <h2 class="title">Feteasc&#259; Neagr&#259; <em style="font-family:var(--cormo);font-style:italic">&middot; Semne</em></h2>
+        <p class="sub">LS02 &middot; Ro&#537;u Demisec</p>
+      </div>
+    </section>
+
+    <!-- 07 · Semne — Riesling Italian -->
+    <section class="panel pos-l" data-label="semne riesling" data-color="#8B7841" aria-label="Riesling Italian, gama semne">
+      <div class="collage">
+        <span class="backdrop" aria-hidden="true">Riesling</span>
+        <img class="c-linie" src="assets/graphics/linie-punctata.png" alt="">
+        <img class="c-bottle" src="assets/bottles/semne.png" alt="Sticlă premium din gama semne">
+        <img class="c-semn" src="assets/graphics/semne-3.png" alt="">
+        <img class="c-gama" src="assets/logos/locus-semne.png" alt="Locus — gama semne">
+      </div>
+      <div class="center">
+        <span class="dot" style="--dot:#8B7841"></span>
+        <h2 class="title">Riesling Italian <em style="font-family:var(--cormo);font-style:italic">&middot; Semne</em></h2>
+        <p class="sub">LS04 &middot; Alb Sec</p>
+      </div>
+    </section>
+
+    <!-- 08 · Pauze -->
+    <section class="panel" data-label="pauze" data-color="#3E4336" aria-label="Pauze — rezerve în pregătire">
+      <div class="collage">
+        <span class="backdrop" aria-hidden="true">Pauze</span>
+        <img class="c-curbe" src="assets/graphics/curbe-nivel.png" alt="">
+        <img class="c-pauze" src="assets/logos/locus-pauze.png" alt="Locus — gama pauze">
+        <span class="c-note">&icirc;n preg&#259;tire</span>
+      </div>
+      <div class="center">
+        <span class="dot" style="--dot:#3E4336"></span>
+        <h2 class="title">Pauze</h2>
+        <p class="sub">Rezerve &middot; &icirc;n preg&#259;tire</p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- fixed hud -->
+<p class="hint">trage sau scrolleaz&#259;</p>
+<div class="progress" aria-hidden="true"><i id="pbar"></i></div>
+<p class="counter"><b id="cnow">01</b> <span>/ 08</span></p>
+<p class="legal">consum responsabil &middot; con&#539;ine sulfi&#539;i</p>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Draggable.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+  var N = panels.length;
+  var track = document.getElementById('track');
+  var stage = document.getElementById('stage');
+  var pbar  = document.getElementById('pbar');
+  var cnow  = document.getElementById('cnow');
+  var BASE  = '#e7e4e2';
+
+  /* ---------- color helpers ---------- */
+  function hex2rgb(h){h=h.replace('#','');return[parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
+  function mix(a,b,t){
+    var A=hex2rgb(a),B=hex2rgb(b);
+    return 'rgb('+Math.round(A[0]+(B[0]-A[0])*t)+','+Math.round(A[1]+(B[1]-A[1])*t)+','+Math.round(A[2]+(B[2]-A[2])*t)+')';
+  }
+  var tints = panels.map(function(p){return mix(BASE, p.dataset.color, 0.14);});
+
+  /* ---------- build the semicircle nav (SVG) ---------- */
+  var SVGNS='http://www.w3.org/2000/svg';
+  var svg = document.getElementById('arc');
+  var CX=700, CY=-210, R=430, STEP=17;           /* deg between items */
+  var wheel = document.createElementNS(SVGNS,'g');
+
+  var ring = document.createElementNS(SVGNS,'circle');
+  ring.setAttribute('cx',CX); ring.setAttribute('cy',CY); ring.setAttribute('r',R);
+  ring.setAttribute('class','arc-ring');
+  svg.appendChild(ring);
+
+  /* small fixed pointer above the active (bottom) position */
+  var ptr = document.createElementNS(SVGNS,'line');
+  ptr.setAttribute('x1',CX); ptr.setAttribute('y1',R+CY-18);
+  ptr.setAttribute('x2',CX); ptr.setAttribute('y2',R+CY-10);
+  ptr.setAttribute('class','arc-pointer');
+  svg.appendChild(ptr);
+
+  var items=[];
+  panels.forEach(function(p,i){
+    var g = document.createElementNS(SVGNS,'g');
+    g.setAttribute('class','arc-item');
+    /* place item i to the RIGHT of the bottom; wheel rolls it in as content moves left */
+    g.setAttribute('transform','rotate('+(-i*STEP)+' '+CX+' '+CY+')');
+
+    var c = document.createElementNS(SVGNS,'circle');
+    c.setAttribute('cx',CX); c.setAttribute('cy',CY+R); c.setAttribute('r',3.5);
+    g.appendChild(c);
+
+    var t = document.createElementNS(SVGNS,'text');
+    t.setAttribute('x',CX); t.setAttribute('y',CY+R+46);
+    t.setAttribute('text-anchor','middle');
+    t.textContent = p.dataset.label;
+    g.appendChild(t);
+
+    g.addEventListener('click',function(){goTo(i);});
+    wheel.appendChild(g);
+    items.push(g);
+  });
+  svg.appendChild(wheel);
+
+  /* ---------- environment ---------- */
+  var reduced  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var small    = window.matchMedia('(max-width: 768px)').matches;
+  var vertical = reduced || small || typeof gsap === 'undefined';
+
+  var active = -1;
+  function setActive(i){
+    if(i===active) return;
+    active = i;
+    items.forEach(function(g,k){g.classList.toggle('is-active',k===i);});
+    panels.forEach(function(p,k){p.classList.toggle('is-active',k===i);});
+    cnow.textContent = (i+1<10?'0':'')+(i+1);
+    if(typeof gsap!=='undefined' && !reduced){
+      gsap.to(document.body,{backgroundColor:tints[i],duration:1,ease:'power2.out',overwrite:'auto'});
+    }else{
+      document.body.style.backgroundColor = tints[i];
+    }
+  }
+
+  /* =====================================================
+     VERTICAL fallback (mobile / reduced motion)
+     ===================================================== */
+  if(vertical){
+    document.documentElement.classList.add('is-vertical');
+    setActive(0);
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting) setActive(panels.indexOf(e.target));
+      });
+    },{threshold:.55});
+    panels.forEach(function(p){io.observe(p);});
+    document.querySelectorAll('[data-goto]').forEach(function(a){
+      a.addEventListener('click',function(ev){
+        ev.preventDefault();
+        panels[+a.dataset.goto].scrollIntoView({behavior: reduced?'auto':'smooth'});
+      });
+    });
+    return;
+  }
+
+  /* =====================================================
+     HORIZONTAL mode — GSAP pin + scrub + drag
+     ===================================================== */
+  gsap.registerPlugin(ScrollTrigger, Draggable);
+
+  var maxX = function(){return (N-1)*window.innerWidth;};
+
+  /* per-panel parallax setters */
+  var setBackdrop=[], setBottle=[], setCenter=[], setCenterO=[];
+  panels.forEach(function(p){
+    var bd = p.querySelector('.backdrop');
+    var bt = p.querySelector('.c-bottle') || p.querySelector('.c-pauze') || p.querySelector('.c-simbol');
+    var ct = p.querySelector('.center');
+    setBackdrop.push(bd? gsap.quickSetter(bd,'x','px') : null);
+    setBottle.push(bt? gsap.quickSetter(bt,'x','px') : null);
+    setCenter.push(gsap.quickSetter(ct,'x','px'));
+    setCenterO.push(gsap.quickSetter(ct,'opacity'));
+  });
+
+  var st;
+  var tween = gsap.to(track,{
+    x:function(){return -maxX();},
+    ease:'none',
+    scrollTrigger:{
+      id:'hscroll',
+      trigger:stage,
+      start:'top top',
+      end:function(){return '+='+ maxX()*1.15;},   /* a little scroll-room per panel */
+      pin:true,
+      scrub:1,
+      invalidateOnRefresh:true,
+      snap:{
+        snapTo:1/(N-1),
+        duration:{min:.35,max:.9},
+        ease:'power2.inOut',
+        delay:.05,
+        inertia:false
+      },
+      onUpdate:function(self){
+        var p = self.progress;
+        var cont = p*(N-1);
+
+        /* rotate the wheel so the current item sits at the bottom */
+        gsap.set(wheel,{rotation:cont*STEP, svgOrigin:CX+' '+CY});
+
+        /* progress line + active index */
+        pbar.style.transform = 'scaleX('+p+')';
+        setActive(Math.round(cont));
+
+        /* parallax + crossfade per panel */
+        for(var i=0;i<N;i++){
+          var off = i - cont;                         /* 0 = centred */
+          if(Math.abs(off)>1.4) continue;
+          if(setBackdrop[i]) setBackdrop[i](off*110);
+          if(setBottle[i])   setBottle[i](off*52);
+          setCenter[i](off*-64);
+          var o = 1 - Math.min(1, Math.abs(off)*1.15);
+          setCenterO[i](Math.max(0,o));
+        }
+      }
+    }
+  });
+  st = ScrollTrigger.getById('hscroll');
+  setActive(0);
+
+  /* ---------- drag to scroll (proxy) ---------- */
+  var proxy = document.createElement('div');
+  var startScroll = 0;
+  Draggable.create(proxy,{
+    type:'x',
+    trigger:stage,
+    onPress:function(){
+      startScroll = st.scroll();
+      gsap.set(proxy,{x:0});
+      this.update();
+      document.body.style.cursor='grabbing';
+    },
+    onDrag:function(){
+      var ratio = (st.end - st.start)/maxX();
+      st.scroll(startScroll - this.x*ratio);
+    },
+    onRelease:function(){document.body.style.cursor='';}
+  });
+
+  /* ---------- horizontal trackpad wheel ---------- */
+  window.addEventListener('wheel',function(e){
+    if(Math.abs(e.deltaX)>Math.abs(e.deltaY)){
+      window.scrollBy(0,e.deltaX);
+    }
+  },{passive:true});
+
+  /* ---------- keyboard ---------- */
+  window.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight') goTo(Math.min(N-1,active+1));
+    if(e.key==='ArrowLeft')  goTo(Math.max(0,active-1));
+  });
+
+  /* ---------- goto section ---------- */
+  function goTo(i){
+    var y = st.start + (st.end - st.start)*(i/(N-1));
+    window.scrollTo({top:y,behavior:'smooth'});
+  }
+  window.goTo = goTo;
+  document.querySelectorAll('[data-goto]').forEach(function(a){
+    a.addEventListener('click',function(ev){ev.preventDefault();goTo(+a.dataset.goto);});
+  });
+
+  /* ---------- custom cursor ---------- */
+  var cur = document.querySelector('.cursor');
+  if(window.matchMedia('(pointer:fine)').matches){
+    var cx=0,cy=0,tx=0,ty=0;
+    window.addEventListener('mousemove',function(e){
+      tx=e.clientX; ty=e.clientY;
+      cur.classList.add('is-on');
+    });
+    gsap.ticker.add(function(){
+      cx += (tx-cx)*.18; cy += (ty-cy)*.18;
+      cur.style.transform='translate('+ (cx-cur.offsetWidth/2) +'px,'+ (cy-cur.offsetHeight/2) +'px)';
+    });
+    document.querySelectorAll('.dot').forEach(function(d){
+      d.addEventListener('mouseenter',function(){cur.classList.add('is-hover');});
+      d.addEventListener('mouseleave',function(){cur.classList.remove('is-hover');});
+    });
+  }
+
+  /* ---------- resize ---------- */
+  var rid;
+  window.addEventListener('resize',function(){
+    clearTimeout(rid);
+    rid=setTimeout(function(){ScrollTrigger.refresh();},200);
+  });
+
+})();
+</script>
+</body>
+</html>
