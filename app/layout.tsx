@@ -7,6 +7,31 @@ import { SvgSprite } from "@/components/svg-sprite";
 
 const GTM_ID = "GTM-5TNDPL7Z";
 
+// Google Consent Mode v2 default state — TREBUIE injectat înainte de GTM.
+// Toate categoriile de tracking sunt DENIED implicit; se activează doar
+// când user acceptă în cookie banner (vezi lib/consent-store.ts saveConsent).
+// Obligatoriu din martie 2024 pentru piețele UE (GA4 nu mai colectează
+// nimic din UE fără Consent Mode v2 configurat corect).
+//
+// - functionality_storage: granted → cart, session, preferinte temă (cookies necesare)
+// - security_storage: granted → CSRF, anti-fraud (cookies necesare)
+// - restul denied până la accept explicit din banner
+const CONSENT_DEFAULT_SCRIPT = `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent', 'default', {
+  'ad_storage': 'denied',
+  'ad_user_data': 'denied',
+  'ad_personalization': 'denied',
+  'analytics_storage': 'denied',
+  'functionality_storage': 'granted',
+  'security_storage': 'granted',
+  'wait_for_update': 500
+});
+gtag('set', 'ads_data_redaction', true);
+gtag('set', 'url_passthrough', true);
+`;
+
 const italiana = Italiana({
   variable: "--font-serif",
   subsets: ["latin"],
@@ -67,12 +92,24 @@ export default function RootLayout({
     >
       <head>
         <ThemeScript />
+        {/*
+          Google Consent Mode v2 (denied by default) — TREBUIE injectat
+          înainte ca GTM să încarce vreun tag. Îl pun inline direct în
+          <head> ca să garantez ordinea (înainte de scriptul GTM injectat
+          de <GoogleTagManager /> mai jos). Fără dangerouslySetInnerHTML
+          conținutul ar fi escapat de React.
+        */}
+        <script
+          id="consent-default"
+          dangerouslySetInnerHTML={{ __html: CONSENT_DEFAULT_SCRIPT }}
+        />
       </head>
       {/*
         Google Tag Manager — Container ID GTM-5TNDPL7Z.
         Instalat pe TOATE paginile (public + coming-soon + admin).
         Marketing configurează tag-urile (GA4, Meta Pixel, Ads) în GTM UI —
         eu doar trimit evenimente în dataLayer prin lib/analytics/gtm.ts.
+        Consent state e sincronizat prin lib/consent-store.ts (Consent Mode v2).
         Vezi docs/ANALYTICS.md pentru harta completă a evenimentelor.
       */}
       <GoogleTagManager gtmId={GTM_ID} />

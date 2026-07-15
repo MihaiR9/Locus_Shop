@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ResetConsentButton } from "@/components/legal/reset-consent-button";
 
 export const metadata: Metadata = {
   title: "Politica de cookie-uri",
@@ -24,10 +25,11 @@ export default function CookiesPage() {
       </p>
 
       <div className="callout">
-        Îți poți schimba preferințele oricând. Doar șterge cookie-ul{" "}
-        <strong>locus-cookie-consent</strong> din browser și banner-ul va apărea
-        din nou la următoarea vizită.
+        Îți poți schimba preferințele oricând — apasă butonul de mai jos și
+        banner-ul va apărea din nou.
       </div>
+
+      <ResetConsentButton />
 
       <h2>Categorii</h2>
 

@@ -25,6 +25,34 @@ function pushAuditEntry() {
   }
 }
 
+// ─── Google Consent Mode v2 ─────────────────────────────────────────
+// Sincronizează starea de consent cu GTM. Trimite `gtag('consent', 'update', ...)`
+// când utilizatorul acceptă / respinge categorii în banner. GTM ascultă
+// aceste evenimente și pornește / oprește tag-urile respective (GA4, Ads, Pixel).
+//
+// Dacă `analytics_storage` e denied → GA4 folosește "cookieless pings" în UE
+// (agregate anonime, fără cookie). Dacă `ad_*_storage` sunt denied → Ads
+// nu folosește nici un cookie de personalizare.
+function pushConsentUpdate(analytics: boolean, marketing: boolean) {
+  if (typeof window === "undefined") return;
+  const w = window as unknown as {
+    dataLayer?: unknown[];
+    gtag?: (...args: unknown[]) => void;
+  };
+  const gtag =
+    w.gtag ??
+    ((...args: unknown[]) => {
+      w.dataLayer = w.dataLayer ?? [];
+      w.dataLayer.push(args);
+    });
+  gtag("consent", "update", {
+    analytics_storage: analytics ? "granted" : "denied",
+    ad_storage: marketing ? "granted" : "denied",
+    ad_user_data: marketing ? "granted" : "denied",
+    ad_personalization: marketing ? "granted" : "denied",
+  });
+}
+
 // ─── Cookie consent ─────────────────────────────────────────────────
 const CONSENT_COOKIE = "locus-cookie-consent";
 
@@ -76,6 +104,7 @@ type ConsentStore = {
   verifyAge: () => void;
   refuseAge: () => void;
   saveConsent: (next: Omit<Consent, "ts">) => void;
+  resetConsent: () => void;
 };
 
 export const useConsentStore = create<ConsentStore>()((set) => ({
@@ -85,11 +114,16 @@ export const useConsentStore = create<ConsentStore>()((set) => ({
   consent: null,
 
   hydrate: () => {
+    const consent = readConsentCookie();
     set({
       hydrated: true,
       ageVerified: readCookie(AGE_COOKIE) === "1",
-      consent: readConsentCookie(),
+      consent,
     });
+    // Rehidratează Consent Mode v2 la fiecare load ca GTM să știe starea
+    // actualizată (default e denied — dacă user a acceptat înainte,
+    // trebuie să reafirmăm în noua sesiune de pagină).
+    if (consent) pushConsentUpdate(consent.analytics, consent.marketing);
   },
 
   verifyAge: () => {
@@ -106,5 +140,15 @@ export const useConsentStore = create<ConsentStore>()((set) => ({
     const full: Consent = { ...next, ts: Date.now() };
     writeCookie(CONSENT_COOKIE, JSON.stringify(full), SIX_MONTHS);
     set({ consent: full });
+    // Sincronizează imediat cu GTM (Consent Mode v2).
+    pushConsentUpdate(next.analytics, next.marketing);
+  },
+
+  // Pentru buton „Modifică preferințe" pe /cookies — șterge cookie-ul
+  // de consent, banner-ul reapare. Consent Mode revine implicit la denied.
+  resetConsent: () => {
+    writeCookie(CONSENT_COOKIE, "", -1);
+    set({ consent: null });
+    pushConsentUpdate(false, false);
   },
 }));

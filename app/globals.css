@@ -3024,6 +3024,51 @@
 }
 
 /* ----------------------------------------------------------------
+   /cookies — reset preferences button
+---------------------------------------------------------------- */
+.cookie-reset {
+  margin: 24px 0 40px;
+  padding: 20px 24px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  font-family: var(--font-mono), monospace;
+}
+.cookie-reset-status {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--ink-mute);
+  line-height: 1.6;
+}
+.cookie-reset-status strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+.cookie-reset-btn {
+  display: inline-block;
+  padding: 10px 18px;
+  border: 1px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 240ms var(--ease), color 240ms var(--ease);
+}
+.cookie-reset-btn:hover {
+  background: var(--ink);
+  color: var(--bg);
+}
+.cookie-reset-hint {
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--vie);
+  line-height: 1.6;
+}
+
+/* ----------------------------------------------------------------
    /despre — story page
 ---------------------------------------------------------------- */
 .despre-page {

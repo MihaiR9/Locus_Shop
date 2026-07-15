@@ -174,20 +174,72 @@ Ar trebui să vezi un array cu evenimente (`gtm.js`, `gtm.dom`, `gtm.load`, apoi
 
 ---
 
-## Compliance — ⚠️ IMPORTANT
+## Compliance — Consent Mode v2 ✅
 
-**GTM încarcă script-uri third-party fără consent utilizator.** Asta e:
-- ❌ Ne-conform cu **GDPR** (Regulamentul UE 2016/679)
-- ❌ Ne-conform cu **Legea RO 506/2004** (art. 4 — cookies non-esențiale)
-- ❌ Google impune **Consent Mode v2** din martie 2024 pentru piețele UE
+**Consent Mode v2 e activ** (implementat 2026-07-15). GTM încarcă pe toate
+paginile, dar toate tag-urile de tracking rămân **denied by default**
+până când user-ul acceptă explicit în cookie banner.
 
-**Ce ar trebui făcut înainte de lansare publică:**
-1. Cookie banner cu 3 categorii: necesare / analitice / marketing
-2. Consent Mode v2 — inițializare cu `default: denied`
-3. `gtag('consent', 'update', {...})` când user acceptă
-4. GTM tag-uri configurate să respecte consent-ul
+### Configurare defaults
 
-**Momentan** — site-ul e blocat de coming-soon gate, deci nu are trafic public. La lansare, cookie banner-ul e obligatoriu. **Vezi în roadmap: Faza „compliance"** (verificare 18+ + cookie banner + pagini legale).
+Injectat inline în `<head>` din [app/layout.tsx](../app/layout.tsx),
+înainte de `<GoogleTagManager>`:
+
+```js
+gtag('consent', 'default', {
+  ad_storage: 'denied',
+  ad_user_data: 'denied',
+  ad_personalization: 'denied',
+  analytics_storage: 'denied',
+  functionality_storage: 'granted',  // cart, sesiune, temă
+  security_storage: 'granted',       // CSRF, anti-fraud
+  wait_for_update: 500               // 500ms grace pt banner
+});
+gtag('set', 'ads_data_redaction', true);   // scoate PII din reclame
+gtag('set', 'url_passthrough', true);      // păstrează GCLID între pagini
+```
+
+### Sincronizare consent → GTM
+
+Când user acceptă în banner ([components/legal/cookie-banner.tsx](../components/legal/cookie-banner.tsx)):
+1. `saveConsent` scrie cookie-ul `locus-cookie-consent` (6 luni)
+2. `pushConsentUpdate` face `gtag('consent', 'update', {...})` cu noua stare
+3. GTM detectează update-ul și pornește tag-urile care așteptau consent
+
+Când user revine în sesiuni ulterioare, `hydrate()` (apelat de
+[ConsentScripts](../components/legal/consent-scripts.tsx) la mount) reafirmă
+starea salvată — Consent Mode nu persistă între page loads.
+
+### Categorii banner → categorii Consent Mode
+
+| Banner categorie | Consent Mode categorii impactate |
+|---|---|
+| **Necesare** (always on) | `functionality_storage`, `security_storage` (deja granted) |
+| **Analitice** | `analytics_storage` |
+| **Marketing** | `ad_storage`, `ad_user_data`, `ad_personalization` |
+
+### Revocare consent
+
+Butonul „Modifică preferințele" din [/cookies](../app/(storefront)/(legal)/cookies/page.tsx)
+apelează `resetConsent()` — șterge cookie-ul, banner-ul reapare, toate
+categoriile revin la denied. Obligatoriu GDPR Art. 7(3): user trebuie să
+poată revoca la fel de ușor cum a dat consent.
+
+### Verificare compliance în browser
+
+```js
+// În Console după accept „Analytics" în banner:
+window.dataLayer.filter(x => Array.isArray(x) && x[0] === 'consent')
+// → [['consent','default',{...}], ['consent','update',{...}]]
+```
+
+### Compliance legal — checklist ✅
+
+- ✅ **GDPR** (Regulamentul UE 2016/679) — consent explicit, granular, revocabil
+- ✅ **Legea RO 506/2004** (art. 4) — cookies non-esențiale doar cu consent
+- ✅ **Google Consent Mode v2** (obligatoriu din martie 2024 pentru UE)
+- ✅ **ePrivacy Directive 2002/58/CE** (art. 5(3)) — cookies strict necesare exceptate
+- ⚠️ **Notă:** Sesiunile pre-lansare (site-ul e după coming-soon gate) — practic 0 trafic public, deci risc minim. La lansare, cookie banner-ul e obligatoriu în toate paginile publice — deja activ prin `StorefrontOverlays`.
 
 ---
 
