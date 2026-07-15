@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useCartStore } from "@/lib/cart-store";
+import { trackAddToCart } from "@/lib/analytics/gtm";
 import type { Wine } from "@/lib/wines";
 
 type Props = {
@@ -16,6 +17,16 @@ export function AddToCartButton({ wine }: Props) {
   function handleClick() {
     addItem(wine);
     open();
+    trackAddToCart([
+      {
+        item_id: wine.code,
+        item_name: wine.name,
+        item_category: wine.gama,
+        item_variant: wine.bottleColor,
+        price: wine.priceRon,
+        quantity: 1,
+      },
+    ]);
     setPulsing(true);
     window.setTimeout(() => setPulsing(false), 600);
   }

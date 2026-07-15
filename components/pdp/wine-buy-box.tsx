@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useCartStore } from "@/lib/cart-store";
+import { trackAddToCart } from "@/lib/analytics/gtm";
 import { abvLabel, metaLine, type Wine } from "@/lib/wines";
 
 export function WineBuyBox({ wine }: { wine: Wine }) {
@@ -21,6 +22,16 @@ export function WineBuyBox({ wine }: { wine: Wine }) {
   function addToCart() {
     addItem(wine, qty);
     open();
+    trackAddToCart([
+      {
+        item_id: wine.code,
+        item_name: wine.name,
+        item_category: wine.gama,
+        item_variant: wine.bottleColor,
+        price: wine.priceRon,
+        quantity: qty,
+      },
+    ]);
     setPulsing(true);
     window.setTimeout(() => setPulsing(false), 600);
   }

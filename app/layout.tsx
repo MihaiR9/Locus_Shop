@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Italiana, IBM_Plex_Mono, Bellefair, Inter } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
 import { ThemeScript } from "@/components/theme-script";
 import { SvgSprite } from "@/components/svg-sprite";
+
+const GTM_ID = "GTM-5TNDPL7Z";
 
 const italiana = Italiana({
   variable: "--font-serif",
@@ -65,6 +68,14 @@ export default function RootLayout({
       <head>
         <ThemeScript />
       </head>
+      {/*
+        Google Tag Manager — Container ID GTM-5TNDPL7Z.
+        Instalat pe TOATE paginile (public + coming-soon + admin).
+        Marketing configurează tag-urile (GA4, Meta Pixel, Ads) în GTM UI —
+        eu doar trimit evenimente în dataLayer prin lib/analytics/gtm.ts.
+        Vezi docs/ANALYTICS.md pentru harta completă a evenimentelor.
+      */}
+      <GoogleTagManager gtmId={GTM_ID} />
       <body className="bg-bg text-ink font-mono" suppressHydrationWarning>
         <SvgSprite />
         {children}

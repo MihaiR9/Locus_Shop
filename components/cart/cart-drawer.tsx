@@ -5,6 +5,7 @@ import { useEffect, useMemo } from "react";
 import { ProductBottle } from "@/components/landing/product-bottle";
 import { useCartStore } from "@/lib/cart-store";
 import { formatRon } from "@/lib/wines";
+import { trackViewCart } from "@/lib/analytics/gtm";
 
 export function CartDrawer() {
   const isOpen = useCartStore((s) => s.isOpen);
@@ -39,6 +40,23 @@ export function CartDrawer() {
       document.body.style.overflow = prev;
     };
   }, [isOpen, close]);
+
+  // view_cart — se trimite când drawer-ul se deschide (nu la fiecare re-render).
+  // Nu trimit dacă coșul e gol.
+  useEffect(() => {
+    if (!isOpen || lines.length === 0) return;
+    trackViewCart(
+      lines.map((l) => ({
+        item_id: l.code,
+        item_name: l.name,
+        item_category: l.gama,
+        item_variant: l.bottleColor,
+        price: l.priceRon,
+        quantity: l.qty,
+      })),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   const empty = lines.length === 0;
 

@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe/server";
 import { formatRon } from "@/lib/wines";
+import { PurchaseTracker } from "@/components/checkout/purchase-tracker";
+import type { GtmItem } from "@/lib/analytics/gtm";
 
 export const metadata = {
   title: "Comandă confirmată · Domeniul Locus",
@@ -111,8 +113,50 @@ export default async function CheckoutSuccessPage({
     order.payment_status === "pending";
   const isCash = order?.payment_method !== "card-online";
 
+  // Fetch order items + eventual cupon pentru evenimentul `purchase` GTM.
+  // Numai când comanda e plătită — nu vrei să înregistrezi purchase pentru
+  // ceva neplătit.
+  let gtmItems: GtmItem[] = [];
+  let gtmShippingRon = 0;
+  let gtmDiscountRon = 0;
+  let gtmCouponCode: string | null = null;
+  if (order && isPaid) {
+    const supabase = getSupabaseAdminClient();
+    const [{ data: itemsData }, { data: orderExtras }] = await Promise.all([
+      supabase
+        .from("order_items")
+        .select("code_snapshot, name_snapshot, qty, unit_price_cents")
+        .eq("order_id", order.id),
+      supabase
+        .from("orders")
+        .select("shipping_cents, discount_cents")
+        .eq("id", order.id)
+        .maybeSingle(),
+    ]);
+
+    gtmItems = (itemsData ?? []).map((it) => ({
+      item_id: it.code_snapshot,
+      item_name: it.name_snapshot,
+      price: it.unit_price_cents / 100,
+      quantity: it.qty,
+    }));
+    gtmShippingRon = (orderExtras?.shipping_cents ?? 0) / 100;
+    gtmDiscountRon = (orderExtras?.discount_cents ?? 0) / 100;
+    gtmCouponCode = null; // TODO: adaugă orders.coupon_code când wire-uim reducerile la checkout
+  }
+
   return (
     <main className="checkout-success">
+      {order && isPaid && gtmItems.length > 0 && (
+        <PurchaseTracker
+          transactionId={order.order_number}
+          value={order.total_cents / 100}
+          shipping={gtmShippingRon}
+          discount={gtmDiscountRon || undefined}
+          couponCode={gtmCouponCode}
+          items={gtmItems}
+        />
+      )}
       <div className="success-card">
         <div
           className="eyebrow"

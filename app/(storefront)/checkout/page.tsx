@@ -5,6 +5,7 @@ import { StepShipping } from "@/components/checkout/step-shipping";
 import { StepBilling } from "@/components/checkout/step-billing";
 import { StepPayment } from "@/components/checkout/step-payment";
 import { OrderSummary } from "@/components/checkout/order-summary";
+import { CheckoutTracker } from "@/components/checkout/checkout-tracker";
 
 export const metadata: Metadata = {
   title: "Checkout · Domeniul Locus",
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 export default function CheckoutPage() {
   return (
     <main className="checkout-page">
+      <CheckoutTracker />
       <div className="checkout-container">
         <header className="checkout-head">
           <div className="eyebrow">Finalizare comandă · pas cu pas</div>
