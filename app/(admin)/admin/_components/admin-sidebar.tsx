@@ -61,6 +61,7 @@ const SECTIONS: NavSection[] = [
       { href: "/admin/pagini", label: "Pagini", icon: FileText },
       { href: "/admin/preferinte", label: "Preferințe", icon: SlidersHorizontal },
       { href: "/admin/fisiere", label: "Fișiere", icon: FolderOpen },
+      { href: "/admin/emailuri", label: "Emailuri", icon: Mail },
       { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
     ],
   },

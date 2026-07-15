@@ -6,45 +6,43 @@ import {
   recipientFor,
 } from "@/lib/resend/server";
 import {
-  orderConfirmationHtml,
   adminOrderNotificationHtml,
-  newsletterWelcomeHtml,
-  shippedNotificationHtml,
-  deliveredNotificationHtml,
-  refundConfirmationHtml,
-  returnStatusUpdateHtml,
   type OrderConfirmationData,
   type ShippedEmailData,
   type DeliveredEmailData,
   type RefundEmailData,
   type ReturnStatusEmailData,
 } from "@/lib/email/templates";
+import {
+  renderOrderConfirmation,
+  renderShipped,
+  renderDelivered,
+  renderRefundConfirmation,
+  renderReturnStatus,
+  renderNewsletterWelcome,
+} from "@/lib/email/render";
 
 type SendResult = { ok: true; id: string } | { ok: false; error: string };
 
-/**
- * Customer order confirmation — fires after Stripe webhook marks
- * the order paid (or after a card-livrare order is placed).
- */
-export async function sendOrderConfirmation(
+async function sendRendered(
   to: string,
-  data: OrderConfirmationData,
+  rendered: { subject: string; html: string },
+  logTag: string,
 ): Promise<SendResult> {
-  const tpl = orderConfirmationHtml(data);
   try {
     const result = await getResend().emails.send({
       from: fromAddress(),
       to: recipientFor(to),
-      subject: tpl.subject,
-      html: tpl.html,
+      subject: rendered.subject,
+      html: rendered.html,
     });
     if (result.error) {
-      console.error("[email] order confirmation failed", result.error);
+      console.error(`[email] ${logTag} failed`, result.error);
       return { ok: false, error: result.error.message };
     }
     return { ok: true, id: result.data?.id ?? "" };
   } catch (err) {
-    console.error("[email] order confirmation exception", err);
+    console.error(`[email] ${logTag} exception`, err);
     return {
       ok: false,
       error: err instanceof Error ? err.message : "send failed",
@@ -53,7 +51,20 @@ export async function sendOrderConfirmation(
 }
 
 /**
- * Internal admin notification — same trigger as the customer one.
+ * Customer order confirmation — fires after Stripe webhook marks
+ * the order paid (or after a card-livrare order is placed).
+ * Text content e din DB (email_templates.key='order_confirmation').
+ */
+export async function sendOrderConfirmation(
+  to: string,
+  data: OrderConfirmationData,
+): Promise<SendResult> {
+  const rendered = await renderOrderConfirmation(data);
+  return sendRendered(to, rendered, "order confirmation");
+}
+
+/**
+ * Internal admin notification — HARDCODED template (nu e editabil din UI).
  * Goes to RESEND_ADMIN_EMAIL (default office@domeniul-locus.ro).
  */
 export async function sendOrderNotificationToAdmin(
@@ -63,171 +74,57 @@ export async function sendOrderNotificationToAdmin(
   },
 ): Promise<SendResult> {
   const tpl = adminOrderNotificationHtml(data);
-  try {
-    const result = await getResend().emails.send({
-      from: fromAddress(),
-      to: recipientFor(adminEmail()),
-      subject: tpl.subject,
-      html: tpl.html,
-    });
-    if (result.error) {
-      console.error("[email] admin notification failed", result.error);
-      return { ok: false, error: result.error.message };
-    }
-    return { ok: true, id: result.data?.id ?? "" };
-  } catch (err) {
-    console.error("[email] admin notification exception", err);
-    return {
-      ok: false,
-      error: err instanceof Error ? err.message : "send failed",
-    };
-  }
-}
-
-/**
- * Shipped notification — fires when admin marks an order as expediat.
- * AWB e opțional (deocamdată admin îl introduce manual; când integrăm
- * FanCourier API va fi generat automat).
- */
-export async function sendShippedNotification(
-  to: string,
-  data: ShippedEmailData,
-): Promise<SendResult> {
-  const tpl = shippedNotificationHtml(data);
-  try {
-    const result = await getResend().emails.send({
-      from: fromAddress(),
-      to: recipientFor(to),
-      subject: tpl.subject,
-      html: tpl.html,
-    });
-    if (result.error) {
-      console.error("[email] shipped notification failed", result.error);
-      return { ok: false, error: result.error.message };
-    }
-    return { ok: true, id: result.data?.id ?? "" };
-  } catch (err) {
-    console.error("[email] shipped notification exception", err);
-    return {
-      ok: false,
-      error: err instanceof Error ? err.message : "send failed",
-    };
-  }
-}
-
-/**
- * Delivered notification — fires when admin marks livrată.
- * Include instrucțiuni scurte de servire + reminder retur (14 zile).
- */
-export async function sendDeliveredNotification(
-  to: string,
-  data: DeliveredEmailData,
-): Promise<SendResult> {
-  const tpl = deliveredNotificationHtml(data);
-  try {
-    const result = await getResend().emails.send({
-      from: fromAddress(),
-      to: recipientFor(to),
-      subject: tpl.subject,
-      html: tpl.html,
-    });
-    if (result.error) {
-      console.error("[email] delivered notification failed", result.error);
-      return { ok: false, error: result.error.message };
-    }
-    return { ok: true, id: result.data?.id ?? "" };
-  } catch (err) {
-    console.error("[email] delivered notification exception", err);
-    return {
-      ok: false,
-      error: err instanceof Error ? err.message : "send failed",
-    };
-  }
-}
-
-/**
- * Refund confirmation — fires când admin apasă „Rambursează" (Stripe SAU
- * manual — transfer bancar / cash). Include suma + metoda + timeline.
- */
-export async function sendRefundConfirmation(
-  to: string,
-  data: RefundEmailData,
-): Promise<SendResult> {
-  const tpl = refundConfirmationHtml(data);
-  try {
-    const result = await getResend().emails.send({
-      from: fromAddress(),
-      to: recipientFor(to),
-      subject: tpl.subject,
-      html: tpl.html,
-    });
-    if (result.error) {
-      console.error("[email] refund confirmation failed", result.error);
-      return { ok: false, error: result.error.message };
-    }
-    return { ok: true, id: result.data?.id ?? "" };
-  } catch (err) {
-    console.error("[email] refund confirmation exception", err);
-    return {
-      ok: false,
-      error: err instanceof Error ? err.message : "send failed",
-    };
-  }
-}
-
-/**
- * Return status update — fires când admin schimbă statusul cererii de retur
- * (approved / in_transit / completed / rejected). Opțional include un
- * mesaj personalizat de la admin.
- */
-export async function sendReturnStatusUpdate(
-  to: string,
-  data: ReturnStatusEmailData,
-): Promise<SendResult> {
-  const tpl = returnStatusUpdateHtml(data);
-  try {
-    const result = await getResend().emails.send({
-      from: fromAddress(),
-      to: recipientFor(to),
-      subject: tpl.subject,
-      html: tpl.html,
-    });
-    if (result.error) {
-      console.error("[email] return status update failed", result.error);
-      return { ok: false, error: result.error.message };
-    }
-    return { ok: true, id: result.data?.id ?? "" };
-  } catch (err) {
-    console.error("[email] return status update exception", err);
-    return {
-      ok: false,
-      error: err instanceof Error ? err.message : "send failed",
-    };
-  }
+  return sendRendered(adminEmail(), tpl, "admin notification");
 }
 
 /**
  * Newsletter welcome — fires when someone submits the footer signup.
  */
 export async function sendNewsletterWelcome(to: string): Promise<SendResult> {
-  const tpl = newsletterWelcomeHtml();
-  try {
-    const result = await getResend().emails.send({
-      from: fromAddress(),
-      to: recipientFor(to),
-      subject: tpl.subject,
-      html: tpl.html,
-    });
-    if (result.error) {
-      console.error("[email] newsletter welcome failed", result.error);
-      return { ok: false, error: result.error.message };
-    }
-    return { ok: true, id: result.data?.id ?? "" };
-  } catch (err) {
-    console.error("[email] newsletter welcome exception", err);
-    return {
-      ok: false,
-      error: err instanceof Error ? err.message : "send failed",
-    };
-  }
+  const rendered = await renderNewsletterWelcome();
+  return sendRendered(to, rendered, "newsletter welcome");
+}
+
+/**
+ * Shipped notification — fires when admin marks an order as expediat.
+ */
+export async function sendShippedNotification(
+  to: string,
+  data: ShippedEmailData,
+): Promise<SendResult> {
+  const rendered = await renderShipped(data);
+  return sendRendered(to, rendered, "shipped notification");
+}
+
+/**
+ * Delivered notification — fires when admin marks livrată.
+ */
+export async function sendDeliveredNotification(
+  to: string,
+  data: DeliveredEmailData,
+): Promise<SendResult> {
+  const rendered = await renderDelivered(data);
+  return sendRendered(to, rendered, "delivered notification");
+}
+
+/**
+ * Refund confirmation — fires când admin apasă „Rambursează" (Stripe SAU manual).
+ */
+export async function sendRefundConfirmation(
+  to: string,
+  data: RefundEmailData,
+): Promise<SendResult> {
+  const rendered = await renderRefundConfirmation(data);
+  return sendRendered(to, rendered, "refund confirmation");
+}
+
+/**
+ * Return status update — fires când admin schimbă statusul unei cereri retur.
+ */
+export async function sendReturnStatusUpdate(
+  to: string,
+  data: ReturnStatusEmailData,
+): Promise<SendResult> {
+  const rendered = await renderReturnStatus(data);
+  return sendRendered(to, rendered, "return status update");
 }

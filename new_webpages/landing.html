@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Domeniul Locus — un loc. un timp. un vin.</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* ----------------------------------------------------------------
+       Tokens — inspirat de imaginea de referință (Château Haut-Brion).
+       Palet cald, off-white de bază.
+    ---------------------------------------------------------------- */
+    :root {
+      --bg: #e7e4e2;
+      --bg-warm: #ddd8d3;
+      --ink: #1a1a1a;
+      --ink-soft: #4a3c2d;
+      --ink-mute: #8a7f70;
+      --vie: #3e4336;
+      --line: rgba(74, 60, 45, 0.14);
+      --line-strong: rgba(74, 60, 45, 0.28);
+
+      --serif-display: "Italiana", "Cormorant Garamond", Georgia, serif;
+      --serif-editorial: "Cormorant Garamond", "Italiana", Georgia, serif;
+      --serif-numeral: "Bellefair", "Italiana", Georgia, serif;
+      --mono: "IBM Plex Mono", "Courier New", monospace;
+
+      --px: clamp(20px, 4.5vw, 56px);
+      --container: 1440px;
+
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { border: none; background: none; cursor: pointer; font: inherit; color: inherit; }
+    img, svg { display: block; max-width: 100%; }
+
+    /* ----------------------------------------------------------------
+       Reusable primitives
+    ---------------------------------------------------------------- */
+    .container {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding-inline: var(--px);
+    }
+
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .eyebrow.dark {
+      color: var(--ink);
+    }
+    .eyebrow::before {
+      content: "";
+      display: inline-block;
+      width: 20px;
+      height: 1px;
+      background: currentColor;
+      margin-right: 12px;
+      vertical-align: middle;
+      opacity: 0.5;
+    }
+
+    .caps {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+
+    /* Editorial page marker (like II / IV) */
+    .page-marker {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-family: var(--serif-editorial);
+      font-size: 15px;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--ink-soft);
+      padding-block: 20px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .page-marker__number {
+      font-family: var(--serif-numeral);
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      color: var(--ink-mute);
+      font-style: normal;
+    }
+
+    /* ----------------------------------------------------------------
+       Top navigation — minimal, editorial
+    ---------------------------------------------------------------- */
+    .site-nav {
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+      background: rgba(231, 228, 226, 0.72);
+      border-bottom: 1px solid var(--line);
+    }
+    .site-nav__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px var(--px);
+      gap: 24px;
+    }
+    .site-nav__brand {
+      font-family: var(--serif-display);
+      font-size: 22px;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+    }
+    .site-nav__brand small {
+      display: block;
+      font-family: var(--mono);
+      font-size: 8px;
+      letter-spacing: 0.34em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-top: -2px;
+    }
+    .site-nav__menu {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+    }
+    .site-nav__menu a {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      transition: color 240ms var(--ease);
+    }
+    .site-nav__menu a:hover {
+      color: var(--ink);
+    }
+    .site-nav__utility {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .site-nav__cart {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      color: var(--ink);
+      transition: background 240ms var(--ease);
+    }
+    .site-nav__cart:hover { background: var(--bg-warm); }
+
+    @media (max-width: 900px) {
+      .site-nav__menu { display: none; }
+    }
+
+    /* ----------------------------------------------------------------
+       HERO — editorial split
+    ---------------------------------------------------------------- */
+    .hero {
+      padding-top: 120px;
+      padding-bottom: clamp(80px, 12vw, 160px);
+      position: relative;
+    }
+    .hero__grid {
+      display: grid;
+      grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+      gap: clamp(40px, 6vw, 96px);
+      align-items: end;
+    }
+    @media (max-width: 900px) {
+      .hero__grid { grid-template-columns: 1fr; gap: 64px; }
+    }
+
+    .hero__text {
+      padding-block: 80px 40px;
+    }
+    .hero__eyebrow {
+      margin-bottom: clamp(40px, 6vw, 72px);
+    }
+    .hero__headline {
+      font-family: var(--serif-display);
+      font-weight: 400;
+      font-size: clamp(64px, 8vw, 128px);
+      line-height: 0.98;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+    }
+    .hero__headline em {
+      font-family: var(--serif-editorial);
+      font-style: italic;
+      font-weight: 300;
+    }
+    .hero__intro {
+      max-width: 380px;
+      margin-top: clamp(32px, 5vw, 48px);
+      font-family: var(--serif-editorial);
+      font-size: 17px;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      font-weight: 300;
+    }
+    .hero__meta {
+      margin-top: 48px;
+      display: flex;
+      align-items: baseline;
+      gap: 32px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .hero__meta strong {
+      font-weight: 400;
+      color: var(--ink-soft);
+    }
+
+    .hero__visual {
+      position: relative;
+      aspect-ratio: 4 / 5;
+      background: var(--bg-warm);
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+    .hero__visual::after {
+      /* subtle grain */
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(rgba(74, 60, 45, 0.06) 1px, transparent 1px);
+      background-size: 3px 3px;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    .hero__visual-caption {
+      position: absolute;
+      inset: auto 0 24px 0;
+      text-align: center;
+      font-family: var(--serif-editorial);
+      font-style: italic;
+      font-weight: 300;
+      font-size: 15px;
+      color: var(--ink-soft);
+      z-index: 2;
+    }
+    .hero__amphora {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+    }
+    .hero__amphora svg {
+      width: 60%;
+      height: auto;
+      opacity: 0.85;
+    }
+
+    /* Scroll indicator */
+    .hero__scroll {
+      position: absolute;
+      left: var(--px);
+      bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .hero__scroll::after {
+      content: "";
+      display: block;
+      width: 60px;
+      height: 1px;
+      background: currentColor;
+      animation: scroll-line 2.4s var(--ease) infinite;
+    }
+    @keyframes scroll-line {
+      0%, 100% { transform: scaleX(1); opacity: 0.6; }
+      50% { transform: scaleX(1.4); opacity: 1; }
+    }
+
+    /* ----------------------------------------------------------------
+       DIPTYCH — two bottles editorial (inspirat de imaginea trimisă)
+    ---------------------------------------------------------------- */
+    .diptych {
+      padding-block: clamp(80px, 12vw, 160px);
+      border-top: 1px solid var(--line);
+      position: relative;
+    }
+    .diptych__head {
+      display: grid;
+      grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+      gap: clamp(40px, 6vw, 96px);
+      margin-bottom: clamp(48px, 8vw, 96px);
+    }
+    @media (max-width: 900px) {
+      .diptych__head { grid-template-columns: 1fr; }
+    }
+    .diptych__title {
+      font-family: var(--serif-display);
+      font-weight: 400;
+      font-size: clamp(36px, 4vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .diptych__title em {
+      font-family: var(--serif-editorial);
+      font-style: italic;
+      font-weight: 300;
+    }
+    .diptych__lede {
+      font-family: var(--serif-editorial);
+      font-weight: 300;
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--ink-soft);
+      max-width: 44ch;
+    }
+    .diptych__lede p + p { margin-top: 18px; }
+
+    .diptych__stage {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(20px, 3vw, 48px);
+      align-items: end;
+      padding-top: clamp(60px, 10vw, 140px);
+      padding-bottom: 40px;
+    }
+
+    .bottle-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .bottle-card__year {
+      position: absolute;
+      inset: -20% 0 auto 0;
+      font-family: var(--serif-numeral);
+      font-size: clamp(140px, 22vw, 320px);
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      opacity: 0.06;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+      text-align: center;
+    }
+    .bottle-card__figure {
+      position: relative;
+      z-index: 1;
+      height: clamp(320px, 44vw, 540px);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .bottle-card__figure svg {
+      height: 100%;
+      width: auto;
+      filter: drop-shadow(0 24px 30px rgba(74, 60, 45, 0.14));
+    }
+    .bottle-card__caption {
+      position: relative;
+      z-index: 2;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      width: 60%;
+      max-width: 260px;
+    }
+    .bottle-card__vintage {
+      font-family: var(--serif-numeral);
+      font-size: 16px;
+      color: var(--ink-mute);
+      letter-spacing: 0.08em;
+    }
+    .bottle-card__name {
+      display: block;
+      margin-top: 8px;
+      font-family: var(--serif-display);
+      font-size: 22px;
+      color: var(--ink);
+      letter-spacing: -0.005em;
+    }
+    .bottle-card__meta {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 10px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .bottle-card__meta span::after {
+      content: "·";
+      margin-left: 12px;
+      opacity: 0.4;
+    }
+    .bottle-card__meta span:last-child::after { display: none; }
+
+    /* Timeline strip at bottom of diptych */
+    .diptych__timeline {
+      margin-top: clamp(40px, 6vw, 80px);
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .diptych__timeline-ticks {
+      flex: 1;
+      display: flex;
+      gap: 4px;
+      margin: 0 32px;
+      align-items: center;
+    }
+    .diptych__timeline-ticks span {
+      flex: 1;
+      height: 1px;
+      background: var(--line-strong);
+      transform-origin: left;
+    }
+    .diptych__timeline-ticks span:nth-child(3) { background: var(--vie); height: 2px; }
+    .diptych__timeline-ticks span:nth-child(4) { background: var(--vie); height: 2px; }
+
+    /* ----------------------------------------------------------------
+       MANIFESTO — three columns
+    ---------------------------------------------------------------- */
+    .manifesto {
+      padding-block: clamp(80px, 12vw, 160px);
+      border-top: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-warm) 100%);
+    }
+    .manifesto__head {
+      max-width: 640px;
+      margin-bottom: clamp(64px, 10vw, 120px);
+    }
+    .manifesto__title {
+      margin-top: 24px;
+      font-family: var(--serif-display);
+      font-weight: 400;
+      font-size: clamp(40px, 5vw, 72px);
+      line-height: 1.02;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+    }
+    .manifesto__title em {
+      font-family: var(--serif-editorial);
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .manifesto__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(32px, 5vw, 72px);
+    }
+    @media (max-width: 900px) {
+      .manifesto__grid { grid-template-columns: 1fr; }
+    }
+
+    .manifesto-item__word {
+      font-family: var(--serif-display);
+      font-weight: 400;
+      font-size: clamp(56px, 7vw, 96px);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .manifesto-item__number {
+      display: block;
+      font-family: var(--serif-numeral);
+      font-size: 13px;
+      color: var(--ink-mute);
+      letter-spacing: 0.16em;
+      margin-bottom: 20px;
+    }
+    .manifesto-item__body {
+      margin-top: 24px;
+      font-family: var(--serif-editorial);
+      font-style: italic;
+      font-weight: 300;
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--ink-soft);
+    }
+
+    /* ----------------------------------------------------------------
+       CTA — quiet
+    ---------------------------------------------------------------- */
+    .cta {
+      padding-block: clamp(100px, 14vw, 200px);
+      border-top: 1px solid var(--line);
+      text-align: center;
+    }
+    .cta__eyebrow {
+      display: inline-block;
+    }
+    .cta__line {
+      margin-top: 32px;
+      font-family: var(--serif-display);
+      font-weight: 400;
+      font-size: clamp(40px, 5vw, 80px);
+      line-height: 1.04;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      max-width: 720px;
+      margin-inline: auto;
+    }
+    .cta__line em {
+      font-family: var(--serif-editorial);
+      font-style: italic;
+      font-weight: 300;
+    }
+    .cta__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 48px;
+      padding: 18px 32px;
+      border: 1px solid var(--ink);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      transition: background 320ms var(--ease), color 320ms var(--ease);
+    }
+    .cta__link:hover {
+      background: var(--ink);
+      color: var(--bg);
+    }
+    .cta__link svg { transition: transform 320ms var(--ease); }
+    .cta__link:hover svg { transform: translateX(6px); }
+
+    /* ----------------------------------------------------------------
+       Footer — quiet
+    ---------------------------------------------------------------- */
+    .site-foot {
+      padding: 64px var(--px) 32px;
+      border-top: 1px solid var(--line);
+      background: var(--bg-warm);
+    }
+    .site-foot__grid {
+      max-width: var(--container);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 48px;
+    }
+    @media (max-width: 900px) {
+      .site-foot__grid { grid-template-columns: 1fr 1fr; }
+    }
+    .site-foot h4 {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-bottom: 20px;
+    }
+    .site-foot ul { list-style: none; }
+    .site-foot li {
+      font-family: var(--serif-editorial);
+      font-size: 16px;
+      line-height: 2;
+      color: var(--ink-soft);
+    }
+    .site-foot li a:hover { color: var(--ink); }
+    .site-foot__brand {
+      font-family: var(--serif-display);
+      font-size: 32px;
+      color: var(--ink);
+    }
+    .site-foot__brand small {
+      display: block;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+      margin-top: 4px;
+    }
+    .site-foot__contact {
+      margin-top: 32px;
+      font-family: var(--serif-editorial);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--ink-soft);
+    }
+    .site-foot__bottom {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 24px;
+      flex-wrap: wrap;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+
+    /* Preview banner (nu apare în prod) */
+    .preview-banner {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+      padding: 10px 16px;
+      background: var(--vie);
+      color: var(--bg);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border-radius: 4px;
+      box-shadow: 0 8px 24px rgba(62, 67, 54, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav ------------------------------------------------------------ -->
+  <nav class="site-nav">
+    <div class="site-nav__inner">
+      <a href="#" class="site-nav__brand">
+        LOCUS
+        <small>domeniul</small>
+      </a>
+      <div class="site-nav__menu">
+        <a href="#origine">Origine</a>
+        <a href="#vinuri">Vinuri</a>
+        <a href="#manifest">Manifest</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="site-nav__utility">
+        <span>RO / EN</span>
+        <a href="#" class="site-nav__cart">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4"
+                  stroke="currentColor" stroke-width="1.1" fill="none" />
+          </svg>
+          Coș · 0
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero ----------------------------------------------------------- -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero__grid">
+        <div class="hero__text">
+          <div class="eyebrow hero__eyebrow">Buciumeni · Panciu · Nicorești</div>
+          <h1 class="hero__headline">
+            Un loc.<br />
+            Un <em>timp.</em><br />
+            Un vin.
+          </h1>
+          <p class="hero__intro">
+            Vinuri din vița Nicorești–Panciu, îngrijite cu răbdarea unei mărturii.
+            Fără grabă, fără artificii — doar locul, în cuvinte.
+          </p>
+          <div class="hero__meta">
+            <span>Anul <strong>2026</strong></span>
+            <span>Recolta <strong>2024–2025</strong></span>
+            <span><strong>6</strong> vinuri</span>
+          </div>
+        </div>
+
+        <div class="hero__visual">
+          <div class="hero__amphora">
+            <!-- Simplu amphora SVG — stylized -->
+            <svg viewBox="0 0 200 300" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="amph" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#8a7f70" stop-opacity="0.8" />
+                  <stop offset="100%" stop-color="#4a3c2d" stop-opacity="0.95" />
+                </linearGradient>
+              </defs>
+              <!-- Amphora silhouette -->
+              <path d="M 85 20 L 85 30 L 75 40 L 75 55 L 60 60
+                       Q 40 90 40 150
+                       Q 40 220 80 260
+                       L 90 275 L 110 275 L 120 260
+                       Q 160 220 160 150
+                       Q 160 90 140 60
+                       L 125 55 L 125 40 L 115 30 L 115 20 Z"
+                    fill="url(#amph)" />
+              <!-- Handles -->
+              <path d="M 75 60 Q 55 80 65 110"
+                    stroke="#4a3c2d" stroke-width="4" fill="none" stroke-linecap="round" />
+              <path d="M 125 60 Q 145 80 135 110"
+                    stroke="#4a3c2d" stroke-width="4" fill="none" stroke-linecap="round" />
+              <!-- Neck detail -->
+              <line x1="75" y1="40" x2="125" y2="40" stroke="#3a2e21" stroke-width="1.5" opacity="0.7" />
+              <!-- Base line -->
+              <ellipse cx="100" cy="278" rx="20" ry="3" fill="#3a2e21" opacity="0.4" />
+            </svg>
+          </div>
+          <div class="hero__visual-caption">
+            Amforă din pivniță · Buciumeni
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__scroll">Descoperă parcursul</div>
+  </section>
+
+  <!-- Diptych — doi vini side by side, ca imaginea de referință ------ -->
+  <section class="diptych" id="vinuri">
+    <div class="container">
+      <div class="diptych__head">
+        <div>
+          <div class="page-marker">
+            <span class="page-marker__number">II / IV</span>
+            <span>Fetească Regală, două expresii</span>
+          </div>
+          <h2 class="diptych__title" style="margin-top: 32px;">
+            Aceeași <em>vița.</em><br />
+            Două felii de timp.
+          </h2>
+        </div>
+        <div class="diptych__lede">
+          <p>
+            Din aceleași parcele, două vinuri diferite. <em>Cuvinte</em> — proaspăt,
+            direct, un vin care se bea acum. <em>Semne</em> — selecție de parcelă,
+            mai amplu, cu răbdare de a se dezvălui.
+          </p>
+          <p>
+            Amândouă Fetească Regală, amândouă din Buciumeni. Ce le desparte e
+            atenția, timpul, gestul.
+          </p>
+        </div>
+      </div>
+
+      <div class="diptych__stage">
+        <!-- Cuvinte -->
+        <div class="bottle-card">
+          <div class="bottle-card__year">2025</div>
+          <div class="bottle-card__figure">
+            <!-- White wine bottle (Cuvinte — sticlă transparentă/verde deschis) -->
+            <svg viewBox="0 0 120 400" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="glassW" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#c8cfc4" stop-opacity="0.6" />
+                  <stop offset="50%" stop-color="#e0e5db" stop-opacity="0.85" />
+                  <stop offset="100%" stop-color="#b5bdb0" stop-opacity="0.7" />
+                </linearGradient>
+                <linearGradient id="capW" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#3a2e21" />
+                  <stop offset="100%" stop-color="#1a1310" />
+                </linearGradient>
+              </defs>
+              <!-- Cap / foil -->
+              <rect x="48" y="0" width="24" height="34" fill="url(#capW)" />
+              <!-- Neck -->
+              <rect x="50" y="30" width="20" height="60" fill="url(#glassW)" stroke="#8a9086" stroke-width="0.5" />
+              <!-- Shoulders + body -->
+              <path d="M 50 88
+                       Q 50 100 32 118
+                       L 32 380
+                       Q 32 392 42 392
+                       L 78 392
+                       Q 88 392 88 380
+                       L 88 118
+                       Q 70 100 70 88
+                       Z"
+                    fill="url(#glassW)" stroke="#8a9086" stroke-width="0.5" />
+              <!-- Label -->
+              <rect x="34" y="220" width="52" height="130" fill="#f5f0eb" stroke="#c9c0b3" stroke-width="0.5" />
+              <text x="60" y="248" text-anchor="middle" font-family="Bellefair" font-size="10" fill="#1a1a1a" letter-spacing="1.5">LC01</text>
+              <line x1="45" y1="256" x2="75" y2="256" stroke="#8a7f70" stroke-width="0.4" />
+              <text x="60" y="278" text-anchor="middle" font-family="Italiana" font-size="11" fill="#1a1a1a">Fetească</text>
+              <text x="60" y="292" text-anchor="middle" font-family="Italiana" font-size="11" fill="#1a1a1a">Regală</text>
+              <text x="60" y="325" text-anchor="middle" font-family="IBM Plex Mono" font-size="6" fill="#8a7f70" letter-spacing="1.5">CUVINTE</text>
+              <text x="60" y="340" text-anchor="middle" font-family="IBM Plex Mono" font-size="5" fill="#a89d8d">2025 · 13.5%</text>
+              <!-- Highlight -->
+              <rect x="37" y="130" width="3" height="230" fill="#fff" opacity="0.3" />
+            </svg>
+          </div>
+          <div class="bottle-card__caption">
+            <div class="bottle-card__vintage">Recolta 2025</div>
+            <span class="bottle-card__name">Fetească Regală</span>
+            <div class="bottle-card__meta">
+              <span>Cuvinte</span>
+              <span>LC01</span>
+              <span>79 lei</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Semne -->
+        <div class="bottle-card">
+          <div class="bottle-card__year">2024</div>
+          <div class="bottle-card__figure">
+            <!-- Semne — sticlă mai închisă, premium -->
+            <svg viewBox="0 0 120 400" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="glassS" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#5a5548" stop-opacity="0.8" />
+                  <stop offset="50%" stop-color="#7a7360" stop-opacity="0.9" />
+                  <stop offset="100%" stop-color="#4a4438" stop-opacity="0.85" />
+                </linearGradient>
+                <linearGradient id="capS" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#3e4336" />
+                  <stop offset="100%" stop-color="#242820" />
+                </linearGradient>
+              </defs>
+              <rect x="48" y="0" width="24" height="34" fill="url(#capS)" />
+              <rect x="50" y="30" width="20" height="60" fill="url(#glassS)" stroke="#3a3628" stroke-width="0.5" />
+              <path d="M 50 88
+                       Q 50 100 32 118
+                       L 32 380
+                       Q 32 392 42 392
+                       L 78 392
+                       Q 88 392 88 380
+                       L 88 118
+                       Q 70 100 70 88
+                       Z"
+                    fill="url(#glassS)" stroke="#3a3628" stroke-width="0.5" />
+              <!-- Label — cream, mai premium -->
+              <rect x="34" y="220" width="52" height="130" fill="#ebe4d7" stroke="#a09680" stroke-width="0.5" />
+              <text x="60" y="248" text-anchor="middle" font-family="Bellefair" font-size="10" fill="#1a1a1a" letter-spacing="1.5">LS01</text>
+              <line x1="45" y1="256" x2="75" y2="256" stroke="#8a7f70" stroke-width="0.4" />
+              <text x="60" y="278" text-anchor="middle" font-family="Italiana" font-size="11" fill="#1a1a1a">Fetească</text>
+              <text x="60" y="292" text-anchor="middle" font-family="Italiana" font-size="11" fill="#1a1a1a">Regală</text>
+              <text x="60" y="325" text-anchor="middle" font-family="IBM Plex Mono" font-size="6" fill="#3e4336" letter-spacing="1.5">SEMNE</text>
+              <text x="60" y="340" text-anchor="middle" font-family="IBM Plex Mono" font-size="5" fill="#8a7f70">2024 · 13.5%</text>
+              <rect x="37" y="130" width="3" height="230" fill="#fff" opacity="0.15" />
+            </svg>
+          </div>
+          <div class="bottle-card__caption">
+            <div class="bottle-card__vintage">Recolta 2024</div>
+            <span class="bottle-card__name">Fetească Regală</span>
+            <div class="bottle-card__meta">
+              <span>Semne</span>
+              <span>LS01</span>
+              <span>109 lei</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="diptych__timeline">
+        <span>Cuvinte · 2025</span>
+        <div class="diptych__timeline-ticks">
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <span>Semne · 2024</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Manifesto ------------------------------------------------------ -->
+  <section class="manifesto" id="manifest">
+    <div class="container">
+      <div class="manifesto__head">
+        <div class="eyebrow">III / IV</div>
+        <h2 class="manifesto__title">
+          Trei cuvinte care <em>țin locul</em> deschis.
+        </h2>
+      </div>
+
+      <div class="manifesto__grid">
+        <article class="manifesto-item">
+          <span class="manifesto-item__number">01</span>
+          <h3 class="manifesto-item__word">Origine</h3>
+          <p class="manifesto-item__body">
+            Vița e din Buciumeni, între Panciu și Nicorești. Sol argilos-nisipos,
+            expunere sudică, altitudine 180 m. Nu adăugăm nimic care să ascundă
+            aceste patru condiții.
+          </p>
+        </article>
+
+        <article class="manifesto-item">
+          <span class="manifesto-item__number">02</span>
+          <h3 class="manifesto-item__word">Timp</h3>
+          <p class="manifesto-item__body">
+            Culesul se face manual, la momentul potrivit — nu la data optimă
+            pentru operațiuni. Fermentația începe spontan. Îmbutelierea urmează
+            când vinul e gata, nu când ne convine.
+          </p>
+        </article>
+
+        <article class="manifesto-item">
+          <span class="manifesto-item__number">03</span>
+          <h3 class="manifesto-item__word">Măsură</h3>
+          <p class="manifesto-item__body">
+            Sulfiți doar cât e nevoie, filtrare minimă, fără cleiuri. Fiecare
+            lot poartă amprenta anului — o Fetească din 2024 nu seamănă cu una
+            din 2025. Așa e corect.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA ------------------------------------------------------------ -->
+  <section class="cta">
+    <div class="container">
+      <div class="eyebrow cta__eyebrow">IV / IV · vinurile</div>
+      <p class="cta__line">
+        Șase vinuri. Trei game. <em>Un singur loc.</em>
+      </p>
+      <a href="#" class="cta__link">
+        Descoperă colecția
+        <svg width="18" height="10" viewBox="0 0 24 12" fill="none">
+          <path d="M0 6 L22 6 M16 1 L22 6 L16 11"
+                stroke="currentColor" stroke-width="1.2" fill="none" />
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer --------------------------------------------------------- -->
+  <footer class="site-foot" id="contact">
+    <div class="site-foot__grid">
+      <div>
+        <div class="site-foot__brand">
+          LOCUS
+          <small>Domeniul · un loc, un timp, un vin</small>
+        </div>
+        <div class="site-foot__contact">
+          Punct de lucru<br />
+          Centrul de Vinificație Buciumeni,<br />
+          jud. Galați · România<br /><br />
+          <a href="tel:+40752232912">(0752) 232 912</a><br />
+          <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>
+        </div>
+      </div>
+
+      <div>
+        <h4>Navighează</h4>
+        <ul>
+          <li><a href="#">Acasă</a></li>
+          <li><a href="#">Despre</a></li>
+          <li><a href="#">Vinuri</a></li>
+          <li><a href="#">Parteneri</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Cumpără</h4>
+        <ul>
+          <li><a href="#">Cum cumperi</a></li>
+          <li><a href="#">Livrare</a></li>
+          <li><a href="#">Retur</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Termeni</a></li>
+          <li><a href="#">Confidențialitate</a></li>
+          <li><a href="#">Cookies</a></li>
+          <li><a href="#">ANPC</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-foot__bottom">
+      <span>45.98°N 27.30°E · Buciumeni</span>
+      <span>SC ROMVINTEC SRL · 18+ · Conține sulfiți</span>
+      <span>© 2026 Domeniul Locus</span>
+    </div>
+  </footer>
+
+  <div class="preview-banner">Preview · landing v2</div>
+
+</body>
+</html>

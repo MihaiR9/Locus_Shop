@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Domeniul Locus — un loc. un timp. un vin.</title>
+  <meta name="description" content="Domeniul Locus — vin din Buciumeni, între Panciu și Nicorești. Origine, timp, măsură." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=Cormorant+Garamond:ital,wght@0,300;1,300&family=IBM+Plex+Mono:wght@300;400&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* ==================================================================
+       01 · TOKENS
+       Palet editorial cald — off-white #e7e4e2, cerneală, stejar, vie.
+    ================================================================== */
+    :root {
+      --bg:        #e7e4e2;
+      --bg-warm:   #ddd8d3;
+      --ink:       #1a1a1a;
+      --ink-soft:  #4a3c2d;
+      --ink-mute:  #8a7f70;
+      --vie:       #3e4336;
+      --vie-deep:  #24281f;
+      --paper:     #efeae4;
+      --line:      rgba(74, 60, 45, 0.14);
+      --line-strong: rgba(74, 60, 45, 0.30);
+
+      --f-display: "Italiana", Georgia, serif;
+      --f-edit:    "Cormorant Garamond", Georgia, serif;
+      --f-num:     "Bellefair", Georgia, serif;
+      --f-mono:    "IBM Plex Mono", "Courier New", monospace;
+
+      --px: clamp(20px, 4.5vw, 60px);
+      --container: 1480px;
+      --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--f-mono);
+      font-weight: 300;
+      font-size: 14px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      transition: background 1100ms var(--ease);
+    }
+    /* Color-shift subtil între secțiuni: corpul devine mai cald spre final */
+    body.is-warm { background: var(--bg-warm); }
+
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; color: inherit; }
+    button { border: none; background: none; cursor: pointer; }
+    svg { display: block; max-width: 100%; }
+    ::selection { background: var(--vie); color: var(--bg); }
+
+    /* Grain de peliculă — foarte discret */
+    .grain {
+      position: fixed; inset: 0; z-index: 90;
+      pointer-events: none; opacity: 0.05;
+      mix-blend-mode: multiply;
+    }
+
+    /* ==================================================================
+       02 · PRIMITIVE EDITORIALE
+    ================================================================== */
+    .container { max-width: var(--container); margin-inline: auto; padding-inline: var(--px); }
+
+    .eyebrow {
+      font-family: var(--f-mono);
+      font-size: 10px; font-weight: 400;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--ink-mute);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .eyebrow::before {
+      content: ""; width: 22px; height: 1px;
+      background: currentColor; opacity: 0.55; flex: none;
+    }
+
+    .marker {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 24px; padding-block: 18px;
+      border-top: 1px solid var(--line);
+      font-family: var(--f-num); font-size: 13px;
+      letter-spacing: 0.14em; color: var(--ink-mute);
+    }
+    .marker em {
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      font-size: 15px; letter-spacing: 0.02em; color: var(--ink-soft);
+    }
+
+    .lede {
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      font-size: clamp(17px, 1.6vw, 21px); line-height: 1.6;
+      color: var(--ink-soft);
+    }
+
+    /* Mască pe linii — pentru reveal-uri; conținutul e vizibil implicit,
+       GSAP setează starea inițială doar când animăm. */
+    .mask { overflow: hidden; display: block; }
+    .mask > span { display: block; will-change: transform; }
+
+    /* ==================================================================
+       03 · NAV
+    ================================================================== */
+    .nav {
+      position: fixed; inset: 0 0 auto 0; z-index: 60;
+      background: rgba(231, 228, 226, 0.78);
+      background: color-mix(in srgb, var(--bg) 78%, transparent);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav__inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; padding: 18px var(--px);
+    }
+    .nav__brand { font-family: var(--f-display); font-size: 21px; letter-spacing: 0.05em; }
+    .nav__brand small {
+      display: block; font-family: var(--f-mono); font-size: 8px;
+      letter-spacing: 0.4em; text-transform: uppercase; color: var(--ink-mute);
+    }
+    .nav__menu { display: flex; gap: 38px; }
+    .nav__menu a {
+      font-size: 10.5px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--ink-soft); position: relative; padding-block: 4px;
+      transition: color 300ms var(--ease);
+    }
+    .nav__menu a::after {
+      content: ""; position: absolute; left: 0; bottom: 0;
+      width: 100%; height: 1px; background: var(--ink);
+      transform: scaleX(0); transform-origin: right;
+      transition: transform 420ms var(--ease);
+    }
+    .nav__menu a:hover { color: var(--ink); }
+    .nav__menu a:hover::after { transform: scaleX(1); transform-origin: left; }
+    .nav__geo {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .nav__progress {
+      position: absolute; left: 0; bottom: -1px; height: 1px; width: 100%;
+      background: var(--vie); transform: scaleX(0); transform-origin: left;
+    }
+    @media (max-width: 900px) {
+      .nav__menu, .nav__geo { display: none; }
+    }
+
+    /* ==================================================================
+       04 · HERO
+    ================================================================== */
+    .hero {
+      min-height: 100svh;
+      padding-top: clamp(120px, 16vh, 180px);
+      padding-bottom: 32px;
+      position: relative;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .hero__grid {
+      display: grid;
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      gap: clamp(40px, 6vw, 100px);
+      align-items: center;
+      flex: 1;
+    }
+    .hero__eyebrow { margin-bottom: clamp(36px, 5vh, 64px); }
+    .hero__title {
+      font-family: var(--f-display); font-weight: 400;
+      font-size: clamp(66px, 10.5vw, 176px);
+      line-height: 0.94; letter-spacing: -0.015em;
+    }
+    .hero__title em {
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      letter-spacing: 0;
+    }
+    .hero__intro {
+      max-width: 42ch; margin-top: clamp(30px, 4vh, 52px);
+    }
+    .hero__meta {
+      margin-top: clamp(28px, 4vh, 44px);
+      display: flex; flex-wrap: wrap; gap: 12px 36px;
+      font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .hero__meta strong { font-weight: 400; color: var(--ink-soft); }
+
+    .hero__visual { position: relative; display: flex; justify-content: center; }
+    .hero__amphora { width: min(76%, 380px); will-change: transform; }
+    .hero__amphora path, .hero__amphora ellipse {
+      stroke: var(--ink-soft); fill: none;
+      stroke-width: 1.1; vector-effect: non-scaling-stroke;
+    }
+    .hero__visual-caption {
+      position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      font-size: 15px; color: var(--ink-mute); white-space: nowrap;
+    }
+    /* Coordonate verticale — detaliu de margine */
+    .hero__coords {
+      position: absolute; right: calc(var(--px) * 0.35); top: 50%;
+      transform: translateY(-50%) rotate(90deg); transform-origin: center;
+      font-size: 9px; letter-spacing: 0.34em; text-transform: uppercase;
+      color: var(--ink-mute); white-space: nowrap;
+    }
+    .hero__foot {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; padding-top: 18px; border-top: 1px solid var(--line);
+    }
+    .hero__scroll {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .hero__scroll::after {
+      content: ""; width: 56px; height: 1px; background: currentColor;
+      animation: breathe 2.6s var(--ease) infinite;
+    }
+    @keyframes breathe {
+      0%, 100% { transform: scaleX(1); opacity: 0.55; }
+      50% { transform: scaleX(1.5); opacity: 1; }
+    }
+    .hero__vintage {
+      font-family: var(--f-num); font-size: 14px;
+      letter-spacing: 0.2em; color: var(--ink-mute);
+    }
+    @media (max-width: 900px) {
+      .hero__grid { grid-template-columns: 1fr; gap: 56px; }
+      .hero__visual { order: 2; }
+      .hero__coords { display: none; }
+    }
+
+    /* ==================================================================
+       05 · DIPTIC — două sticle, aceeași viță
+    ================================================================== */
+    .diptych { padding-block: clamp(90px, 13vw, 190px) clamp(70px, 9vw, 140px); }
+    .diptych__head {
+      display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: clamp(36px, 6vw, 110px);
+      align-items: end;
+      margin-bottom: clamp(70px, 9vw, 130px);
+    }
+    .diptych__title {
+      font-family: var(--f-display); font-weight: 400;
+      font-size: clamp(42px, 5.4vw, 84px); line-height: 1.02;
+      letter-spacing: -0.01em; margin-top: 28px;
+    }
+    .diptych__title em { font-family: var(--f-edit); font-style: italic; font-weight: 300; }
+    .diptych__lede p + p { margin-top: 16px; }
+
+    .diptych__stage {
+      position: relative;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(24px, 4vw, 72px);
+      align-items: end;
+    }
+    /* linia despărțitoare centrală — se desenează la scroll */
+    .diptych__divider {
+      position: absolute; left: 50%; top: 6%; bottom: 6%;
+      width: 1px; background: var(--line-strong);
+      transform-origin: top; will-change: transform;
+    }
+
+    .pair { position: relative; text-align: center; padding-top: clamp(90px, 12vw, 170px); }
+    /* Numărul HUGE de vintage — translucid, în spatele sticlei, cu parallax */
+    .pair__year {
+      position: absolute; left: 50%; top: 0; transform: translateX(-50%);
+      font-family: var(--f-num);
+      font-size: clamp(170px, 24vw, 400px);
+      line-height: 0.85; letter-spacing: -0.03em;
+      color: var(--ink); opacity: 0.065;
+      pointer-events: none; user-select: none;
+      will-change: transform; z-index: 0; white-space: nowrap;
+    }
+    .pair__figure {
+      position: relative; z-index: 1;
+      display: flex; justify-content: center;
+      perspective: 900px;
+    }
+    .pair__bottle {
+      width: clamp(96px, 11vw, 168px);
+      will-change: transform;
+      filter: drop-shadow(0 26px 22px rgba(26, 26, 26, 0.16));
+      transition: filter 500ms var(--ease);
+    }
+    .pair:hover .pair__bottle { filter: drop-shadow(0 34px 30px rgba(26, 26, 26, 0.22)); }
+    .pair__shadow {
+      width: clamp(120px, 13vw, 190px); height: 12px;
+      margin: 10px auto 0; border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(26,26,26,0.16), transparent 70%);
+    }
+    .pair__info { margin-top: clamp(28px, 4vw, 48px); }
+    .pair__range {
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      font-size: clamp(20px, 2vw, 26px); color: var(--ink-mute);
+    }
+    .pair__name {
+      font-family: var(--f-display); font-weight: 400;
+      font-size: clamp(26px, 3vw, 44px); line-height: 1.08; margin-top: 6px;
+    }
+    .pair__meta {
+      margin-top: 14px; font-size: 10px;
+      letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-mute);
+    }
+    .pair__note {
+      max-width: 30ch; margin: 16px auto 0;
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      font-size: 16px; line-height: 1.55; color: var(--ink-soft);
+    }
+    .pair__price {
+      margin-top: 20px; font-family: var(--f-num);
+      font-size: 22px; letter-spacing: 0.08em;
+    }
+    .pair__price small {
+      font-family: var(--f-mono); font-size: 9px;
+      letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--ink-mute); margin-left: 8px;
+    }
+    .diptych__foot {
+      margin-top: clamp(60px, 8vw, 110px);
+      display: flex; justify-content: center;
+    }
+    @media (max-width: 720px) {
+      .diptych__head { grid-template-columns: 1fr; }
+      .diptych__stage { grid-template-columns: 1fr; gap: 90px; }
+      .diptych__divider { display: none; }
+    }
+
+    /* Link editorial — linie care se re-desenează */
+    .link-line {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-size: 10.5px; letter-spacing: 0.26em; text-transform: uppercase;
+      color: var(--ink-soft); padding-bottom: 6px; position: relative;
+      transition: color 300ms var(--ease);
+    }
+    .link-line::after {
+      content: ""; position: absolute; left: 0; bottom: 0;
+      width: 100%; height: 1px; background: var(--ink-soft);
+      transform-origin: right; transition: transform 460ms var(--ease);
+    }
+    .link-line:hover { color: var(--ink); }
+    .link-line:hover::after { transform: scaleX(0.4); transform-origin: left; }
+    .link-line svg { width: 26px; height: 8px; stroke: currentColor; fill: none; stroke-width: 1; }
+
+    /* ==================================================================
+       06 · MANIFESTO — Origine → Timp → Măsură (pinned morph)
+    ================================================================== */
+    .manifesto { position: relative; }
+    .manifesto__pin {
+      padding-block: clamp(80px, 10vw, 140px);
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .manifesto__head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 24px;
+      margin-bottom: clamp(40px, 6vh, 80px);
+    }
+    .manifesto__counter {
+      font-family: var(--f-num); font-size: 13px;
+      letter-spacing: 0.2em; color: var(--ink-mute);
+    }
+    .manifesto__stage { position: relative; }
+    .m-word { text-align: center; }
+    .m-word__title {
+      font-family: var(--f-display); font-weight: 400;
+      font-size: clamp(64px, 12vw, 200px);
+      line-height: 0.95; letter-spacing: -0.01em;
+    }
+    .m-word__title em { font-family: var(--f-edit); font-style: italic; font-weight: 300; }
+    .m-word__text {
+      max-width: 46ch; margin: clamp(22px, 3vh, 40px) auto 0;
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      font-size: clamp(16px, 1.6vw, 20px); line-height: 1.65;
+      color: var(--ink-soft);
+    }
+    /* fallback static: cuvintele stau unul sub altul */
+    .m-word + .m-word { margin-top: clamp(70px, 10vh, 120px); }
+    /* mod pin (adăugat de JS pe desktop, fără reduced-motion) */
+    .manifesto__stage.is-pinned { min-height: 46vh; }
+    .manifesto__stage.is-pinned .m-word {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: center;
+      margin: 0;
+    }
+
+    /* ==================================================================
+       07 · PARCURS — pașii vinului, linie SVG care se desenează
+    ================================================================== */
+    .journey { padding-block: clamp(90px, 12vw, 180px); }
+    .journey__head { max-width: 720px; margin-bottom: clamp(60px, 8vw, 110px); }
+    .journey__title {
+      font-family: var(--f-display); font-weight: 400;
+      font-size: clamp(40px, 5vw, 76px); line-height: 1.04; margin-top: 26px;
+    }
+    .journey__title em { font-family: var(--f-edit); font-style: italic; font-weight: 300; }
+    .journey__body { position: relative; }
+    /* firul vertical desenat la scroll */
+    .journey__thread {
+      position: absolute; left: 50%; top: 0; height: 100%; width: 1px;
+    }
+    .journey__thread line {
+      stroke: var(--line-strong); stroke-width: 1;
+    }
+    .step {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 7vw, 120px);
+      align-items: baseline;
+      padding-block: clamp(36px, 5vw, 64px);
+    }
+    .step:nth-child(even) .step__left { order: 2; text-align: left; }
+    .step:nth-child(even) .step__right { order: 1; text-align: right; }
+    .step__num {
+      font-family: var(--f-num); font-size: clamp(52px, 6vw, 96px);
+      line-height: 1; color: var(--ink-mute); opacity: 0.55;
+    }
+    .step__name {
+      font-family: var(--f-display); font-weight: 400;
+      font-size: clamp(28px, 3.2vw, 48px); margin-top: 8px;
+    }
+    .step__text {
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      font-size: clamp(16px, 1.5vw, 19px); line-height: 1.65;
+      color: var(--ink-soft); max-width: 38ch;
+    }
+    .step:nth-child(even) .step__text { margin-left: auto; }
+    .step__dot {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--vie); margin-top: 10px;
+    }
+    .step { position: relative; }
+    @media (max-width: 720px) {
+      .step { grid-template-columns: 1fr; gap: 12px; }
+      .step:nth-child(even) .step__left,
+      .step:nth-child(even) .step__right { order: initial; text-align: left; }
+      .step:nth-child(even) .step__text { margin-left: 0; }
+      .journey__thread, .step__dot { display: none; }
+    }
+
+    /* ==================================================================
+       08 · COLECȚIA — traveling orizontal (scrub pe desktop)
+    ================================================================== */
+    .collection { padding-block: clamp(80px, 10vw, 150px) 0; }
+    .collection__head {
+      display: flex; align-items: end; justify-content: space-between;
+      gap: 24px; margin-bottom: clamp(44px, 6vw, 80px);
+    }
+    .collection__title {
+      font-family: var(--f-display); font-weight: 400;
+      font-size: clamp(40px, 5vw, 76px); line-height: 1.04; margin-top: 26px;
+    }
+    .collection__title em { font-family: var(--f-edit); font-style: italic; font-weight: 300; }
+    .collection__hint {
+      font-size: 10px; letter-spacing: 0.24em; text-transform: uppercase;
+      color: var(--ink-mute); white-space: nowrap; padding-bottom: 10px;
+    }
+
+    .collection__viewport {
+      overflow-x: auto; overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+    body.cursor-active .collection { cursor: none; }
+    .collection__viewport::-webkit-scrollbar { display: none; }
+    .collection__viewport.is-scrub { overflow: hidden; }
+    .collection__track {
+      display: flex; width: max-content;
+      border-top: 1px solid var(--line);
+      will-change: transform;
+    }
+
+    .wine {
+      position: relative;
+      width: clamp(280px, 30vw, 420px);
+      flex: none;
+      scroll-snap-align: start;
+      padding: clamp(36px, 4vw, 60px) clamp(28px, 3vw, 48px) clamp(44px, 5vw, 70px);
+      border-right: 1px solid var(--line);
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center;
+      transition: background 600ms var(--ease);
+    }
+    .wine:hover { background: rgba(239, 234, 228, 0.7); }
+    .wine__code {
+      align-self: flex-start;
+      font-size: 10px; letter-spacing: 0.3em; color: var(--ink-mute);
+    }
+    .wine__year {
+      position: absolute; top: clamp(40px, 5vw, 70px); left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--f-num); font-size: clamp(120px, 12vw, 190px);
+      line-height: 0.9; color: var(--ink); opacity: 0.055;
+      pointer-events: none; user-select: none;
+    }
+    .wine__bottle {
+      width: clamp(64px, 6.5vw, 92px);
+      margin-top: 22px; position: relative; z-index: 1;
+      filter: drop-shadow(0 16px 14px rgba(26,26,26,0.14));
+      transition: transform 600ms var(--ease);
+    }
+    .wine:hover .wine__bottle { transform: translateY(-8px) rotate(-1.2deg); }
+    .wine__range {
+      margin-top: 26px;
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      font-size: 17px; color: var(--ink-mute);
+    }
+    .wine__name {
+      font-family: var(--f-display); font-weight: 400;
+      font-size: clamp(22px, 2.2vw, 30px); line-height: 1.12; margin-top: 4px;
+    }
+    .wine__meta {
+      margin-top: 12px; font-size: 9.5px;
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute);
+    }
+    .wine__price { margin-top: 18px; font-family: var(--f-num); font-size: 19px; letter-spacing: 0.08em; }
+    .wine__price small {
+      font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--ink-mute); margin-left: 6px;
+    }
+    .wine--tease { justify-content: center; background: var(--bg-warm); }
+    .wine--tease .wine__name { font-size: clamp(30px, 3vw, 42px); }
+    .wine--tease p {
+      max-width: 26ch; margin-top: 16px;
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      font-size: 16px; color: var(--ink-soft);
+    }
+    .collection__progress {
+      height: 1px; background: var(--line); position: relative;
+    }
+    .collection__progress i {
+      position: absolute; inset: 0; background: var(--vie);
+      transform: scaleX(0); transform-origin: left; display: block;
+    }
+
+    /* Cursor custom pentru zona colecției */
+    .cursor {
+      position: fixed; left: 0; top: 0; z-index: 80;
+      width: 68px; height: 68px; margin: -34px 0 0 -34px;
+      border: 1px solid var(--ink-soft); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--f-edit); font-style: italic; font-size: 13px;
+      color: var(--ink-soft); background: color-mix(in srgb, var(--bg) 55%, transparent);
+      backdrop-filter: blur(2px);
+      pointer-events: none; opacity: 0; transform: scale(0.6);
+      will-change: transform;
+    }
+
+    /* ==================================================================
+       09 · EPILOG — citat pe fond vie-închis
+    ================================================================== */
+    .epilog {
+      margin-top: clamp(90px, 12vw, 180px);
+      background: var(--vie-deep); color: var(--bg);
+      padding-block: clamp(110px, 16vw, 220px);
+      position: relative; overflow: hidden;
+    }
+    .epilog .eyebrow { color: rgba(231, 228, 226, 0.5); justify-content: center; }
+    .epilog__quote {
+      max-width: 22ch; margin: clamp(30px, 4vw, 54px) auto 0;
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      font-size: clamp(30px, 4.6vw, 66px); line-height: 1.28;
+      text-align: center; letter-spacing: 0.005em;
+    }
+    .epilog__quote .w { display: inline-block; }
+    .epilog__attr {
+      margin-top: clamp(30px, 4vw, 50px); text-align: center;
+      font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(231, 228, 226, 0.5);
+    }
+    /* cerc topografic decorativ */
+    .epilog__ring {
+      position: absolute; right: -12%; top: 50%;
+      width: clamp(340px, 40vw, 640px); aspect-ratio: 1;
+      transform: translateY(-50%);
+      opacity: 0.1; pointer-events: none; will-change: transform;
+    }
+    .epilog__ring circle { fill: none; stroke: var(--bg); stroke-width: 0.6; }
+
+    /* ==================================================================
+       10 · CTA + NEWSLETTER
+    ================================================================== */
+    .cta { padding-block: clamp(100px, 13vw, 190px); text-align: center; }
+    .cta .eyebrow { justify-content: center; }
+    .cta__title {
+      font-family: var(--f-display); font-weight: 400;
+      font-size: clamp(48px, 7.5vw, 120px); line-height: 1; margin-top: 30px;
+    }
+    .cta__title em { font-family: var(--f-edit); font-style: italic; font-weight: 300; }
+    .cta__sub {
+      max-width: 46ch; margin: 26px auto 0;
+      font-family: var(--f-edit); font-style: italic; font-weight: 300;
+      font-size: 17px; line-height: 1.6; color: var(--ink-soft);
+    }
+    .cta__form {
+      margin: clamp(40px, 5vw, 64px) auto 0;
+      max-width: 480px; display: flex;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .cta__form input {
+      flex: 1; min-width: 0; background: none; border: none; outline: none;
+      padding: 16px 4px; font-family: var(--f-mono); font-size: 13px;
+      color: var(--ink); letter-spacing: 0.04em;
+    }
+    .cta__form input::placeholder { color: var(--ink-mute); }
+    .cta__form input:focus { box-shadow: 0 1px 0 var(--vie); }
+    .cta__btn {
+      position: relative; overflow: hidden;
+      padding: 16px 26px; flex: none;
+      font-size: 10.5px; letter-spacing: 0.26em; text-transform: uppercase;
+      color: var(--ink); isolation: isolate;
+    }
+    .cta__btn::after {
+      content: ""; position: absolute; inset: 0; z-index: -1;
+      background: var(--vie); transform: translateY(101%);
+      transition: transform 420ms var(--ease);
+    }
+    .cta__btn:hover, .cta__btn:focus-visible { color: var(--bg); }
+    .cta__btn:hover::after, .cta__btn:focus-visible::after { transform: translateY(0); }
+    .cta__note {
+      margin-top: 18px; font-size: 9.5px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--ink-mute);
+    }
+
+    /* ==================================================================
+       11 · FOOTER
+    ================================================================== */
+    .foot { border-top: 1px solid var(--line); padding-block: clamp(50px, 6vw, 80px) 34px; }
+    .foot__grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: clamp(32px, 5vw, 80px);
+      margin-bottom: clamp(50px, 6vw, 80px);
+    }
+    .foot__brand { font-family: var(--f-display); font-size: 30px; letter-spacing: 0.04em; }
+    .foot__tag {
+      margin-top: 10px; font-family: var(--f-edit); font-style: italic;
+      font-weight: 300; font-size: 16px; color: var(--ink-mute);
+    }
+    .foot h4 {
+      font-size: 9.5px; letter-spacing: 0.3em; text-transform: uppercase;
+      font-weight: 400; color: var(--ink-mute); margin-bottom: 18px;
+    }
+    .foot ul { list-style: none; display: grid; gap: 10px; }
+    .foot ul a {
+      font-size: 12px; color: var(--ink-soft);
+      transition: color 260ms var(--ease);
+    }
+    .foot ul a:hover { color: var(--ink); }
+    .foot__legal {
+      border-top: 1px solid var(--line); padding-top: 26px;
+      display: flex; flex-wrap: wrap; gap: 12px 32px;
+      justify-content: space-between;
+      font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--ink-mute);
+    }
+    .foot__warning {
+      margin-top: 22px; padding: 14px 0;
+      border-top: 1px solid var(--line);
+      text-align: center;
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    @media (max-width: 820px) {
+      .foot__grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ==================================================================
+       12 · REDUCED MOTION — totul static, totul vizibil
+    ================================================================== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .cursor { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Grain de peliculă -->
+  <svg class="grain" aria-hidden="true">
+    <filter id="grainF"><feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="2" stitchTiles="stitch"/></filter>
+    <rect width="100%" height="100%" filter="url(#grainF)"/>
+  </svg>
+
+  <!-- Cursor custom (colecție) -->
+  <div class="cursor" aria-hidden="true"><span>privește</span></div>
+
+  <!-- ===================== SVG DEFS: sticlele ===================== -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <!-- Silueta sticlei — folosită prin <use>, colorată per instanță -->
+      <g id="bottle-shape">
+        <!-- corp -->
+        <path d="M50 16 L50 108 C50 132 26 140 26 172 L26 366 Q26 384 44 384 L76 384 Q94 384 94 366 L94 172 C94 140 70 132 70 108 L70 16 Z" />
+        <!-- capsulă -->
+        <path d="M47 8 Q47 4 51 4 L69 4 Q73 4 73 8 L73 54 L47 54 Z" fill="#26221c" />
+        <!-- reflex de lumină -->
+        <path d="M36 176 C36 152 52 142 54 122 L54 116 L58 116 L58 124 C56 146 40 154 40 178 L40 352 L36 352 Z" fill="#ffffff" opacity="0.14" />
+      </g>
+    </defs>
+  </svg>
+
+  <!-- ============================ NAV ============================ -->
+  <nav class="nav" aria-label="Navigare principală">
+    <div class="nav__inner">
+      <a class="nav__brand" href="#top">Locus<small>Domeniul · Buciumeni</small></a>
+      <div class="nav__menu">
+        <a href="#vinuri">Vinurile</a>
+        <a href="#manifest">Manifest</a>
+        <a href="#parcurs">Parcurs</a>
+        <a href="#colectia">Colecția</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="nav__geo">45.91° N · 27.28° E</div>
+    </div>
+    <div class="nav__progress" aria-hidden="true"></div>
+  </nav>
+
+  <main id="top">
+
+    <!-- ========================== HERO ========================== -->
+    <header class="hero container">
+      <div class="hero__grid">
+        <div class="hero__text">
+          <p class="eyebrow hero__eyebrow">Buciumeni · între Panciu și Nicorești</p>
+          <h1 class="hero__title" data-hero-title>
+            <span class="mask"><span>un loc.</span></span>
+            <span class="mask"><span>un <em>timp.</em></span></span>
+            <span class="mask"><span>un vin.</span></span>
+          </h1>
+          <p class="lede hero__intro" data-hero-fade>
+            Din vița Nicorești–Panciu, îngrijită cu răbdarea unei mărturii.
+            Nu am inventat locul. L-am ascultat, an după an, până a început să vorbească.
+          </p>
+          <div class="hero__meta" data-hero-fade>
+            <span>Podgorie <strong>Nicorești–Panciu</strong></span>
+            <span>Sol <strong>lut și nisip</strong></span>
+            <span>Recolte <strong>numărate</strong></span>
+          </div>
+        </div>
+
+        <figure class="hero__visual" data-hero-visual>
+          <!-- Amforă — desen în linie, trasată la încărcare -->
+          <svg class="hero__amphora" viewBox="0 0 300 420" role="img" aria-label="Amforă desenată în linie">
+            <path data-draw d="M116 32 Q150 44 184 32" />
+            <path data-draw d="M112 50 L112 78 Q112 92 126 98 Q150 108 174 98 Q188 92 188 78 L188 50" />
+            <path data-draw d="M126 98 Q66 138 66 216 Q66 300 116 348 Q136 366 138 392 L162 392 Q164 366 184 348 Q234 300 234 216 Q234 138 174 98" />
+            <path data-draw d="M112 62 Q76 74 72 112 Q70 130 88 138" />
+            <path data-draw d="M188 62 Q224 74 228 112 Q230 130 212 138" />
+            <path data-draw d="M122 392 L178 392 Q186 402 178 408 L122 408 Q114 402 122 392" />
+            <ellipse data-draw cx="150" cy="216" rx="60" ry="4" opacity="0.5" />
+            <ellipse data-draw cx="150" cy="286" rx="46" ry="3.4" opacity="0.35" />
+          </svg>
+          <figcaption class="hero__visual-caption" data-hero-fade>lutul ține minte forma</figcaption>
+        </figure>
+      </div>
+
+      <div class="hero__coords" aria-hidden="true">origine · timp · măsură</div>
+
+      <div class="hero__foot" data-hero-fade>
+        <span class="hero__scroll">Coboară în pivniță</span>
+        <span class="hero__vintage">I / VI · MMXXVI</span>
+      </div>
+    </header>
+
+    <!-- ========================= DIPTIC ========================= -->
+    <section class="diptych container" id="vinuri" aria-labelledby="diptych-title">
+      <div class="marker" data-reveal><span>II / VI</span><em>aceeași viță, două expresii</em></div>
+
+      <div class="diptych__head">
+        <div>
+          <p class="eyebrow" data-reveal>Fetească Neagră · aceeași parcelă</p>
+          <h2 class="diptych__title" id="diptych-title">
+            <span class="mask" data-lines><span>Două drumuri</span></span>
+            <span class="mask" data-lines><span>prin <em>același an.</em></span></span>
+          </h2>
+        </div>
+        <div class="diptych__lede lede" data-reveal>
+          <p>Aceeași coastă de deal, același soi, aceeași mână. Ce se schimbă e doar timpul pe care i-l dăm.</p>
+          <p><strong style="font-style: normal; font-weight: 300; font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em;">cuvinte</strong> spune totul din primul an. <strong style="font-style: normal; font-weight: 300; font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em;">semne</strong> așteaptă — și tace mai frumos.</p>
+        </div>
+      </div>
+
+      <div class="diptych__stage" data-tilt-zone>
+        <div class="diptych__divider" data-divider aria-hidden="true"></div>
+
+        <!-- Perechea A — cuvinte -->
+        <article class="pair" data-pair>
+          <div class="pair__year" data-parallax="-16" aria-hidden="true">2023</div>
+          <div class="pair__figure">
+            <svg class="pair__bottle" data-bottle viewBox="0 0 120 390" role="img" aria-label="Sticlă Fetească Neagră, gama cuvinte">
+              <use href="#bottle-shape" fill="#33262a" />
+              <rect x="34" y="222" width="52" height="104" fill="#efe9e1" />
+              <text x="60" y="252" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" letter-spacing="3" fill="#8a7f70">LC 02</text>
+              <text x="60" y="282" text-anchor="middle" font-family="Italiana, serif" font-size="15" fill="#1a1a1a">Locus</text>
+              <text x="60" y="300" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="9" fill="#4a3c2d">cuvinte</text>
+              <line x1="44" y1="312" x2="76" y2="312" stroke="#8a7f70" stroke-width="0.6" />
+            </svg>
+          </div>
+          <div class="pair__shadow" aria-hidden="true"></div>
+          <div class="pair__info" data-reveal>
+            <p class="pair__range">gama cuvinte</p>
+            <h3 class="pair__name">Fetească Neagră</h3>
+            <p class="pair__meta">Roșu · Demisec · 14.9% vol · 2023</p>
+            <p class="pair__note">Fruct tânăr, spus direct. Vinul primului an — o propoziție scurtă, fără ocolișuri.</p>
+            <p class="pair__price">89 <small>lei · LC02</small></p>
+          </div>
+        </article>
+
+        <!-- Perechea B — semne -->
+        <article class="pair" data-pair>
+          <div class="pair__year" data-parallax="-30" aria-hidden="true">2021</div>
+          <div class="pair__figure">
+            <svg class="pair__bottle" data-bottle viewBox="0 0 120 390" role="img" aria-label="Sticlă Fetească Neagră, gama semne">
+              <use href="#bottle-shape" fill="#241d20" />
+              <rect x="34" y="222" width="52" height="104" fill="#1f2119" />
+              <text x="60" y="252" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" letter-spacing="3" fill="#8a7f70">LS 02</text>
+              <text x="60" y="282" text-anchor="middle" font-family="Italiana, serif" font-size="15" fill="#e7e4e2">Locus</text>
+              <text x="60" y="300" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="9" fill="#cbbfae">semne</text>
+              <line x1="44" y1="312" x2="76" y2="312" stroke="#8a7f70" stroke-width="0.6" />
+            </svg>
+          </div>
+          <div class="pair__shadow" aria-hidden="true"></div>
+          <div class="pair__info" data-reveal>
+            <p class="pair__range">gama semne</p>
+            <h3 class="pair__name">Fetească Neagră</h3>
+            <p class="pair__meta">Roșu · Demisec · 14.9% vol · 2021</p>
+            <p class="pair__note">Aceeași viță, mai multă tăcere. Doi ani în pivniță, sub deal, fără grabă.</p>
+            <p class="pair__price">119 <small>lei · LS02</small></p>
+          </div>
+        </article>
+      </div>
+
+      <div class="diptych__foot" data-reveal>
+        <a class="link-line" href="#colectia">
+          Toată colecția
+          <svg viewBox="0 0 26 8"><path d="M0 4 H24 M20 1 L24 4 L20 7" /></svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- ======================== MANIFESTO ======================== -->
+    <section class="manifesto container" id="manifest" aria-labelledby="manifest-eyebrow">
+      <div class="manifesto__pin" data-manifesto-pin>
+        <div class="manifesto__head">
+          <p class="eyebrow" id="manifest-eyebrow">III / VI · Manifest</p>
+          <span class="manifesto__counter"><span data-m-counter>01</span> — 03</span>
+        </div>
+
+        <div class="manifesto__stage" data-manifesto-stage>
+          <div class="m-word" data-m-word>
+            <h2 class="m-word__title">Origine<em>.</em></h2>
+            <p class="m-word__text">
+              Un vin începe cu un loc. Al nostru: dealul de la Buciumeni,
+              lut și nisip, între două podgorii cu memorie lungă.
+            </p>
+          </div>
+          <div class="m-word" data-m-word>
+            <h2 class="m-word__title">Timp<em>.</em></h2>
+            <p class="m-word__text">
+              Nu grăbim nimic. Anul intră în sticlă așa cum a fost —
+              cu ploaia, cu seceta, cu răbdarea lui.
+            </p>
+          </div>
+          <div class="m-word" data-m-word>
+            <h2 class="m-word__title">Măsură<em>.</em></h2>
+            <p class="m-word__text">
+              Facem puțin ca să facem bine. Fiecare parcelă are un nume,
+              fiecare sticlă e o mărturie numărată.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================= PARCURS ========================= -->
+    <section class="journey container" id="parcurs" aria-labelledby="journey-title">
+      <div class="marker" data-reveal><span>IV / VI</span><em>parcursul vinului</em></div>
+
+      <div class="journey__head">
+        <p class="eyebrow" data-reveal>De la butuc la mărturie</p>
+        <h2 class="journey__title" id="journey-title">
+          <span class="mask" data-lines><span>Un parcurs lent,</span></span>
+          <span class="mask" data-lines><span>în <em>cinci tăceri.</em></span></span>
+        </h2>
+      </div>
+
+      <div class="journey__body">
+        <svg class="journey__thread" preserveAspectRatio="none" viewBox="0 0 1 100" aria-hidden="true">
+          <line data-thread x1="0.5" y1="0" x2="0.5" y2="100" />
+        </svg>
+
+        <article class="step" data-step>
+          <div class="step__left">
+            <div class="step__num">01</div>
+            <h3 class="step__name">Vița</h3>
+          </div>
+          <span class="step__dot" aria-hidden="true"></span>
+          <div class="step__right">
+            <p class="step__text">Butuci de Fetească și Riesling, pe coasta dinspre răsărit. Tăiați scurt, lăsați să se lupte cu dealul.</p>
+          </div>
+        </article>
+
+        <article class="step" data-step>
+          <div class="step__left">
+            <div class="step__num">02</div>
+            <h3 class="step__name">Culesul</h3>
+          </div>
+          <span class="step__dot" aria-hidden="true"></span>
+          <div class="step__right">
+            <p class="step__text">Manual, în lădițe mici, dimineața devreme. Strugurele ajunge în cramă înainte de căldura zilei.</p>
+          </div>
+        </article>
+
+        <article class="step" data-step>
+          <div class="step__left">
+            <div class="step__num">03</div>
+            <h3 class="step__name">Pivnița</h3>
+          </div>
+          <span class="step__dot" aria-hidden="true"></span>
+          <div class="step__right">
+            <p class="step__text">Fermentație lentă, temperatură joasă. Vinul coboară în liniște, sub deal, și rămâne acolo cât trebuie.</p>
+          </div>
+        </article>
+
+        <article class="step" data-step>
+          <div class="step__left">
+            <div class="step__num">04</div>
+            <h3 class="step__name">Timpul</h3>
+          </div>
+          <span class="step__dot" aria-hidden="true"></span>
+          <div class="step__right">
+            <p class="step__text">Cuvinte se odihnește un an. Semne — cât are nevoie. Niciodată invers, niciodată la termen.</p>
+          </div>
+        </article>
+
+        <article class="step" data-step>
+          <div class="step__left">
+            <div class="step__num">05</div>
+            <h3 class="step__name">Mărturia</h3>
+          </div>
+          <span class="step__dot" aria-hidden="true"></span>
+          <div class="step__right">
+            <p class="step__text">Sticla pleacă spre tine cu tot ce a fost anul acela — locul, ploaia, mâna. Restul e al tău.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ========================= COLECȚIA ========================= -->
+    <section class="collection" id="colectia" aria-labelledby="collection-title">
+      <div class="container">
+        <div class="marker" data-reveal><span>V / VI</span><em>colecția — șase mărturii</em></div>
+        <div class="collection__head">
+          <div>
+            <p class="eyebrow" data-reveal>Cuvinte · Semne · Pauze</p>
+            <h2 class="collection__title" id="collection-title">
+              <span class="mask" data-lines><span>Șase vinuri,</span></span>
+              <span class="mask" data-lines><span>un singur <em>loc.</em></span></span>
+            </h2>
+          </div>
+          <p class="collection__hint" data-collection-hint>Derulează pentru a parcurge</p>
+        </div>
+      </div>
+
+      <div class="collection__viewport" data-collection-viewport tabindex="0" aria-label="Colecția de vinuri — listă derulabilă orizontal">
+        <div class="collection__track" data-collection-track>
+
+          <article class="wine">
+            <span class="wine__code">LC01</span>
+            <span class="wine__year" aria-hidden="true">23</span>
+            <svg class="wine__bottle" viewBox="0 0 120 390" role="img" aria-label="Sticlă Fetească Regală, gama cuvinte">
+              <use href="#bottle-shape" fill="#5a5c42" />
+              <rect x="34" y="222" width="52" height="104" fill="#efe9e1" />
+              <text x="60" y="266" text-anchor="middle" font-family="Italiana, serif" font-size="14" fill="#1a1a1a">Locus</text>
+              <text x="60" y="284" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="9" fill="#4a3c2d">cuvinte</text>
+            </svg>
+            <p class="wine__range">cuvinte</p>
+            <h3 class="wine__name">Fetească Regală</h3>
+            <p class="wine__meta">Alb · Demisec · 13.5% vol</p>
+            <p class="wine__price">79 <small>lei</small></p>
+          </article>
+
+          <article class="wine">
+            <span class="wine__code">LC02</span>
+            <span class="wine__year" aria-hidden="true">23</span>
+            <svg class="wine__bottle" viewBox="0 0 120 390" role="img" aria-label="Sticlă Fetească Neagră, gama cuvinte">
+              <use href="#bottle-shape" fill="#33262a" />
+              <rect x="34" y="222" width="52" height="104" fill="#efe9e1" />
+              <text x="60" y="266" text-anchor="middle" font-family="Italiana, serif" font-size="14" fill="#1a1a1a">Locus</text>
+              <text x="60" y="284" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="9" fill="#4a3c2d">cuvinte</text>
+            </svg>
+            <p class="wine__range">cuvinte</p>
+            <h3 class="wine__name">Fetească Neagră</h3>
+            <p class="wine__meta">Roșu · Demisec · 14.9% vol</p>
+            <p class="wine__price">89 <small>lei</small></p>
+          </article>
+
+          <article class="wine">
+            <span class="wine__code">LC04</span>
+            <span class="wine__year" aria-hidden="true">23</span>
+            <svg class="wine__bottle" viewBox="0 0 120 390" role="img" aria-label="Sticlă Riesling Italian, gama cuvinte">
+              <use href="#bottle-shape" fill="#4c5240" />
+              <rect x="34" y="222" width="52" height="104" fill="#efe9e1" />
+              <text x="60" y="266" text-anchor="middle" font-family="Italiana, serif" font-size="14" fill="#1a1a1a">Locus</text>
+              <text x="60" y="284" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="9" fill="#4a3c2d">cuvinte</text>
+            </svg>
+            <p class="wine__range">cuvinte</p>
+            <h3 class="wine__name">Riesling Italian</h3>
+            <p class="wine__meta">Alb · Sec · 13% vol</p>
+            <p class="wine__price">79 <small>lei</small></p>
+          </article>
+
+          <article class="wine">
+            <span class="wine__code">LS01</span>
+            <span class="wine__year" aria-hidden="true">21</span>
+            <svg class="wine__bottle" viewBox="0 0 120 390" role="img" aria-label="Sticlă Fetească Regală, gama semne">
+              <use href="#bottle-shape" fill="#3c3f2e" />
+              <rect x="34" y="222" width="52" height="104" fill="#1f2119" />
+              <text x="60" y="266" text-anchor="middle" font-family="Italiana, serif" font-size="14" fill="#e7e4e2">Locus</text>
+              <text x="60" y="284" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="9" fill="#cbbfae">semne</text>
+            </svg>
+            <p class="wine__range">semne</p>
+            <h3 class="wine__name">Fetească Regală</h3>
+            <p class="wine__meta">Alb · Demisec · 13.5% vol</p>
+            <p class="wine__price">109 <small>lei</small></p>
+          </article>
+
+          <article class="wine">
+            <span class="wine__code">LS02</span>
+            <span class="wine__year" aria-hidden="true">21</span>
+            <svg class="wine__bottle" viewBox="0 0 120 390" role="img" aria-label="Sticlă Fetească Neagră, gama semne">
+              <use href="#bottle-shape" fill="#241d20" />
+              <rect x="34" y="222" width="52" height="104" fill="#1f2119" />
+              <text x="60" y="266" text-anchor="middle" font-family="Italiana, serif" font-size="14" fill="#e7e4e2">Locus</text>
+              <text x="60" y="284" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="9" fill="#cbbfae">semne</text>
+            </svg>
+            <p class="wine__range">semne</p>
+            <h3 class="wine__name">Fetească Neagră</h3>
+            <p class="wine__meta">Roșu · Demisec · 14.9% vol</p>
+            <p class="wine__price">119 <small>lei</small></p>
+          </article>
+
+          <article class="wine">
+            <span class="wine__code">LS04</span>
+            <span class="wine__year" aria-hidden="true">21</span>
+            <svg class="wine__bottle" viewBox="0 0 120 390" role="img" aria-label="Sticlă Riesling Italian, gama semne">
+              <use href="#bottle-shape" fill="#31352a" />
+              <rect x="34" y="222" width="52" height="104" fill="#1f2119" />
+              <text x="60" y="266" text-anchor="middle" font-family="Italiana, serif" font-size="14" fill="#e7e4e2">Locus</text>
+              <text x="60" y="284" text-anchor="middle" font-family="Cormorant Garamond, serif" font-style="italic" font-size="9" fill="#cbbfae">semne</text>
+            </svg>
+            <p class="wine__range">semne</p>
+            <h3 class="wine__name">Riesling Italian</h3>
+            <p class="wine__meta">Alb · Sec · 13% vol</p>
+            <p class="wine__price">109 <small>lei</small></p>
+          </article>
+
+          <article class="wine wine--tease">
+            <h3 class="wine__name" style="font-family: var(--f-edit); font-style: italic; font-weight: 300;">pauze</h3>
+            <p>Rezervele așteaptă în pivniță. Când vor avea ceva de spus, vei ști.</p>
+            <p class="wine__meta" style="margin-top: 20px;">în curând</p>
+          </article>
+
+        </div>
+      </div>
+      <div class="collection__progress" aria-hidden="true"><i data-collection-progress></i></div>
+    </section>
+
+    <!-- ========================= EPILOG ========================= -->
+    <section class="epilog" aria-label="Epilog">
+      <svg class="epilog__ring" data-ring viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="49" /><circle cx="50" cy="50" r="42" />
+        <circle cx="50" cy="50" r="34" /><circle cx="50" cy="50" r="25" />
+        <circle cx="50" cy="50" r="15" />
+      </svg>
+      <div class="container">
+        <p class="eyebrow">VI / VI · Epilog</p>
+        <blockquote class="epilog__quote" data-quote>
+          Vinul ține minte locul, anul, mâna care l-a cules. Noi doar îl lăsăm să spună.
+        </blockquote>
+        <p class="epilog__attr">Domeniul Locus · Buciumeni</p>
+      </div>
+    </section>
+
+    <!-- =========================== CTA =========================== -->
+    <section class="cta container" id="contact" aria-labelledby="cta-title">
+      <p class="eyebrow" data-reveal>Rămâi aproape de loc</p>
+      <h2 class="cta__title" id="cta-title">
+        <span class="mask" data-lines><span>Primul cules,</span></span>
+        <span class="mask" data-lines><span><em>prima mărturie.</em></span></span>
+      </h2>
+      <p class="cta__sub" data-reveal>
+        Lăsăm rar vești — doar când pleacă un vin din pivniță
+        sau când anul are ceva de spus. Fără zgomot.
+      </p>
+      <form class="cta__form" data-reveal action="#" method="post" aria-label="Abonare noutăți">
+        <label for="nl-email" class="caps" style="position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0);">Adresa de email</label>
+        <input id="nl-email" type="email" name="email" placeholder="adresa ta de email" required autocomplete="email" />
+        <button class="cta__btn" type="submit">Rămân aproape</button>
+      </form>
+      <p class="cta__note" data-reveal>Fără spam. Te poți retrage oricând. Doar 18+.</p>
+    </section>
+
+  </main>
+
+  <!-- ========================== FOOTER ========================== -->
+  <footer class="foot container">
+    <div class="foot__grid">
+      <div>
+        <p class="foot__brand">Locus</p>
+        <p class="foot__tag">un loc. un timp. un vin.</p>
+      </div>
+      <div>
+        <h4>Domeniul</h4>
+        <ul>
+          <li><a href="#vinuri">Vinurile</a></li>
+          <li><a href="#manifest">Manifest</a></li>
+          <li><a href="#parcurs">Parcurs</a></li>
+          <li><a href="#colectia">Colecția</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:contact@domeniullocus.ro">contact@domeniullocus.ro</a></li>
+          <li><a href="#">Buciumeni, jud. Galați</a></li>
+          <li><a href="#">Vizite doar cu programare</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Termeni și condiții</a></li>
+          <li><a href="#">Confidențialitate</a></li>
+          <li><a href="#">Politica de retur</a></li>
+          <li><a href="https://anpc.ro" rel="noopener noreferrer">ANPC · SOL</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot__legal">
+      <span>© MMXXVI Domeniul Locus</span>
+      <span>Conține sulfiți · Vânzare exclusiv 18+</span>
+    </div>
+    <p class="foot__warning">Consumul excesiv de alcool dăunează sănătății.</p>
+  </footer>
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <script>
+    /* ================================================================
+       Animații — totul e progresiv: pagina e complet lizibilă fără JS
+       sau cu prefers-reduced-motion. GSAP doar adaugă mișcarea.
+    ================================================================ */
+    (function () {
+      "use strict";
+
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const hasGsap = typeof window.gsap !== "undefined" && typeof window.ScrollTrigger !== "undefined";
+      const isTouch = window.matchMedia("(hover: none)").matches;
+
+      /* — Newsletter: mock submit, fără backend — */
+      const form = document.querySelector(".cta__form");
+      if (form) {
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          const btn = form.querySelector(".cta__btn");
+          btn.textContent = "Ești aproape.";
+          btn.disabled = true;
+          form.querySelector("input").disabled = true;
+        });
+      }
+
+      if (!hasGsap || reduced) return; // static, calm, complet vizibil
+
+      gsap.registerPlugin(ScrollTrigger);
+      const EASE = "power3.out";
+
+      /* ------------------------------------------------------------
+         1 · HERO — intrare cinematică
+         Titlul urcă linie cu linie din mască; amfora se trasează.
+      ------------------------------------------------------------ */
+      const heroLines = gsap.utils.toArray("[data-hero-title] .mask > span");
+      const heroFades = gsap.utils.toArray("[data-hero-fade]");
+      const drawPaths = gsap.utils.toArray(".hero__amphora [data-draw]");
+
+      drawPaths.forEach((p) => {
+        const len = p.getTotalLength ? p.getTotalLength() : 300;
+        p.style.strokeDasharray = len;
+        p.style.strokeDashoffset = len;
+      });
+
+      const intro = gsap.timeline({ defaults: { ease: EASE } });
+      intro
+        .from(".nav", { yPercent: -100, duration: 0.9 })
+        .fromTo(heroLines,
+          { yPercent: 115 },
+          { yPercent: 0, duration: 1.15, stagger: 0.14 }, 0.25)
+        .to(drawPaths, {
+          strokeDashoffset: 0, duration: 1.6, stagger: 0.09, ease: "power2.inOut"
+        }, 0.5)
+        .from(heroFades, { opacity: 0, y: 26, duration: 0.9, stagger: 0.12 }, 0.9);
+
+      /* Parallax lent pe amforă la scroll */
+      gsap.to("[data-hero-visual]", {
+        y: -70,
+        ease: "none",
+        scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: 1.2 }
+      });
+
+      /* Hairline de progres în nav */
+      gsap.to(".nav__progress", {
+        scaleX: 1,
+        ease: "none",
+        scrollTrigger: { trigger: document.body, start: "top top", end: "bottom bottom", scrub: 0.4 }
+      });
+
+      /* ------------------------------------------------------------
+         2 · REVEALS globale — măști pe linii + fade-uri discrete
+      ------------------------------------------------------------ */
+      gsap.utils.toArray("[data-lines] > span").forEach((span) => {
+        gsap.from(span, {
+          yPercent: 115, duration: 1.1, ease: EASE,
+          scrollTrigger: { trigger: span.parentElement, start: "top 88%" }
+        });
+      });
+      gsap.utils.toArray("[data-reveal]").forEach((el) => {
+        gsap.from(el, {
+          opacity: 0, y: 30, duration: 1, ease: EASE,
+          scrollTrigger: { trigger: el, start: "top 90%" }
+        });
+      });
+
+      /* ------------------------------------------------------------
+         3 · DIPTIC — parallax pe numerele de vintage
+             (numărul urcă mai încet decât sticla) + divider desenat
+      ------------------------------------------------------------ */
+      gsap.utils.toArray("[data-parallax]").forEach((el) => {
+        gsap.to(el, {
+          yPercent: parseFloat(el.dataset.parallax),
+          ease: "none",
+          scrollTrigger: { trigger: el.closest(".pair"), start: "top bottom", end: "bottom top", scrub: 1 }
+        });
+      });
+      gsap.from("[data-divider]", {
+        scaleY: 0, ease: "none",
+        scrollTrigger: { trigger: ".diptych__stage", start: "top 80%", end: "center center", scrub: 0.8 }
+      });
+      gsap.utils.toArray("[data-pair] .pair__figure").forEach((fig, i) => {
+        gsap.from(fig, {
+          y: 90, opacity: 0, duration: 1.3, ease: EASE, delay: i * 0.12,
+          scrollTrigger: { trigger: ".diptych__stage", start: "top 78%" }
+        });
+      });
+
+      /* Sticlele se înclină ușor spre cursor (doar cu hover real) */
+      if (!isTouch) {
+        const zone = document.querySelector("[data-tilt-zone]");
+        const bottles = gsap.utils.toArray("[data-bottle]");
+        const setters = bottles.map((b) => ({
+          rot: gsap.quickTo(b, "rotation", { duration: 0.7, ease: "power3.out" }),
+          x:   gsap.quickTo(b, "x",        { duration: 0.7, ease: "power3.out" })
+        }));
+        zone.addEventListener("pointermove", (e) => {
+          bottles.forEach((b, i) => {
+            const r = b.getBoundingClientRect();
+            const dx = (e.clientX - (r.left + r.width / 2)) / window.innerWidth;
+            setters[i].rot(dx * 10);
+            setters[i].x(dx * 14);
+          });
+        });
+        zone.addEventListener("pointerleave", () => {
+          setters.forEach((s) => { s.rot(0); s.x(0); });
+        });
+      }
+
+      /* ------------------------------------------------------------
+         4 · MANIFESTO — pin + morph Origine → Timp → Măsură
+             (doar pe ecrane late; pe mobil rămâne stivuit)
+      ------------------------------------------------------------ */
+      const mm = gsap.matchMedia();
+      mm.add("(min-width: 900px)", () => {
+        const stage = document.querySelector("[data-manifesto-stage]");
+        const words = gsap.utils.toArray("[data-m-word]");
+        const counter = document.querySelector("[data-m-counter]");
+        stage.classList.add("is-pinned");
+
+        gsap.set(words, { autoAlpha: 0, y: 60, filter: "blur(6px)" });
+        gsap.set(words[0], { autoAlpha: 1, y: 0, filter: "blur(0px)" });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: "[data-manifesto-pin]",
+            start: "top top",
+            end: "+=220%",
+            pin: true,
+            scrub: 0.6,
+            onUpdate(self) {
+              const idx = Math.min(2, Math.floor(self.progress * 3));
+              counter.textContent = "0" + (idx + 1);
+            }
+          }
+        });
+        words.forEach((w, i) => {
+          if (i === 0) return;
+          tl.to(words[i - 1], { autoAlpha: 0, y: -60, filter: "blur(6px)", duration: 1 }, i)
+            .fromTo(w,
+              { autoAlpha: 0, y: 60, filter: "blur(6px)" },
+              { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: 1 }, i + 0.35);
+        });
+
+        return () => stage.classList.remove("is-pinned");
+      });
+
+      /* ------------------------------------------------------------
+         5 · PARCURS — firul se desenează, pașii apar alternat
+      ------------------------------------------------------------ */
+      const thread = document.querySelector("[data-thread]");
+      if (thread) {
+        gsap.fromTo(thread,
+          { attr: { y2: 0 } },
+          {
+            attr: { y2: 100 }, ease: "none",
+            scrollTrigger: { trigger: ".journey__body", start: "top 75%", end: "bottom 65%", scrub: 0.8 }
+          });
+      }
+      gsap.utils.toArray("[data-step]").forEach((step) => {
+        const left = step.querySelector(".step__left");
+        const right = step.querySelector(".step__right");
+        const dot = step.querySelector(".step__dot");
+        const st = { trigger: step, start: "top 82%" };
+        gsap.from(left,  { opacity: 0, x: -40, duration: 1, ease: EASE, scrollTrigger: st });
+        gsap.from(right, { opacity: 0, x: 40, duration: 1, ease: EASE, scrollTrigger: st });
+        if (dot) gsap.from(dot, { scale: 0, duration: 0.5, ease: "back.out(2)", scrollTrigger: st });
+      });
+
+      /* ------------------------------------------------------------
+         6 · COLECȚIA — traveling orizontal cu scrub (desktop)
+             Pe mobil rămâne scroll nativ cu snap.
+      ------------------------------------------------------------ */
+      mm.add("(min-width: 900px)", () => {
+        const viewport = document.querySelector("[data-collection-viewport]");
+        const track = document.querySelector("[data-collection-track]");
+        const progress = document.querySelector("[data-collection-progress]");
+        const hint = document.querySelector("[data-collection-hint]");
+        viewport.classList.add("is-scrub");
+        hint.textContent = "Continuă să derulezi";
+
+        const getAmount = () => track.scrollWidth - viewport.clientWidth;
+        const tween = gsap.to(track, {
+          x: () => -getAmount(),
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".collection",
+            start: "top top",
+            end: () => "+=" + getAmount(),
+            pin: true,
+            scrub: 0.7,
+            invalidateOnRefresh: true,
+            onUpdate(self) {
+              gsap.set(progress, { scaleX: self.progress });
+            }
+          }
+        });
+        return () => {
+          viewport.classList.remove("is-scrub");
+          tween.scrollTrigger && tween.scrollTrigger.kill();
+          tween.kill();
+          gsap.set(track, { x: 0 });
+        };
+      });
+
+      /* Progres pentru scroll nativ (mobil) */
+      const nativeViewport = document.querySelector("[data-collection-viewport]");
+      nativeViewport.addEventListener("scroll", () => {
+        if (nativeViewport.classList.contains("is-scrub")) return;
+        const max = nativeViewport.scrollWidth - nativeViewport.clientWidth;
+        const p = max > 0 ? nativeViewport.scrollLeft / max : 0;
+        gsap.set("[data-collection-progress]", { scaleX: p });
+      }, { passive: true });
+
+      /* Cursor custom în colecție */
+      if (!isTouch) {
+        document.body.classList.add("cursor-active");
+        const cursor = document.querySelector(".cursor");
+        const cx = gsap.quickTo(cursor, "x", { duration: 0.35, ease: "power3.out" });
+        const cy = gsap.quickTo(cursor, "y", { duration: 0.35, ease: "power3.out" });
+        window.addEventListener("pointermove", (e) => { cx(e.clientX); cy(e.clientY); }, { passive: true });
+        const zone = document.querySelector(".collection");
+        zone.addEventListener("pointerenter", () =>
+          gsap.to(cursor, { opacity: 1, scale: 1, duration: 0.4, ease: EASE }));
+        zone.addEventListener("pointerleave", () =>
+          gsap.to(cursor, { opacity: 0, scale: 0.6, duration: 0.4, ease: EASE }));
+      }
+
+      /* ------------------------------------------------------------
+         7 · EPILOG — cuvintele citatului apar rând pe rând,
+             inelul topografic se rotește lent; corpul paginii
+             se încălzește (color-shift) la finalul parcursului.
+      ------------------------------------------------------------ */
+      const quote = document.querySelector("[data-quote]");
+      if (quote) {
+        quote.innerHTML = quote.textContent.trim().split(/\s+/)
+          .map((w) => '<span class="w">' + w + "</span>").join(" ");
+        gsap.from(quote.querySelectorAll(".w"), {
+          opacity: 0.08, y: 14, duration: 0.7, ease: EASE, stagger: 0.05,
+          scrollTrigger: { trigger: ".epilog", start: "top 62%" }
+        });
+      }
+      gsap.to("[data-ring]", {
+        rotation: 90, ease: "none", transformOrigin: "center",
+        scrollTrigger: { trigger: ".epilog", start: "top bottom", end: "bottom top", scrub: 2 }
+      });
+      ScrollTrigger.create({
+        trigger: ".epilog",
+        start: "top 70%",
+        onEnter: () => document.body.classList.add("is-warm"),
+        onLeaveBack: () => document.body.classList.remove("is-warm")
+      });
+    })();
+  </script>
+</body>
+</html>
