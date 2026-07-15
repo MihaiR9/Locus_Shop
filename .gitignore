@@ -30,3 +30,11 @@ _scripts/
 
 # Surse originale poze produse (versiuni optimizate sunt în public/photos/products/)
 Assets/
+
+# Exceptie: asset-urile procesate pt landing-uri (new_webpages/assets/) se commit
+# — sunt necesare pentru ca landing-v3/v4/v5.html să funcționeze pe alt laptop.
+!new_webpages/assets/
+!new_webpages/assets/**
+
+# Fable 5 (subagent) își salvează memoria în .claude/ oriunde ajunge — excludem.
+**/.claude/agent-memory/
