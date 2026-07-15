@@ -211,6 +211,265 @@ export function adminOrderNotificationHtml(d: OrderConfirmationData & {
   };
 }
 
+// ─── Shipped notification (to customer) ─────────────────────────
+export type ShippedEmailData = {
+  orderNumber: string;
+  customerName?: string;
+  awbNumber?: string | null;
+  courierName?: string; // ex: "FanCourier"
+  trackingUrl?: string; // opțional, dacă știm URL-ul de tracking
+  shippingAddress?: string;
+};
+
+export function shippedNotificationHtml(d: ShippedEmailData): {
+  subject: string;
+  html: string;
+} {
+  const greeting = d.customerName
+    ? `<span style="font-family:${SERIF};font-size:36px;color:${INK};letter-spacing:-0.015em;">Coletul e pe drum, ${escapeHtml(d.customerName)}.</span>`
+    : `<span style="font-family:${SERIF};font-size:36px;color:${INK};letter-spacing:-0.015em;">Coletul e pe drum.</span>`;
+
+  const awbBlock = d.awbNumber
+    ? `
+    <div style="margin-top:32px;padding:20px;background:${PAMANT};border:1px solid ${LINE};">
+      <div style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:8px;">
+        AWB${d.courierName ? ` · ${escapeHtml(d.courierName)}` : ""}
+      </div>
+      <div style="font-family:${MONO};font-size:20px;font-weight:500;color:${INK};letter-spacing:0.06em;">
+        ${escapeHtml(d.awbNumber)}
+      </div>
+      ${
+        d.trackingUrl
+          ? `<p style="margin:14px 0 0 0;"><a href="${escapeHtml(d.trackingUrl)}" style="font-family:${MONO};font-size:12px;color:${VIE};text-decoration:underline;">Urmărește coletul →</a></p>`
+          : ""
+      }
+    </div>`
+    : "";
+
+  const content = `
+    <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:14px;">
+      comandă expediată · ${escapeHtml(d.orderNumber)}
+    </div>
+    ${greeting}
+    <p style="font-family:${MONO};font-size:14px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
+      Am predat coletul curierului. Livrarea durează în general 2–4 zile
+      lucrătoare${d.shippingAddress ? ` la <strong style="color:${INK};">${escapeHtml(d.shippingAddress)}</strong>` : ""}.
+    </p>
+
+    ${awbBlock}
+
+    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:32px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
+      Curierul te va contacta telefonic înainte de livrare. Dacă nu ești acasă,
+      poți reprograma direct cu el.
+    </p>
+    <p style="font-family:${MONO};font-size:12px;line-height:1.7;color:${INK_MUTE};margin:20px 0 0 0;">
+      Recomandăm să deschizi coletul în prezența curierului — sticlele sunt
+      fragile, iar dacă găsești ceva stricat, marchezi rezervă pe AWB și
+      ne scrii la
+      <a href="mailto:contact@domeniul-locus.ro" style="color:${INK_SOFT};">contact@domeniul-locus.ro</a>.
+    </p>`;
+
+  return {
+    subject: `Comanda ${d.orderNumber} · expediată`,
+    html: shell(
+      content,
+      d.awbNumber
+        ? `Coletul e pe drum. AWB ${d.awbNumber}.`
+        : `Coletul e pe drum.`,
+    ),
+  };
+}
+
+// ─── Delivered notification (to customer) ────────────────────────
+export type DeliveredEmailData = {
+  orderNumber: string;
+  customerName?: string;
+};
+
+export function deliveredNotificationHtml(d: DeliveredEmailData): {
+  subject: string;
+  html: string;
+} {
+  const greeting = d.customerName
+    ? `<span style="font-family:${SERIF};font-size:36px;color:${INK};letter-spacing:-0.015em;">Sper să-ți placă, ${escapeHtml(d.customerName)}.</span>`
+    : `<span style="font-family:${SERIF};font-size:36px;color:${INK};letter-spacing:-0.015em;">Sper să-ți placă.</span>`;
+
+  const content = `
+    <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:14px;">
+      comandă livrată · ${escapeHtml(d.orderNumber)}
+    </div>
+    ${greeting}
+    <p style="font-family:${MONO};font-size:14px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
+      Coletul a ajuns. Deschide-l cu o urgență liniștită.
+    </p>
+
+    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:32px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
+      <strong style="color:${INK};">Cum să bei bine.</strong><br />
+      Vinurile albe și rosé la 8–10 °C, roșurile la 14–16 °C. Decantează
+      Fetească Neagră 20–30 de minute înainte de servit — merită timpul.
+    </p>
+
+    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:20px 0 0 0;">
+      <strong style="color:${INK};">Ceva nu a mers?</strong><br />
+      Ai 14 zile calendaristice pentru drept de retragere (OUG 34/2014).
+      Sticlele deschise sau deteriorate după livrare nu intră în acest drept.
+      Deschide o cerere din contul tău sau scrie-ne direct la
+      <a href="mailto:contact@domeniul-locus.ro" style="color:${INK_SOFT};">contact@domeniul-locus.ro</a>.
+    </p>
+
+    <p style="font-family:${MONO};font-size:12px;line-height:1.7;color:${INK_MUTE};margin:32px 0 0 0;">
+      Vinul, ca și locul, are nevoie de timp. Noroc.
+    </p>`;
+
+  return {
+    subject: `Comanda ${d.orderNumber} · livrată`,
+    html: shell(content, "Coletul a ajuns. Deschide-l cu o urgență liniștită."),
+  };
+}
+
+// ─── Refund confirmation (to customer) ──────────────────────────
+export type RefundEmailData = {
+  orderNumber: string;
+  customerName?: string;
+  refundedRon: number;
+  method: "stripe" | "manual";
+  manualChannel?: "transfer" | "cash" | "altul" | null;
+  isPartial?: boolean; // dacă e refund parțial
+};
+
+export function refundConfirmationHtml(d: RefundEmailData): {
+  subject: string;
+  html: string;
+} {
+  const greeting = d.customerName
+    ? `<span style="font-family:${SERIF};font-size:32px;color:${INK};letter-spacing:-0.015em;">${d.isPartial ? "Rambursare parțială" : "Rambursare confirmată"}, ${escapeHtml(d.customerName)}.</span>`
+    : `<span style="font-family:${SERIF};font-size:32px;color:${INK};letter-spacing:-0.015em;">${d.isPartial ? "Rambursare parțială" : "Rambursare confirmată"}.</span>`;
+
+  const methodLabel =
+    d.method === "stripe"
+      ? "Se întoarce pe cardul cu care ai plătit. Ajunge în 3–7 zile lucrătoare (depinde de banca ta)."
+      : d.manualChannel === "transfer"
+        ? "Transfer bancar direct în contul tău. Confirmarea a plecat din banca noastră astăzi."
+        : d.manualChannel === "cash"
+          ? "Rambursat în numerar."
+          : "Rambursare manuală procesată.";
+
+  const content = `
+    <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:14px;">
+      rambursare · ${escapeHtml(d.orderNumber)}
+    </div>
+    ${greeting}
+    <p style="font-family:${MONO};font-size:14px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
+      Am procesat rambursarea pentru comanda ta.
+    </p>
+
+    <div style="margin-top:32px;padding:24px;background:${PAMANT};border:1px solid ${LINE};text-align:center;">
+      <div style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:8px;">
+        Sumă rambursată
+      </div>
+      <div style="font-family:${SERIF};font-size:36px;color:${INK};letter-spacing:-0.01em;">
+        ${formatRon(d.refundedRon)}
+      </div>
+    </div>
+
+    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:32px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
+      <strong style="color:${INK};">Metodă</strong><br />
+      ${methodLabel}
+    </p>
+
+    <p style="font-family:${MONO};font-size:12px;line-height:1.7;color:${INK_MUTE};margin:32px 0 0 0;">
+      Dacă nu vezi suma pe extras după termenul menționat, scrie la
+      <a href="mailto:contact@domeniul-locus.ro" style="color:${INK_SOFT};">contact@domeniul-locus.ro</a>
+      cu numărul comenzii — verificăm imediat.
+    </p>`;
+
+  return {
+    subject: `Rambursare ${d.orderNumber} · ${formatRon(d.refundedRon)}`,
+    html: shell(
+      content,
+      `${formatRon(d.refundedRon)} rambursat pentru comanda ${d.orderNumber}.`,
+    ),
+  };
+}
+
+// ─── Return status update (to customer) ─────────────────────────
+export type ReturnStatusEmailData = {
+  returnNumber: string;
+  orderNumber?: string | null;
+  customerName?: string;
+  status: "approved" | "in_transit" | "completed" | "rejected";
+  adminMessage?: string; // opțional — mesaj personalizat de la admin
+};
+
+export function returnStatusUpdateHtml(d: ReturnStatusEmailData): {
+  subject: string;
+  html: string;
+} {
+  const statusMeta: Record<
+    ReturnStatusEmailData["status"],
+    { headline: string; subject: string; body: string }
+  > = {
+    approved: {
+      headline: "Cererea de retur e aprobată.",
+      subject: `Retur ${d.returnNumber} · aprobat`,
+      body: `Am aprobat cererea ta de retur. Următorul pas: trimiți coletul înapoi la Buciumeni. Îți vom trimite instrucțiuni de expediere separat sau te contactăm telefonic în următoarele 24h.`,
+    },
+    in_transit: {
+      headline: "Coletul de retur e pe drum.",
+      subject: `Retur ${d.returnNumber} · în transport`,
+      body: `Am marcat coletul de retur ca fiind în transport. Așteptăm să ajungă la noi și apoi te anunțăm când e verificat.`,
+    },
+    completed: {
+      headline: "Returul e finalizat.",
+      subject: `Retur ${d.returnNumber} · finalizat`,
+      body: `Am procesat returul complet. Dacă ai ales rambursare, banii au plecat spre tine (vezi emailul separat cu detaliile). Dacă ai ales înlocuire sau voucher, primești confirmarea corespunzătoare.`,
+    },
+    rejected: {
+      headline: "Cererea de retur nu a fost aprobată.",
+      subject: `Retur ${d.returnNumber} · respins`,
+      body: `După verificare, cererea ta nu a putut fi aprobată. Motivul e adesea legat de termenul de 14 zile de la livrare (OUG 34/2014) sau de starea produsului. Dacă vrei mai multe detalii sau contești decizia, scrie-ne la contact@domeniul-locus.ro.`,
+    },
+  };
+
+  const meta = statusMeta[d.status];
+  const greeting = d.customerName
+    ? `<span style="font-family:${SERIF};font-size:32px;color:${INK};letter-spacing:-0.015em;">${meta.headline}</span>`
+    : `<span style="font-family:${SERIF};font-size:32px;color:${INK};letter-spacing:-0.015em;">${meta.headline}</span>`;
+
+  const adminBlock = d.adminMessage
+    ? `
+    <div style="margin-top:24px;padding:16px 20px;border-left:2px solid ${VIE};background:${PAMANT};">
+      <div style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:6px;">
+        mesaj din partea noastră
+      </div>
+      <p style="font-family:${MONO};font-size:13px;line-height:1.7;color:${INK};margin:0;">
+        ${escapeHtml(d.adminMessage)}
+      </p>
+    </div>`
+    : "";
+
+  const content = `
+    <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:14px;">
+      retur · ${escapeHtml(d.returnNumber)}${d.orderNumber ? ` · comandă ${escapeHtml(d.orderNumber)}` : ""}
+    </div>
+    ${greeting}
+    <p style="font-family:${MONO};font-size:14px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
+      ${meta.body}
+    </p>
+
+    ${adminBlock}
+
+    <p style="font-family:${MONO};font-size:12px;line-height:1.7;color:${INK_MUTE};margin:32px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
+      Vezi statusul în orice moment în contul tău sau răspunde la acest email
+      dacă ai întrebări.
+    </p>`;
+
+  return {
+    subject: meta.subject,
+    html: shell(content, meta.headline),
+  };
+}
+
 // ─── Newsletter welcome ───────────────────────────────────────────
 export function newsletterWelcomeHtml(): { subject: string; html: string } {
   const content = `

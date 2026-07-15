@@ -5,6 +5,11 @@ import Stripe from "stripe";
 import { getCurrentAdmin } from "@/lib/auth/current-admin";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { getStripe } from "@/lib/stripe/server";
+import {
+  sendShippedNotification,
+  sendDeliveredNotification,
+  sendRefundConfirmation,
+} from "@/lib/email/send";
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -12,6 +17,67 @@ async function assertAdmin(): Promise<Result> {
   const admin = await getCurrentAdmin();
   if (!admin) return { ok: false, error: "Neautorizat." };
   return { ok: true };
+}
+
+/**
+ * Rezolvă email + nume + adresă pentru email-urile tranzacționale.
+ * Preferă `customers` (cont creat) → cade pe `guest_email` + snapshot.
+ * Returnează null dacă nu găsim email — atunci nu trimitem email dar
+ * flow-ul principal continuă.
+ */
+async function resolveCustomer(orderId: string): Promise<{
+  email: string;
+  name?: string;
+  shippingAddress?: string;
+} | null> {
+  const supabase = await getSupabaseServerClient();
+  const { data: order } = await supabase
+    .from("orders")
+    .select("customer_id, guest_email, shipping_address")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (!order) return null;
+
+  let email: string | null = null;
+  let name: string | undefined;
+
+  if (order.customer_id) {
+    const { data: customer } = await supabase
+      .from("customers")
+      .select("email, name")
+      .eq("id", order.customer_id)
+      .maybeSingle();
+    if (customer) {
+      email = customer.email;
+      name = customer.name ?? undefined;
+    }
+  }
+  if (!email) email = order.guest_email ?? null;
+  if (!email) return null;
+
+  // shipping_address e jsonb — snapshot la momentul comenzii.
+  let shippingAddress: string | undefined;
+  const addr = order.shipping_address as
+    | {
+        first_name?: string;
+        last_name?: string;
+        line1?: string;
+        city?: string;
+        county?: string;
+      }
+    | null;
+  if (addr) {
+    if (!name && (addr.first_name || addr.last_name)) {
+      name = [addr.first_name, addr.last_name].filter(Boolean).join(" ");
+    }
+    if (addr.line1) {
+      shippingAddress = [addr.line1, addr.city, addr.county]
+        .filter(Boolean)
+        .join(", ");
+    }
+  }
+
+  return { email, name, shippingAddress };
 }
 
 /**
@@ -58,6 +124,25 @@ export async function markShipped(
     payload: { awb_number: awbNumber ?? null },
   });
 
+  // Email client — fail silent (log în events dacă pică, nu blochează action-ul).
+  const customer = await resolveCustomer(order.id);
+  if (customer) {
+    const emailRes = await sendShippedNotification(customer.email, {
+      orderNumber,
+      customerName: customer.name,
+      awbNumber: awbNumber?.trim() || null,
+      courierName: "FanCourier", // TODO: derivă din setări când integrăm curier API
+      shippingAddress: customer.shippingAddress,
+    });
+    if (!emailRes.ok) {
+      await supabase.from("order_events").insert({
+        order_id: order.id,
+        type: "email_shipped_failed",
+        payload: { error: emailRes.error },
+      });
+    }
+  }
+
   revalidatePath(`/admin/comenzi/${orderNumber}`);
   revalidatePath("/admin/comenzi");
   return { ok: true };
@@ -98,6 +183,22 @@ export async function markDelivered(orderNumber: string): Promise<Result> {
     type: "marked_delivered",
     payload: {},
   });
+
+  // Email client — thank you + tips servire + reminder retur 14 zile.
+  const customer = await resolveCustomer(order.id);
+  if (customer) {
+    const emailRes = await sendDeliveredNotification(customer.email, {
+      orderNumber,
+      customerName: customer.name,
+    });
+    if (!emailRes.ok) {
+      await supabase.from("order_events").insert({
+        order_id: order.id,
+        type: "email_delivered_failed",
+        payload: { error: emailRes.error },
+      });
+    }
+  }
 
   revalidatePath(`/admin/comenzi/${orderNumber}`);
   revalidatePath("/admin/comenzi");
@@ -219,6 +320,26 @@ export async function refundOrder(
         order_id: order.id,
         type: "stock_restore_failed",
         payload: { error: restoreErr.message ?? String(restoreErr) },
+      });
+    }
+  }
+
+  // Email client — cu suma + metoda + timeline.
+  const customer = await resolveCustomer(order.id);
+  if (customer) {
+    const emailRes = await sendRefundConfirmation(customer.email, {
+      orderNumber,
+      customerName: customer.name,
+      refundedRon: order.total_cents / 100,
+      method,
+      manualChannel: method === "manual" ? args.manualChannel ?? null : null,
+      isPartial: !full,
+    });
+    if (!emailRes.ok) {
+      await supabase.from("order_events").insert({
+        order_id: order.id,
+        type: "email_refund_failed",
+        payload: { error: emailRes.error },
       });
     }
   }
