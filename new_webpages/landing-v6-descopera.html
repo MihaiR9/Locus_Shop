@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Descoperă — Domeniul Locus</title>
+<meta name="description" content="Povestea Domeniului Locus — Buciumeni, între Panciu și Nicorești. Trei generații, o singură măsură: locul.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DOMENIUL LOCUS — landing v6 · pagina DESCOPERĂ
+   Povestea cramei: hero → Locul → carousel narativ →
+   Timpul → Măsura → CTA colecție → footer complet
+   Paletă brandbook: Pământ / Nisip / Piatră / Vie / Stejar / Pivniță
+   ============================================================ */
+:root{
+  --pamant:  #EBE1DA;
+  --nisip:   #CBBEAE;
+  --piatra:  #A89D8D;
+  --vie:     #3E4336;
+  --stejar:  #4A3C2D;
+  --pivnita: #1A1A1A;
+
+  --bg:        #faf9f6; /* off-white neutru — brand background */
+  --ink:       var(--pivnita);
+  --ink-soft:  var(--stejar);
+  --ink-mute:  var(--piatra);
+  --line:      rgba(74,60,45,.16);
+  --auriu:     #8B7841;
+
+  --serif:  'Italiana', serif;
+  --cormo:  'Cormorant Garamond', serif;
+  --belle:  'Bellefair', serif;
+  --mono:   'IBM Plex Mono', monospace;
+
+  --ease:   cubic-bezier(.22,.61,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+@media (prefers-reduced-motion: no-preference){
+  html{scroll-behavior:smooth}
+}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--mono);
+  font-weight:300;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;user-select:none;-webkit-user-drag:none}
+a{color:inherit;text-decoration:none}
+button{font:inherit;background:none;border:none;color:inherit;cursor:pointer}
+::selection{background:var(--ink);color:var(--bg)}
+
+/* ---------- film grain ---------- */
+.grain{
+  position:fixed;inset:0;z-index:1000;pointer-events:none;opacity:.05;
+  mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- custom cursor — punct (scroll vertical) ---------- */
+.cursor{
+  position:fixed;top:0;left:0;z-index:1001;pointer-events:none;
+  width:34px;height:34px;border-radius:999px;
+  border:1px solid var(--ink-soft);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .3s,transform .05s linear,width .3s var(--ease),height .3s var(--ease),background .3s var(--ease);
+}
+.cursor i{
+  width:5px;height:5px;border-radius:99px;background:var(--ink-soft);
+  transition:background .3s var(--ease);
+}
+.cursor.is-on{opacity:1}
+.cursor.is-hover{width:52px;height:52px;background:rgba(26,26,26,.06)}
+@media (pointer:coarse){.cursor{display:none}}
+
+/* ---------- header sticky ---------- */
+.chrome{position:fixed;inset:0 0 auto 0;z-index:80;pointer-events:none}
+.chrome > *{pointer-events:auto}
+.brand{position:absolute;top:22px;left:28px;display:block}
+.brand img{height:56px;width:auto;display:block}
+.nav{
+  position:absolute;top:32px;right:32px;
+  display:flex;align-items:center;gap:28px;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.nav a{position:relative;padding:4px 0}
+.nav a:not(.nav-shop)::after{
+  content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;
+  background:var(--ink);transform:scaleX(0);transform-origin:right;
+  transition:transform .45s var(--ease);
+}
+.nav a:not(.nav-shop):hover::after{transform:scaleX(1);transform-origin:left}
+.nav a[aria-current="page"]::after{transform:scaleX(1)}
+.nav-shop{
+  position:relative;isolation:isolate;overflow:hidden;
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:11px 26px;border:1px solid var(--ink);border-radius:999px;
+  background:var(--ink);
+}
+.nav-shop span{position:relative;z-index:1;font-size:9.5px;letter-spacing:.22em;color:var(--bg);transition:color .5s var(--ease)}
+.nav-shop::after{
+  content:"";position:absolute;inset:0;background:var(--bg);z-index:0;
+  transform:translateY(101%);transition:transform .5s var(--ease);
+}
+.nav-shop:hover::after{transform:translateY(0)}
+.nav-shop:hover span{color:var(--ink)}
+.lang{display:flex;gap:8px;align-items:center;color:var(--ink-mute)}
+.lang b{font-weight:500;color:var(--ink);border-bottom:1px solid currentColor;padding-bottom:3px}
+.lang span:not(b){opacity:.55}
+
+/* ---------- semicerc gol cu X central ---------- */
+.arc-top{
+  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  width:clamp(560px,54vw,880px);aspect-ratio:1400/380;
+  z-index:75;pointer-events:none;
+}
+.arc-top svg{display:block;width:100%;height:100%;overflow:visible}
+.arc-ring{fill:none;stroke:var(--line);stroke-width:1}
+.arc-x{
+  position:absolute;left:50%;top:84.2%;transform:translate(-50%,-50%);
+  width:64px;height:64px;border-radius:50%;
+  border:1px solid var(--ink);background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--cormo);font-size:26px;font-weight:300;line-height:1;
+  color:var(--ink);pointer-events:auto;cursor:pointer;
+  transition:transform .45s var(--ease),background .45s var(--ease),color .45s var(--ease);
+}
+.arc-x:hover{transform:translate(-50%,-50%) rotate(90deg);background:var(--ink);color:var(--bg)}
+.arc-x small{
+  position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink-mute);white-space:nowrap;opacity:0;transition:opacity .4s var(--ease);
+}
+.arc-x:hover small{opacity:1}
+
+/* ---------- slide-up entry ---------- */
+.page{will-change:transform}
+html.js-entry .page{transform:translateY(100vh)}
+@media (prefers-reduced-motion:reduce){
+  html.js-entry .page{transform:none}
+}
+
+/* ---------- utilitare tipografice ---------- */
+.eyebrow{
+  font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink-mute);display:inline-flex;align-items:center;gap:14px;
+}
+.eyebrow::before{content:"";width:22px;height:1px;background:var(--ink-mute)}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.is-in .rv{opacity:1;transform:none}
+.is-in .rv:nth-child(2){transition-delay:.12s}
+.is-in .rv:nth-child(3){transition-delay:.24s}
+.is-in .rv:nth-child(4){transition-delay:.36s}
+
+/* ============================================================
+   HERO — povestea
+   ============================================================ */
+.d-hero{
+  position:relative;min-height:100svh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;overflow:hidden;padding:150px 24px 90px;
+}
+.d-hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:url('assets/Imagini/dealuri-cu-vii.jpg') center/cover no-repeat;
+  opacity:.4;
+  filter:saturate(.35) contrast(1.05) brightness(1.06) sepia(.08);
+  will-change:transform;
+}
+.d-hero::after{
+  content:"";position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,var(--bg) 0%,rgba(250,249,246,.25) 34%,rgba(250,249,246,.1) 60%,var(--bg) 100%);
+}
+.d-hero > *{position:relative;z-index:2}
+.d-hero .eyebrow{margin-bottom:32px}
+.d-title{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(58px,8.4vw,132px);line-height:.98;letter-spacing:.01em;
+  max-width:14ch;
+}
+.d-sub{
+  margin-top:28px;
+  font-family:var(--cormo);font-style:italic;font-weight:300;
+  font-size:clamp(20px,2.4vw,27px);color:var(--ink-soft);
+  max-width:34ch;
+}
+.scroll-cue{
+  position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+  font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-mute);
+  display:flex;align-items:center;gap:14px;white-space:nowrap;z-index:2;
+}
+.scroll-cue::before,.scroll-cue::after{content:"";width:26px;height:1px;background:var(--line)}
+
+/* ============================================================
+   LOCUL — split editorial 60/40
+   ============================================================ */
+.d-locul{
+  position:relative;min-height:92svh;
+  display:grid;grid-template-columns:minmax(0,58fr) minmax(0,42fr);
+  align-items:center;gap:clamp(40px,6vw,100px);
+  padding:14vh 7vw;overflow:hidden;
+}
+.locul-num{
+  position:absolute;top:5vh;right:5vw;z-index:0;
+  font-family:var(--belle);font-size:clamp(140px,20vw,260px);line-height:1;
+  color:var(--ink);opacity:.05;pointer-events:none;
+}
+.locul-copy{position:relative;z-index:1}
+.locul-copy .eyebrow{margin-bottom:30px}
+.locul-title{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(48px,5.6vw,84px);line-height:1;letter-spacing:.01em;
+  margin-bottom:32px;
+}
+.locul-text{
+  font-family:var(--cormo);font-style:italic;font-weight:300;
+  font-size:clamp(20px,2vw,25px);line-height:1.65;
+  color:var(--ink-soft);max-width:44ch;
+}
+.locul-text + .locul-text{margin-top:1.2em}
+.locul-coord{
+  margin-top:38px;display:flex;gap:clamp(24px,3.4vw,56px);flex-wrap:wrap;
+}
+.coord{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-mute);line-height:2}
+.coord b{
+  display:block;font-family:var(--belle);font-weight:400;
+  font-size:clamp(20px,2vw,26px);letter-spacing:.06em;color:var(--ink);
+}
+.locul-photo{position:relative;z-index:1}
+.locul-photo figure{position:relative;overflow:hidden}
+.locul-photo img{
+  display:block;width:100%;height:clamp(380px,62vh,640px);object-fit:cover;
+  filter:saturate(.4) contrast(1.05) sepia(.06);
+  will-change:transform;transform:scale(1.08);
+}
+.locul-photo figcaption{
+  margin-top:14px;font-size:9px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink-mute);
+}
+.locul-photo .l-mark{
+  position:absolute;top:-26px;right:-14px;width:52px;height:52px;z-index:2;
+  animation:spin 90s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ============================================================
+   CAROUSEL — parcursul anului
+   ============================================================ */
+.d-carousel{
+  position:relative;padding:16vh 0 14vh;overflow:hidden;
+  border-top:1px solid var(--line);
+}
+.car-head{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:30px;flex-wrap:wrap;
+  padding:0 7vw;margin-bottom:clamp(44px,6vh,70px);
+}
+.car-head .eyebrow{margin-bottom:22px}
+.car-title{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(44px,5vw,74px);line-height:1;letter-spacing:.01em;
+}
+.car-nav{display:flex;gap:12px}
+.car-btn{
+  width:56px;height:56px;border-radius:50%;
+  border:1px solid var(--ink);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--cormo);font-size:20px;line-height:1;
+  transition:background .4s var(--ease),color .4s var(--ease),opacity .3s;
+}
+.car-btn:hover{background:var(--ink);color:var(--bg)}
+.car-btn:disabled{opacity:.3;pointer-events:none}
+.car-track{
+  display:flex;gap:clamp(20px,3vw,44px);
+  padding:0 7vw 26px;
+  overflow-x:auto;scroll-snap-type:x mandatory;
+  scrollbar-width:none;cursor:grab;
+}
+.car-track::-webkit-scrollbar{display:none}
+.car-track.is-drag{cursor:grabbing;scroll-snap-type:none}
+.car-slide{
+  flex:0 0 clamp(270px,30vw,440px);
+  scroll-snap-align:center;
+}
+.car-media{
+  position:relative;height:clamp(340px,50vh,520px);
+  background:#f1eae2;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+.car-media img{
+  width:100%;height:100%;object-fit:cover;
+  filter:saturate(.4) contrast(1.04) sepia(.06);
+  transition:transform 1.4s var(--ease);
+}
+.car-media.is-graphic{background:var(--pamant)}
+.car-media.is-graphic img{
+  width:auto;height:auto;max-width:62%;max-height:56%;object-fit:contain;filter:none;
+}
+.car-media.is-bottle{background:#efe7dd}
+.car-media.is-bottle img{
+  width:auto;height:84%;object-fit:contain;
+  filter:drop-shadow(0 28px 34px rgba(26,26,26,.16));
+}
+.car-slide:hover .car-media img{transform:scale(1.04)}
+.car-slide:hover .car-media.is-bottle img,
+.car-slide:hover .car-media.is-graphic img{transform:none}
+.car-cap{padding:20px 2px 0}
+.car-step{
+  display:block;font-size:9px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--auriu);margin-bottom:10px;
+}
+.car-text{
+  font-family:var(--cormo);font-style:italic;font-weight:300;
+  font-size:17.5px;line-height:1.5;color:var(--ink-soft);max-width:34ch;
+}
+.car-hint{
+  margin-top:34px;text-align:center;
+  font-size:9px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-mute);
+}
+
+/* ============================================================
+   TIMPUL — text lung + sticle în pivniță
+   ============================================================ */
+.d-timpul{
+  position:relative;min-height:100svh;
+  display:grid;grid-template-columns:minmax(0,46fr) minmax(0,54fr);
+  align-items:center;gap:clamp(40px,5vw,80px);
+  padding:14vh 7vw;overflow:hidden;
+  border-top:1px solid var(--line);
+}
+.timpul-num{
+  position:absolute;top:5vh;left:5vw;z-index:0;
+  font-family:var(--belle);font-size:clamp(140px,20vw,260px);line-height:1;
+  color:var(--ink);opacity:.05;pointer-events:none;
+}
+.timpul-cellar{
+  position:relative;z-index:1;
+  display:flex;align-items:flex-end;justify-content:center;
+  min-height:clamp(380px,62vh,620px);
+  background:radial-gradient(120% 100% at 50% 108%, #2a2723 0%, #1A1A1A 62%, #141311 100%);
+  overflow:hidden;padding:56px 20px 0;
+}
+.timpul-cellar::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(70% 55% at 50% 26%, rgba(235,225,218,.13), transparent 68%);
+  pointer-events:none;
+}
+.timpul-cellar img{
+  width:auto;position:relative;
+  filter:drop-shadow(0 26px 30px rgba(0,0,0,.5));
+  will-change:transform;
+}
+.timpul-cellar img:nth-child(1){height:clamp(210px,32vh,330px);margin-right:-2.2vw;z-index:1}
+.timpul-cellar img:nth-child(2){height:clamp(260px,40vh,410px);z-index:2}
+.timpul-cellar img:nth-child(3){height:clamp(200px,30vh,310px);margin-left:-2.2vw;z-index:1}
+.cellar-cap{
+  position:absolute;left:24px;bottom:20px;z-index:3;
+  font-size:8.5px;letter-spacing:.26em;text-transform:uppercase;
+  color:rgba(235,225,218,.55);
+}
+.timpul-copy{position:relative;z-index:1}
+.timpul-copy .eyebrow{margin-bottom:30px}
+.timpul-title{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(48px,5.6vw,84px);line-height:1;letter-spacing:.01em;
+  margin-bottom:32px;
+}
+.timpul-text{
+  font-family:var(--cormo);font-style:italic;font-weight:300;
+  font-size:clamp(19px,1.9vw,24px);line-height:1.65;
+  color:var(--ink-soft);max-width:44ch;
+}
+.timpul-text + .timpul-text{margin-top:1.2em}
+.timpul-sign{
+  display:block;margin-top:36px;
+  font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink);
+}
+
+/* ============================================================
+   MĂSURA — manifest editorial, 4 valori
+   ============================================================ */
+.d-masura{
+  position:relative;padding:16vh 7vw;overflow:hidden;
+  border-top:1px solid var(--line);
+}
+.masura-head{text-align:center;margin-bottom:clamp(56px,9vh,96px)}
+.masura-head .eyebrow{margin-bottom:26px}
+.masura-title{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(48px,6vw,92px);line-height:1;letter-spacing:.01em;
+}
+.masura-lead{
+  margin-top:22px;
+  font-family:var(--cormo);font-style:italic;font-weight:300;
+  font-size:clamp(18px,2vw,23px);color:var(--ink-soft);
+}
+.masura-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--line);border-left:1px solid var(--line);
+  max-width:1240px;margin:0 auto;
+}
+.m-cell{
+  position:relative;
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:clamp(30px,3.4vw,52px) clamp(22px,2.6vw,40px) clamp(36px,4vw,58px);
+  transition:background .5s var(--ease);
+}
+.m-cell:hover{background:rgba(235,225,218,.5)}
+.m-num{
+  display:block;font-family:var(--belle);font-size:15px;letter-spacing:.14em;
+  color:var(--auriu);margin-bottom:clamp(30px,5vh,64px);
+}
+.m-name{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(24px,2.2vw,32px);line-height:1.12;letter-spacing:.01em;
+  margin-bottom:16px;
+}
+.m-desc{
+  font-family:var(--cormo);font-style:italic;font-weight:300;
+  font-size:16.5px;line-height:1.55;color:var(--ink-soft);
+}
+
+/* ============================================================
+   CTA — spre colecție
+   ============================================================ */
+.d-cta{
+  position:relative;min-height:66svh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;gap:36px;padding:14vh 24px;overflow:hidden;
+  border-top:1px solid var(--line);
+}
+.d-cta .l-simbol{
+  width:52px;height:52px;opacity:.85;
+  animation:spin 90s linear infinite;
+}
+.cta-title{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(40px,5vw,76px);line-height:1.05;letter-spacing:.01em;
+  max-width:18ch;
+}
+.cta-btn{
+  position:relative;isolation:isolate;overflow:hidden;
+  display:inline-flex;align-items:center;gap:16px;
+  padding:20px 52px;border:1px solid var(--ink);border-radius:999px;
+  background:var(--ink);
+}
+.cta-btn span{position:relative;z-index:1;font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--bg);transition:color .5s var(--ease)}
+.cta-btn i{position:relative;z-index:1;font-style:normal;font-family:var(--cormo);font-size:18px;color:var(--bg);transition:color .5s var(--ease),transform .4s var(--ease)}
+.cta-btn::after{
+  content:"";position:absolute;inset:0;background:var(--bg);z-index:0;
+  transform:translateY(101%);transition:transform .5s var(--ease);
+}
+.cta-btn:hover::after{transform:translateY(0)}
+.cta-btn:hover span,.cta-btn:hover i{color:var(--ink)}
+.cta-btn:hover i{transform:translateX(6px)}
+.cta-note{
+  font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-mute);
+}
+
+/* ============================================================
+   FOOTER — complet, 4 coloane
+   ============================================================ */
+.site-footer{
+  border-top:1px solid var(--line);
+  padding:clamp(56px,9vh,90px) 7vw 40px;
+}
+.f-grid{
+  display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;
+  gap:clamp(32px,4vw,64px);
+  padding-bottom:clamp(44px,7vh,72px);
+}
+.f-brand img{height:44px;width:auto;display:block;margin-bottom:22px}
+.f-brand address{
+  font-style:normal;font-size:10.5px;letter-spacing:.08em;line-height:2.1;
+  color:var(--ink-soft);
+}
+.f-brand address a:hover{color:var(--ink)}
+.f-col h3{
+  font-size:9px;letter-spacing:.28em;text-transform:uppercase;
+  font-weight:500;color:var(--ink-mute);margin-bottom:20px;
+}
+.f-col ul{list-style:none}
+.f-col li{margin-bottom:12px}
+.f-col a{
+  position:relative;font-size:11.5px;letter-spacing:.06em;color:var(--ink-soft);
+  transition:color .3s var(--ease);
+}
+.f-col a::after{
+  content:"";position:absolute;left:0;bottom:-3px;height:1px;width:100%;
+  background:var(--ink);transform:scaleX(0);transform-origin:right;
+  transition:transform .45s var(--ease);
+}
+.f-col a:hover{color:var(--ink)}
+.f-col a:hover::after{transform:scaleX(1);transform-origin:left}
+.f-bottom{
+  border-top:1px solid var(--line);
+  padding-top:26px;
+  display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;
+  font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-mute);line-height:2;
+}
+.f-bottom .f-coord{font-family:var(--belle);font-size:12px;letter-spacing:.14em;text-transform:none;color:var(--ink-soft)}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (prefers-reduced-motion:reduce){
+  .rv{opacity:1;transform:none;transition:none}
+  .locul-photo img{transform:none}
+  .d-cta .l-simbol,.locul-photo .l-mark{animation:none}
+  .d-hero-bg,.timpul-cellar img{transform:none !important}
+}
+@media (max-width:1020px){
+  .masura-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:820px){
+  .nav{gap:12px;right:18px;top:24px;font-size:9px;flex-wrap:wrap;justify-content:flex-end;max-width:60vw}
+  .nav-shop{padding:9px 18px}
+  .brand{top:16px;left:16px}
+  .brand img{height:40px}
+  .arc-top{width:100vw}
+  .arc-top svg{display:none}
+  .arc-x{position:fixed;left:50%;top:20px;transform:translate(-50%,0);width:46px;height:46px;font-size:21px}
+  .arc-x:hover{transform:translate(-50%,0)}
+  .arc-x small{display:none}
+
+  .d-hero{padding-top:150px}
+  .d-title{font-size:clamp(44px,12vw,64px)}
+
+  .d-locul{grid-template-columns:1fr;padding:10vh 8vw;gap:44px}
+  .locul-photo img{height:52vh;transform:none}
+  .locul-photo .l-mark{top:-20px;right:0;width:40px;height:40px}
+
+  .car-head{flex-direction:column;align-items:flex-start}
+  .car-slide{flex-basis:min(78vw,340px)}
+  .car-media{height:52vh}
+
+  .d-timpul{grid-template-columns:1fr;padding:10vh 8vw;gap:44px}
+  .timpul-cellar{order:2;min-height:52vh}
+  .timpul-copy{order:1}
+
+  .masura-grid{grid-template-columns:1fr}
+  .m-num{margin-bottom:20px}
+
+  .f-grid{grid-template-columns:1fr 1fr}
+  .f-brand{grid-column:1 / -1}
+  .f-bottom{flex-direction:column;align-items:flex-start}
+}
+@media (max-width:520px){
+  .f-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><i></i></div>
+
+<!-- ---------- header ---------- -->
+<header class="chrome">
+  <a class="brand" href="landing-v6.html" aria-label="Domeniul Locus — acasă">
+    <img src="assets/logos/locus.png" alt="Domeniul Locus">
+  </a>
+  <nav class="nav" aria-label="Navigație principală">
+    <a href="landing-v6.html">Home</a>
+    <a href="landing-v6-descopera.html" aria-current="page">Descoper&#259;</a>
+    <a href="#contact">Contact</a>
+    <a href="landing-v6-shop.html" class="nav-shop"><span>Shop now</span></a>
+    <span class="lang" aria-label="Limbă"><b>RO</b><span aria-hidden="true">/</span><span title="în curând">EN</span></span>
+  </nav>
+</header>
+
+<!-- ---------- semicerc gol + X înapoi ---------- -->
+<div class="arc-top">
+  <svg viewBox="0 0 1400 380" aria-hidden="true">
+    <circle class="arc-ring" cx="700" cy="-150" r="470"></circle>
+  </svg>
+  <a class="arc-x" href="landing-v6.html" aria-label="Închide — înapoi la cramă">
+    &times;
+    <small>&icirc;napoi la cram&#259;</small>
+  </a>
+</div>
+
+<!-- ---------- page (slide-up entry) ---------- -->
+<div class="page" id="page">
+<main>
+
+  <!-- ============ HERO ============ -->
+  <section class="d-hero io is-in" aria-label="Povestea domeniului">
+    <div class="d-hero-bg" data-hero-bg aria-hidden="true"></div>
+    <p class="eyebrow rv">Povestea domeniului &middot; Buciumeni</p>
+    <h1 class="d-title rv">Un domeniu n&#259;scut din r&#259;bdare.</h1>
+    <p class="d-sub rv">Trei genera&#539;ii, o singur&#259; m&#259;sur&#259;: locul.</p>
+    <p class="scroll-cue">scrolleaz&#259; pentru poveste</p>
+  </section>
+
+  <!-- ============ LOCUL ============ -->
+  <section class="d-locul io" aria-label="Locul">
+    <span class="locul-num" aria-hidden="true">01</span>
+    <div class="locul-copy">
+      <p class="eyebrow rv">Capitolul &icirc;nt&acirc;i</p>
+      <h2 class="locul-title rv">Locul</h2>
+      <div class="rv">
+        <p class="locul-text">&Icirc;ntre Panciu &#537;i Nicore&#537;ti, acolo unde dealurile &icirc;&#537;i domolesc panta &#537;i &icirc;&#537;i &icirc;ntorc fa&#539;a spre soare, st&#259; Buciumeni. Nu l-am ales noi &mdash; el ne-a ales, cu mult &icirc;naintea noastr&#259;. Vi&#539;a cre&#537;te aici de c&acirc;nd &#539;ine minte dealul, pe un sol care a &icirc;nv&#259;&#539;at s&#259; dea pu&#539;in &#537;i s&#259; dea bine.</p>
+        <p class="locul-text">Tot ce facem pleac&#259; de la aceast&#259; origine. Nu aducem nimic din alt&#259; parte: nici must, nici grab&#259;, nici obiceiuri str&#259;ine de parcursul locului. Vinul nostru este, &icirc;nainte de toate, o m&#259;rturie &mdash; a unei coline, a unui an, a unei m&acirc;ini care a &#537;tiut s&#259; a&#537;tepte.</p>
+      </div>
+      <div class="locul-coord rv">
+        <p class="coord"><b>45.98&deg;N</b>latitudine</p>
+        <p class="coord"><b>27.30&deg;E</b>longitudine</p>
+        <p class="coord"><b>210 m</b>altitudine medie</p>
+      </div>
+    </div>
+    <div class="locul-photo rv">
+      <img class="l-mark" src="assets/graphics/simbol-negru.png" alt="" aria-hidden="true">
+      <figure>
+        <img src="assets/Imagini/homepage-desaturat.jpg" alt="Peisaj de pe domeniul Locus, la Buciumeni" data-parallax-img>
+        <figcaption>Buciumeni &middot; &icirc;ntre Panciu &#537;i Nicore&#537;ti</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ CAROUSEL — parcursul ============ -->
+  <section class="d-carousel io" aria-label="Parcursul anului viticol">
+    <div class="car-head">
+      <div>
+        <p class="eyebrow rv">Parcursul</p>
+        <h2 class="car-title rv">Un an, pe &icirc;ndelete.</h2>
+      </div>
+      <div class="car-nav rv">
+        <button class="car-btn" id="carPrev" aria-label="Etapa anterioară">&larr;</button>
+        <button class="car-btn" id="carNext" aria-label="Etapa următoare">&rarr;</button>
+      </div>
+    </div>
+
+    <div class="car-track" id="carTrack" aria-label="Etapele anului viticol" tabindex="0">
+      <figure class="car-slide">
+        <div class="car-media"><img src="assets/Imagini/dealuri-cu-vii.jpg" alt="Dealuri cu vii primăvara, la Buciumeni" loading="lazy"></div>
+        <figcaption class="car-cap">
+          <span class="car-step">I &middot; Prim&#259;vara</span>
+          <p class="car-text">Dealul se treze&#537;te singur. Noi doar t&#259;iem ce e de t&#259;iat &#537;i l&#259;s&#259;m vi&#539;a s&#259;-&#537;i aminteasc&#259; drumul.</p>
+        </figcaption>
+      </figure>
+      <figure class="car-slide">
+        <div class="car-media is-graphic"><img src="assets/graphics/curbe-nivel.png" alt="Curbele de nivel ale dealului Buciumeni, grafică de brand" loading="lazy"></div>
+        <figcaption class="car-cap">
+          <span class="car-step">II &middot; Harta</span>
+          <p class="car-text">Curbele de nivel ale colinei, citite a&#537;a cum le cite&#537;te vi&#539;a: r&acirc;nd cu r&acirc;nd, f&#259;r&#259; scurt&#259;turi.</p>
+        </figcaption>
+      </figure>
+      <figure class="car-slide">
+        <div class="car-media"><img src="assets/Imagini/frunze.jpeg" alt="Frunze de viță de vie în plină vară" loading="lazy"></div>
+        <figcaption class="car-cap">
+          <span class="car-step">III &middot; Vara</span>
+          <p class="car-text">Frunza lucreaz&#259; &icirc;n t&#259;cere. Noi &#539;inem m&#259;sura umbrei &#537;i a apei &mdash; nici prea mult, nici prea devreme.</p>
+        </figcaption>
+      </figure>
+      <figure class="car-slide">
+        <div class="car-media"><img src="assets/Imagini/homepage-desaturat.jpg" alt="Culesul manual pe domeniul Locus" loading="lazy"></div>
+        <figcaption class="car-cap">
+          <span class="car-step">IV &middot; Culesul</span>
+          <p class="car-text">Cu m&acirc;na, lad&#259; cu lad&#259;, &icirc;n decada pe care o hot&#259;r&#259;&#537;te strugurele, nu calendarul.</p>
+        </figcaption>
+      </figure>
+      <figure class="car-slide">
+        <div class="car-media is-graphic"><img src="assets/graphics/simbol-auriu.png" alt="Simbolul auriu Locus — octagrama domeniului" loading="lazy"></div>
+        <figcaption class="car-cap">
+          <span class="car-step">V &middot; Semnul</span>
+          <p class="car-text">Octagrama noastr&#259; &mdash; opt col&#539;uri pentru opt momente ale anului viticol. Un punct de reper, nu un ornament.</p>
+        </figcaption>
+      </figure>
+      <figure class="car-slide">
+        <div class="car-media is-bottle"><img src="assets/bottles/cuvinte-feteasca-regala.png" alt="Sticlă din gama cuvinte, în pivniță" loading="lazy"></div>
+        <figcaption class="car-cap">
+          <span class="car-step">VI &middot; Pivni&#539;a</span>
+          <p class="car-text">Mustul coboar&#259; la r&#259;coare &#537;i &icirc;&#537;i &icirc;ncepe parcursul. De aici &icirc;ncolo, timpul lucreaz&#259; &icirc;n locul nostru.</p>
+        </figcaption>
+      </figure>
+      <figure class="car-slide">
+        <div class="car-media is-bottle"><img src="assets/bottles/semne.png" alt="Sticlă din gama semne, îmbuteliată manual" loading="lazy"></div>
+        <figcaption class="car-cap">
+          <span class="car-step">VII &middot; M&#259;rturia</span>
+          <p class="car-text">&Icirc;mbuteliem manual, &icirc;n loturi mici. Fiecare sticl&#259; e o m&#259;rturie datat&#259; a locului &#537;i a anului.</p>
+        </figcaption>
+      </figure>
+    </div>
+    <p class="car-hint">trage sau folose&#537;te s&#259;ge&#539;ile</p>
+  </section>
+
+  <!-- ============ TIMPUL ============ -->
+  <section class="d-timpul io" aria-label="Timpul">
+    <span class="timpul-num" aria-hidden="true">02</span>
+    <div class="timpul-cellar rv" aria-label="Sticle Locus în pivniță">
+      <img src="assets/bottles/cuvinte-riesling.png" alt="" aria-hidden="true" data-cellar>
+      <img src="assets/bottles/semne.png" alt="Sticle Domeniul Locus odihnind în pivniță" data-cellar>
+      <img src="assets/bottles/cuvinte-feteasca-neagra.png" alt="" aria-hidden="true" data-cellar>
+      <span class="cellar-cap">pivni&#539;a &middot; 12&deg;C constant</span>
+    </div>
+    <div class="timpul-copy">
+      <p class="eyebrow rv">Capitolul al doilea</p>
+      <h2 class="timpul-title rv">Timpul</h2>
+      <div class="rv">
+        <p class="timpul-text">Vinul nu se face. Vinul se a&#537;teapt&#259;. Ferment&#259;m lent, la temperaturi joase, cu drojdiile pe care le aduce strugurele din vie &mdash; nu cu re&#539;ete care gr&#259;besc ce nu trebuie gr&#259;bit. Unele cuve tac s&#259;pt&#259;m&acirc;ni &icirc;ntregi. Le l&#259;s&#259;m.</p>
+        <p class="timpul-text">&Icirc;mbuteliem manual, &icirc;n loturi mici, atunci c&acirc;nd vinul spune c&#259; e gata &mdash; nu c&acirc;nd spune pia&#539;a. Apoi sticlele coboar&#259; &icirc;napoi &icirc;n &icirc;ntuneric, la 12 grade, &#537;i mai stau. Un vin t&acirc;n&#259;r pleac&#259; dup&#259; c&acirc;teva luni; o rezerv&#259;, dup&#259; c&acirc;&#539;iva ani. Diferen&#539;a dintre ele nu e tehnologia. E r&#259;bdarea.</p>
+      </div>
+      <span class="timpul-sign rv">fermenta&#539;ie lent&#259; &middot; &icirc;mbuteliere manual&#259; &middot; &icirc;nvechire la rece</span>
+    </div>
+  </section>
+
+  <!-- ============ MĂSURA ============ -->
+  <section class="d-masura io" aria-label="Măsura — manifestul domeniului">
+    <div class="masura-head">
+      <p class="eyebrow rv" style="justify-content:center">Capitolul al treilea</p>
+      <h2 class="masura-title rv">M&#259;sura</h2>
+      <p class="masura-lead rv">Patru lucruri pe care le facem pu&#539;in &mdash; sau deloc.</p>
+    </div>
+    <div class="masura-grid rv">
+      <article class="m-cell">
+        <span class="m-num">01</span>
+        <h3 class="m-name">Sulfi&#539;i la minim</h3>
+        <p class="m-desc">At&acirc;t c&acirc;t cere legea vinului s&#259; c&#259;l&#259;toreasc&#259;, nimic &icirc;n plus. Restul protec&#539;iei vine din igien&#259; &#537;i din frig.</p>
+      </article>
+      <article class="m-cell">
+        <span class="m-num">02</span>
+        <h3 class="m-name">F&#259;r&#259; filtrare</h3>
+        <p class="m-desc">L&#259;s&#259;m vinul s&#259; se limpezeasc&#259; singur, prin decantare &#537;i iarn&#259;. Ce r&#259;m&acirc;ne &icirc;n pahar e tot ce a fost &icirc;n strugure.</p>
+      </article>
+      <article class="m-cell">
+        <span class="m-num">03</span>
+        <h3 class="m-name">Fermenta&#539;ie spontan&#259;</h3>
+        <p class="m-desc">Drojdiile locului, nu cele de catalog. Fiecare an fermenteaz&#259; altfel &mdash; &#537;i exact asta vrem s&#259; se aud&#259;.</p>
+      </article>
+      <article class="m-cell">
+        <span class="m-num">04</span>
+        <h3 class="m-name">Etichet&#259;-poem</h3>
+        <p class="m-desc">Pe sticl&#259; nu punem promisiuni, ci cuvinte, semne &#537;i pauze. O etichet&#259; se cite&#537;te &icirc;ncet, ca vinul.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="d-cta io" aria-label="Spre colecție">
+    <img class="l-simbol rv" src="assets/graphics/simbol-negru.png" alt="" aria-hidden="true">
+    <h2 class="cta-title rv">Povestea se termin&#259; &icirc;ntr-un pahar.</h2>
+    <a class="cta-btn rv" href="landing-v6-shop.html">
+      <span>Alege un vin din colec&#539;ie</span><i>&rarr;</i>
+    </a>
+    <p class="cta-note rv">&#537;ase vinuri &middot; trei game &middot; un singur loc</p>
+  </section>
+
+</main>
+
+<!-- ---------- footer complet ---------- -->
+<footer class="site-footer" id="contact">
+  <div class="f-grid">
+    <div class="f-brand">
+      <img src="assets/logos/locus.png" alt="Domeniul Locus">
+      <address>
+        SC ROMVINTEC SRL<br>
+        Buciumeni, jud. Gala&#539;i<br>
+        <a href="tel:+40740000000">+40 740 000 000</a><br>
+        <a href="mailto:contact@domeniullocus.ro">contact@domeniullocus.ro</a>
+      </address>
+    </div>
+    <nav class="f-col" aria-label="Navighează">
+      <h3>Navigheaz&#259;</h3>
+      <ul>
+        <li><a href="landing-v6.html">Acas&#259;</a></li>
+        <li><a href="landing-v6-descopera.html">Despre</a></li>
+        <li><a href="landing-v6-shop.html">Colec&#539;ie</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <nav class="f-col" aria-label="Cumpără">
+      <h3>Cump&#259;r&#259;</h3>
+      <ul>
+        <li><a href="#">Cum cumperi</a></li>
+        <li><a href="#">Livrare</a></li>
+        <li><a href="#">Retur</a></li>
+      </ul>
+    </nav>
+    <nav class="f-col" aria-label="Legal">
+      <h3>Legal</h3>
+      <ul>
+        <li><a href="#">Termeni</a></li>
+        <li><a href="#">Confiden&#539;ialitate</a></li>
+        <li><a href="#">Cookies</a></li>
+        <li><a href="https://anpc.ro" rel="noopener" target="_blank">ANPC</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="f-bottom">
+    <span class="f-coord">45.98&deg;N &middot; 27.30&deg;E</span>
+    <span>SC ROMVINTEC SRL &middot; 18+ &middot; con&#539;ine sulfi&#539;i &middot; consumul excesiv de alcool d&#259;uneaz&#259; s&#259;n&#259;t&#259;&#539;ii</span>
+    <span>&copy; 2026 Domeniul Locus</span>
+  </div>
+</footer>
+</div><!-- /.page -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script>
+document.documentElement.classList.add('js-entry');
+(function(){
+  "use strict";
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hasGsap = typeof gsap !== 'undefined';
+
+  /* ---------- slide-up entry ---------- */
+  var page = document.getElementById('page');
+  if(!reduced && hasGsap){
+    gsap.fromTo(page,
+      {y:window.innerHeight},
+      {y:0,duration:.6,ease:'power3.out',clearProps:'transform',
+       onComplete:function(){document.documentElement.classList.remove('js-entry');}}
+    );
+  }else{
+    document.documentElement.classList.remove('js-entry');
+  }
+
+  /* ---------- reveal la scroll ---------- */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add('is-in');
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.22});
+  document.querySelectorAll('.io').forEach(function(s){
+    if(reduced){ s.classList.add('is-in'); return; }
+    io.observe(s);
+  });
+
+  /* ---------- parallax subtil (doar desktop, fără reduced-motion) ---------- */
+  if(!reduced){
+    var heroBg  = document.querySelector('[data-hero-bg]');
+    var pImg    = document.querySelector('[data-parallax-img]');
+    var cellar  = Array.prototype.slice.call(document.querySelectorAll('[data-cellar]'));
+    var cellarSec = document.querySelector('.d-timpul');
+    var ticking = false;
+    function frame(){
+      ticking = false;
+      if(window.innerWidth <= 820) return;
+      var vh = window.innerHeight;
+      var sy = window.scrollY;
+      if(heroBg && sy < vh*1.2){
+        heroBg.style.transform = 'translateY('+(sy*.18).toFixed(1)+'px)';
+      }
+      if(pImg){
+        var r = pImg.getBoundingClientRect();
+        if(r.bottom > 0 && r.top < vh){
+          var t = (r.top + r.height/2 - vh/2)/vh; /* -1 .. 1 */
+          pImg.style.transform = 'scale(1.08) translateY('+(t*-22).toFixed(1)+'px)';
+        }
+      }
+      if(cellarSec){
+        var cr = cellarSec.getBoundingClientRect();
+        if(cr.bottom > 0 && cr.top < vh){
+          var ct = (cr.top + cr.height/2 - vh/2)/vh;
+          cellar.forEach(function(img,i){
+            var amp = i===1 ? 14 : 26;
+            img.style.transform = 'translateY('+(ct*amp).toFixed(1)+'px)';
+          });
+        }
+      }
+    }
+    window.addEventListener('scroll',function(){
+      if(!ticking){ ticking = true; requestAnimationFrame(frame); }
+    },{passive:true});
+    frame();
+  }
+
+  /* ---------- carousel: săgeți + drag + auto ---------- */
+  var track = document.getElementById('carTrack');
+  var prev  = document.getElementById('carPrev');
+  var next  = document.getElementById('carNext');
+  var slides = track.querySelectorAll('.car-slide');
+
+  function slideStep(){
+    if(slides.length < 2) return 320;
+    return slides[1].offsetLeft - slides[0].offsetLeft;
+  }
+  function updateBtns(){
+    var max = track.scrollWidth - track.clientWidth - 4;
+    prev.disabled = track.scrollLeft <= 4;
+    next.disabled = track.scrollLeft >= max;
+  }
+  function go(dir){
+    track.scrollBy({left:dir*slideStep(),behavior:reduced?'auto':'smooth'});
+  }
+  prev.addEventListener('click',function(){go(-1);});
+  next.addEventListener('click',function(){go(1);});
+  track.addEventListener('scroll',updateBtns,{passive:true});
+  window.addEventListener('resize',updateBtns);
+  updateBtns();
+
+  /* drag cu mouse-ul (touch merge nativ) */
+  var isDown=false,startX=0,startL=0,moved=false;
+  track.addEventListener('pointerdown',function(e){
+    if(e.pointerType!=='mouse') return;
+    isDown=true;moved=false;startX=e.clientX;startL=track.scrollLeft;
+    track.classList.add('is-drag');
+    track.setPointerCapture(e.pointerId);
+  });
+  track.addEventListener('pointermove',function(e){
+    if(!isDown) return;
+    var dx = e.clientX - startX;
+    if(Math.abs(dx)>4) moved=true;
+    track.scrollLeft = startL - dx;
+  });
+  function endDrag(){
+    if(!isDown) return;
+    isDown=false;
+    track.classList.remove('is-drag');
+  }
+  track.addEventListener('pointerup',endDrag);
+  track.addEventListener('pointercancel',endDrag);
+  track.addEventListener('click',function(e){ if(moved){e.preventDefault();} },true);
+
+  /* navigare cu tastatura pe track */
+  track.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'){e.preventDefault();go(1);}
+    if(e.key==='ArrowLeft'){e.preventDefault();go(-1);}
+  });
+
+  /* auto-advance discret — se oprește la interacțiune */
+  if(!reduced){
+    var auto = setInterval(function(){
+      var max = track.scrollWidth - track.clientWidth - 4;
+      if(track.scrollLeft >= max){ track.scrollTo({left:0,behavior:'smooth'}); }
+      else go(1);
+    },5200);
+    ['pointerdown','wheel','keydown','touchstart'].forEach(function(ev){
+      track.addEventListener(ev,function(){clearInterval(auto);},{once:true,passive:true});
+    });
+    document.addEventListener('visibilitychange',function(){
+      if(document.hidden) clearInterval(auto);
+    });
+  }
+
+  /* ---------- cursor punct ---------- */
+  var cur = document.querySelector('.cursor');
+  if(window.matchMedia('(pointer:fine)').matches){
+    var cx=0,cy=0,tx=0,ty=0,raf;
+    window.addEventListener('mousemove',function(e){
+      tx=e.clientX;ty=e.clientY;
+      cur.classList.add('is-on');
+      if(!raf) raf = requestAnimationFrame(loop);
+    });
+    function loop(){
+      cx += (tx-cx)*.2; cy += (ty-cy)*.2;
+      cur.style.left = (cx - cur.offsetWidth/2)+'px';
+      cur.style.top  = (cy - cur.offsetHeight/2)+'px';
+      raf = requestAnimationFrame(loop);
+    }
+    document.querySelectorAll('a,button,.car-track').forEach(function(el){
+      el.addEventListener('mouseenter',function(){cur.classList.add('is-hover');});
+      el.addEventListener('mouseleave',function(){cur.classList.remove('is-hover');});
+    });
+  }
+})();
+</script>
+</body>
+</html>
