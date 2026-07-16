@@ -11,8 +11,7 @@
 
 <!-- preload panel backgrounds so crossfade never stalls -->
 <link rel="preload" as="image" href="assets/Imagini/dealuri-cu-vii.jpg">
-<link rel="preload" as="image" href="assets/Imagini/Cuvintepage.png">
-<link rel="preload" as="image" href="assets/Imagini/frunze.jpeg">
+<link rel="preload" as="image" href="assets/Imagini/Landing2.png">
 <link rel="preload" as="image" href="assets/Imagini/homepage-desaturat.jpg">
 <style>
 /* ============================================================
@@ -75,10 +74,21 @@ button{font:inherit}
   background-size:cover;background-position:center;
   opacity:0;will-change:opacity;
   transition:opacity .5s ease-out;
-  filter:saturate(.75) contrast(1.05) brightness(1.02) sepia(.02);
+  filter:saturate(.9) contrast(1.05) brightness(1.02) sepia(0);
   transform:translateZ(0); /* GPU layer */
 }
-.bg-layer.is-active{opacity:.34}
+.bg-layer.is-active{opacity:.42}
+/* Pan mode — folosit pe panourile Cuvinte + Semne care împart aceeași
+   imagine panoramică (asr.png). Background e scalat mai lat decât viewportul,
+   iar `background-position-x` e animat de JS pe scroll (0% → 100% când
+   user trece de la Cuvinte spre Semne). Imaginea „stă fixă" iar user vede
+   secțiuni diferite. */
+.bg-layer.bg-pan{
+  background-size:auto 100%;
+  background-repeat:no-repeat;
+  background-position:0% center;
+  will-change:background-position;
+}
 /* dithered noise overlay — creates the pixel-dissolve feel during crossfade */
 .bg-dither{
   position:fixed;inset:0;z-index:1;pointer-events:none;
@@ -422,8 +432,8 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
 <!-- background layer stack (crossfade per panel) -->
 <div class="bg-stack" aria-hidden="true">
   <div class="bg-layer" data-idx="0" style="background-image:url('assets/Imagini/dealuri-cu-vii.jpg')"></div>
-  <div class="bg-layer" data-idx="1" style="background-image:url('assets/Imagini/Cuvintepage.png')"></div>
-  <div class="bg-layer" data-idx="2" style="background-image:url('assets/Imagini/frunze.jpeg')"></div>
+  <div class="bg-layer bg-pan" data-idx="1" style="background-image:url('assets/Imagini/Landing2.png')"></div>
+  <div class="bg-layer bg-pan" data-idx="2" style="background-image:url('assets/Imagini/Landing2.png')"></div>
   <div class="bg-layer" data-idx="3" style="background-image:url('assets/Imagini/homepage-desaturat.jpg')"></div>
 </div>
 <div class="bg-dither" aria-hidden="true"></div>
@@ -443,7 +453,7 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
   </a>
   <nav class="nav" aria-label="Navigație principală">
     <a href="#" data-goto="0">Home</a>
-    <a href="#">Descoperă</a>
+    <a href="landing-v6-descopera.html" data-exit-descopera>Descoperă</a>
     <a href="#">Contact</a>
     <a href="#" class="nav-shop"><span>Shop now</span></a>
     <span class="lang" aria-label="Limbă"><b>RO</b><span aria-hidden="true">/</span><span title="în curând">EN</span></span>
@@ -463,7 +473,7 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
 
     <!-- 01 · Welcome -->
     <section class="panel" data-label="descoperă" data-color="#4A3C2D" aria-label="Bun venit">
-      <div class="center">
+      <div class="center" id="welcomeCenter" role="link" tabindex="0" aria-label="Descoperă povestea domeniului" style="cursor:pointer">
         <span class="dot" style="--dot:#4A3C2D" role="img" aria-label="Punct de reper — Descoperă"></span>
         <p class="welcome-lead">un loc &middot; un timp &middot; un vin</p>
         <p class="sub">45.98&deg;N &middot; 27.30&deg;E</p>
@@ -571,7 +581,11 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
     t.textContent = p.dataset.label;
     g.appendChild(t);
 
-    g.addEventListener('click',function(){goTo(i);});
+    g.addEventListener('click',function(){
+      /* dot-ul „descoperă" deja activ → exit animat spre pagina Descoperă */
+      if(i===0 && active===0){ exitToDescopera(); return; }
+      goTo(i);
+    });
     wheel.appendChild(g);
     items.push(g);
   });
@@ -599,6 +613,39 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
 
   /* ---------- background stack (crossfade at each panel) ---------- */
   var bgLayers = Array.prototype.slice.call(document.querySelectorAll('.bg-layer'));
+
+  /* ---------- exit animat spre pagina Descoperă ----------
+     Textul central + dot-ul se retrag (scale-down + fade), fundalul
+     se stinge, apoi navigăm. ~450ms. */
+  var exiting = false;
+  function exitToDescopera(){
+    if(exiting) return;
+    exiting = true;
+    var url = 'landing-v6-descopera.html';
+    if(typeof gsap === 'undefined' || reduced){ window.location.href = url; return; }
+    var c = panels[0].querySelector('.center');
+    gsap.timeline({
+      defaults:{duration:.45,ease:'power2.in'},
+      onComplete:function(){ window.location.href = url; }
+    })
+    .to(c,{scale:.9,y:26,opacity:0},0)
+    .to('.bg-layer',{opacity:0},0)
+    .to(['.line-svg','.counter','.legal','.progress'],{opacity:0,duration:.4},0);
+  }
+  /* link-ul „Descoperă" din nav + blocul central Welcome */
+  document.querySelectorAll('[data-exit-descopera]').forEach(function(a){
+    a.addEventListener('click',function(ev){ev.preventDefault();exitToDescopera();});
+  });
+  var welcomeCenter = document.getElementById('welcomeCenter');
+  if(welcomeCenter){
+    welcomeCenter.addEventListener('click',function(){
+      if(typeof dragMoved !== 'undefined' && dragMoved) return;
+      exitToDescopera();
+    });
+    welcomeCenter.addEventListener('keydown',function(e){
+      if(e.key==='Enter' || e.key===' '){e.preventDefault();exitToDescopera();}
+    });
+  }
 
   /* =====================================================
      VERTICAL fallback (mobile / reduced motion)
@@ -745,6 +792,18 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
         /* multiplier 0 = backdropul se mișcă odată cu track-ul → user citește
            textul complet din partea stângă în dreapta pe durata full a scroll-ului */
         setMegaX(0);
+        /* Pan asr.png între Cuvinte (idx 1) și Semne (idx 2). Intervalul de
+           scroll pe care se aplică e extins la cont [0.5, 2.5] — 2× mai lent
+           decât panouri strict [1,2]. Pan-ul continuă subtil și la intrarea
+           dinspre Welcome și la ieșirea spre Pauze, dar acele bg-layers au
+           opacity 0 acolo, deci user nu vede pan-ul dinafara secțiunii asr.
+           smoothStep aplicat suplimentar pentru mișcare cu accelerație lină. */
+        var panRaw  = (cont - 0.5) / 2.0;
+        var panFrac = Math.max(0, Math.min(1, panRaw));
+        panFrac     = panFrac * panFrac * (3 - 2 * panFrac); // smoothStep
+        var panPos  = (panFrac * 100).toFixed(2) + '%';
+        if(bgLayers[1]) bgLayers[1].style.backgroundPositionX = panPos;
+        if(bgLayers[2]) bgLayers[2].style.backgroundPositionX = panPos;
         if(lineClipRect && linePts.length){
           /* reveal aligns exactly to star centers at each panel */
           var idx  = Math.floor(cont);
@@ -849,8 +908,11 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
       cx += (tx-cx)*.18; cy += (ty-cy)*.18;
       cur.style.transform='translate('+ (cx-cur.offsetWidth/2) +'px,'+ (cy-cur.offsetHeight/2) +'px)';
     });
-    document.querySelectorAll('a.center').forEach(function(d){
-      d.addEventListener('mouseenter',function(){cur.classList.add('is-hover');curSmall.textContent='vezi gama';});
+    document.querySelectorAll('a.center, #welcomeCenter').forEach(function(d){
+      d.addEventListener('mouseenter',function(){
+        cur.classList.add('is-hover');
+        curSmall.textContent = (d.id==='welcomeCenter') ? 'descoperă' : 'vezi gama';
+      });
       d.addEventListener('mouseleave',function(){cur.classList.remove('is-hover');});
     });
   }
