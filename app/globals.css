@@ -17,9 +17,9 @@
   --pivnita: #1a1a1a;
 
   /* semantic — light */
-  --bg: #f2eae2; /* test — revenim la var(--pamant) dacă nu place */
-  --bg-alt: #e2d8ce;
-  --surface: #f2eae2;
+  --bg: #faf9f6; /* off-white neutru — brand background */
+  --bg-alt: #f0ede7;
+  --surface: #f5f2ec;
   --ink: var(--pivnita);
   --ink-soft: var(--stejar);
   /* --piatra (#A89D8D) reads as 2.0:1 on bg-pamant which fails WCAG AA.
@@ -28,7 +28,7 @@
      --piatra token stays unchanged for decorative use (svg lines, etc). */
   --ink-mute: #6e5e4b;
   --line: rgba(74, 60, 45, 0.18);
-  --field-bg: #f6efe8;
+  --field-bg: #f5f2ec;
 
   /* layout */
   --container: 1320px;

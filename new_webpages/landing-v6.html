@@ -8,6 +8,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- preload panel backgrounds so crossfade never stalls -->
+<link rel="preload" as="image" href="assets/Imagini/homepage-desaturat.jpg">
+<link rel="preload" as="image" href="assets/Imagini/dealuri-cu-vii.jpg">
+<link rel="preload" as="image" href="assets/Imagini/frunze.jpeg">
 <style>
 /* ============================================================
    DOMENIUL LOCUS — landing v6
@@ -24,7 +29,7 @@
   --stejar:  #4A3C2D;
   --pivnita: #1A1A1A;
 
-  --bg:        var(--pamant);
+  --bg:        #faf9f6; /* off-white neutru — brand background */
   --ink:       var(--pivnita);
   --ink-soft:  var(--stejar);
   --ink-mute:  var(--piatra);
@@ -47,7 +52,6 @@ body{
   font-family:var(--mono);
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
-  transition:background-color .9s var(--ease);
 }
 img{max-width:100%;user-select:none;-webkit-user-drag:none}
 a{color:inherit;text-decoration:none}
@@ -59,6 +63,27 @@ button{font:inherit}
   position:fixed;inset:0;z-index:1000;pointer-events:none;opacity:.05;
   mix-blend-mode:multiply;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- background stack (cross-dissolve per panel) ---------- */
+.bg-stack{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.bg-layer{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  opacity:0;will-change:opacity;
+  transition:opacity .5s ease-out;
+  filter:saturate(.32) contrast(1.06) brightness(1.05) sepia(.06);
+  transform:translateZ(0); /* GPU layer */
+}
+.bg-layer.is-active{opacity:.18}
+/* dithered noise overlay — creates the pixel-dissolve feel during crossfade */
+.bg-dither{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  opacity:.06;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.35' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 30 -15'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23d)'/%3E%3C/svg%3E");
+  background-size:320px 320px;
 }
 
 /* ---------- chrome: logo + nav ---------- */
@@ -107,7 +132,7 @@ button{font:inherit}
 
 /* ---------- rotating semicircle nav (4 stații) ---------- */
 .arc-wrap{
-  position:fixed;top:0;left:50%;transform:translateX(-50%);
+  position:fixed;top:-70px;left:50%;transform:translateX(-50%);
   width:clamp(760px,72vw,1180px);z-index:60;pointer-events:none;
 }
 .arc-wrap svg{display:block;width:100%;height:auto;overflow:visible}
@@ -119,10 +144,10 @@ button{font:inherit}
   pointer-events:auto;cursor:pointer;
 }
 .arc-item text{
-  font-family:var(--mono);font-size:14px;letter-spacing:2.4px;
+  font-family:var(--mono);font-size:17px;letter-spacing:2.6px;
   text-transform:uppercase;fill:var(--ink-mute);
   transition:fill .6s var(--ease),opacity .6s var(--ease);
-  opacity:.7;pointer-events:auto;cursor:pointer;
+  opacity:.72;pointer-events:auto;cursor:pointer;
 }
 .arc-item.is-active circle{fill:var(--ink);transform:scale(2.2)}
 .arc-item.is-active text{fill:var(--ink);opacity:1}
@@ -138,13 +163,11 @@ button{font:inherit}
 }
 .line-svg{position:absolute;top:0;left:0;z-index:2;pointer-events:none;overflow:visible}
 .line-path{fill:none;stroke:var(--auriu);stroke-width:2.6;stroke-linecap:round;stroke-dasharray:1 17;opacity:.6;animation:antsMove 46s linear infinite}
-.line-node{fill:var(--auriu);opacity:.55;transition:r .5s var(--ease),fill .5s var(--ease),opacity .5s var(--ease)}
-.line-node.is-active{fill:var(--ink);opacity:1}
 @keyframes antsMove{to{stroke-dashoffset:-306px}}
 .mega-backdrop{
   position:absolute;left:6vw;bottom:-.12em;
   font-family:var(--belle);font-weight:400;white-space:nowrap;
-  font-size:clamp(220px,26vw,400px);line-height:.9;
+  font-size:clamp(160px,20vw,300px);line-height:.9;
   color:var(--ink);opacity:.075;z-index:1;
   will-change:transform;pointer-events:none;
 }
@@ -153,7 +176,7 @@ button{font:inherit}
 .center{
   position:relative;z-index:5;text-align:center;
   display:flex;flex-direction:column;align-items:center;
-  transform:translateY(4vh);
+  transform:translateY(9vh);
   will-change:transform,opacity;
 }
 a.center{cursor:pointer}
@@ -161,26 +184,51 @@ a.center{cursor:pointer}
   height:clamp(36px,4.4vw,50px);width:auto;
   margin-top:32px;margin-bottom:22px;opacity:.9;
 }
+.gama-logo-lg{
+  height:clamp(66px,7.6vw,96px);
+  width:auto;object-fit:contain;
+  margin-top:36px;margin-bottom:16px;opacity:.95;
+}
+.gama-wordmark{
+  font-family:var(--cormo);font-style:italic;font-weight:400;
+  font-size:clamp(56px,7vw,88px);line-height:1;letter-spacing:-.01em;
+  color:var(--ink);opacity:.95;
+  margin-top:36px;margin-bottom:16px;
+  display:inline-block;
+}
+.gama-wordmark b{font-weight:400;font-family:var(--serif);letter-spacing:.02em}
+.gama-wordmark span{margin:0 .18em;opacity:.5;font-family:var(--cormo);font-style:normal}
+.gama-wordmark-solo{
+  font-family:var(--serif);font-style:normal;
+  font-size:clamp(64px,8vw,100px);letter-spacing:.005em;
+}
+.gama-logo-pauze{
+  /* emblem is square 1:1, so bigger — "pauze" text within it is only ~35% of height */
+  height:clamp(220px,24vw,320px);
+  width:auto;object-fit:contain;
+  /* tighter than wordmark spacing — the emblem already includes internal padding */
+  margin-top:8px;margin-bottom:0;opacity:.95;
+}
+/* Pauze center block pushed lower so star clears the arc nav */
+.panel[data-label="pauze"] .center{transform:translateY(14vh)}
+.welcome-lead{
+  font-family:var(--cormo);font-style:italic;font-weight:400;
+  font-size:clamp(40px,5vw,68px);line-height:1;letter-spacing:.005em;
+  color:var(--ink);opacity:.94;
+  margin-top:38px;margin-bottom:14px;
+}
 .dot{
-  position:relative;width:106px;height:106px;border-radius:50%;
-  background:var(--dot,#CBBEAE);
-  border:1px solid rgba(26,26,26,.12);
-  box-shadow:inset 0 -14px 30px rgba(26,26,26,.08), 0 18px 44px rgba(26,26,26,.10);
+  position:relative;
+  width:clamp(72px,8vw,104px);
+  height:clamp(72px,8vw,104px);
+  background:var(--dot,#4A3C2D);
+  -webkit-mask-image:url('assets/graphics/simbol-negru.png');
+          mask-image:url('assets/graphics/simbol-negru.png');
+  -webkit-mask-size:contain;         mask-size:contain;
+  -webkit-mask-position:center;      mask-position:center;
+  -webkit-mask-repeat:no-repeat;     mask-repeat:no-repeat;
   animation:breath 5.5s ease-in-out infinite;
 }
-.dot::before{
-  content:"";position:absolute;left:50%;top:50%;
-  width:172%;height:172%;transform:translate(-50%,-50%);
-  border-radius:50%;background:var(--dot,#CBBEAE);
-  filter:blur(30px);opacity:.38;z-index:-1;
-}
-.dot::after{
-  content:"";position:absolute;inset:-14px;border-radius:50%;
-  border:1px solid var(--line);
-  opacity:0;transform:scale(.85);
-  transition:opacity .8s var(--ease),transform .8s var(--ease);
-}
-.panel.is-active .dot::after{opacity:1;transform:scale(1)}
 @keyframes breath{
   0%,100%{transform:scale(1)}
   50%{transform:scale(1.045)}
@@ -347,6 +395,15 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
 </head>
 <body>
 
+<!-- background layer stack (crossfade per panel) -->
+<div class="bg-stack" aria-hidden="true">
+  <div class="bg-layer" data-idx="0" style="background-image:url('assets/Imagini/homepage-desaturat.jpg')"></div>
+  <div class="bg-layer" data-idx="1" style="background-image:url('assets/Imagini/dealuri-cu-vii.jpg')"></div>
+  <div class="bg-layer" data-idx="2" style="background-image:url('assets/Imagini/frunze.jpeg')"></div>
+  <div class="bg-layer" data-idx="3" style="background-image:url('assets/Imagini/homepage-desaturat.jpg')"></div>
+</div>
+<div class="bg-dither" aria-hidden="true"></div>
+
 <div class="grain" aria-hidden="true"></div>
 <div class="cursor" aria-hidden="true"><small>trage &rarr;</small></div>
 
@@ -374,67 +431,42 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
   <div class="track" id="track">
 
     <svg class="line-svg" id="lineSvg" aria-hidden="true"></svg>
-    <span class="mega-backdrop" id="megaBackdrop" aria-hidden="true">Un loc unde timpul își găsește propriul ritm și fiecare sticlă poartă mărturia răbdării noastre. Vinuri născute din grija pentru locul, pentru moment și pentru cei care le vor gusta.</span>
+    <span class="mega-backdrop" id="megaBackdrop" aria-hidden="true">un loc &middot; un timp &middot; un vin</span>
 
     <!-- 01 · Welcome -->
-    <section class="panel" data-label="buciumeni" data-color="#CBBEAE" aria-label="Bun venit">
-      <div class="collage">
-        <img class="c-curbe" src="assets/graphics/curbe-nivel.png" alt="">
-        <img class="c-simbol" src="assets/graphics/simbol-auriu.png" alt="">
-      </div>
+    <section class="panel" data-label="buciumeni" data-color="#4A3C2D" aria-label="Bun venit">
       <div class="center">
-        <span class="dot" style="--dot:#CBBEAE" role="img" aria-label="Punct de reper Buciumeni"></span>
-        <img class="gama-logo" src="assets/logos/locus.png" alt="Domeniul Locus">
-        <h1 class="title">Vinurile din Buciumeni</h1>
-        <p class="sub">Panciu &middot; Nicore&#537;ti &middot; 45.98&deg;N</p>
+        <span class="dot" style="--dot:#4A3C2D" role="img" aria-label="Punct de reper Buciumeni"></span>
+        <p class="welcome-lead">un loc &middot; un timp &middot; un vin</p>
+        <p class="sub">Buciumeni &middot; Panciu &middot; Nicore&#537;ti &middot; 45.98&deg;N</p>
       </div>
     </section>
 
     <!-- 02 · Cuvinte -->
-    <section class="panel pos-r" data-label="cuvinte" data-color="#CBBEAE" aria-label="Gama cuvinte">
-      <div class="collage">
-        <div class="c-trio">
-          <img src="assets/bottles/cuvinte-feteasca-neagra.png" alt="">
-          <img src="assets/bottles/cuvinte-feteasca-regala.png" alt="">
-          <img src="assets/bottles/cuvinte-riesling.png" alt="">
-        </div>
-        <img class="c-mark" src="assets/graphics/simbol-negru.png" alt="">
-      </div>
+    <section class="panel" data-label="cuvinte" data-color="#8B7841" aria-label="Gama cuvinte">
       <a class="center" href="landing-v6-cuvinte.html" aria-label="Deschide gama cuvinte">
-        <span class="dot" style="--dot:#CBBEAE"></span>
-        <img class="gama-logo" src="assets/logos/locus-cuvinte.png" alt="Locus — gama cuvinte">
-        <h2 class="title">Cuvinte</h2>
+        <span class="dot" style="--dot:#8B7841"></span>
+        <img class="gama-logo gama-logo-lg" src="assets/logos/locus-cuvinte.png" alt="Locus — gama cuvinte">
         <p class="sub">Gama de baz&#259; &middot; trei vinuri &middot; <em>din grija zilei</em></p>
         <span class="enter-cue">intr&#259; &icirc;n gam&#259;</span>
       </a>
     </section>
 
     <!-- 03 · Semne -->
-    <section class="panel pos-l" data-label="semne" data-color="#3E4336" aria-label="Gama semne">
-      <div class="collage">
-        <img class="c-bottle" src="assets/bottles/semne.png" alt="">
-        <img class="c-semn" src="assets/graphics/semne-1.png" alt="">
-      </div>
+    <section class="panel" data-label="semne" data-color="#A89D8D" aria-label="Gama semne">
       <a class="center" href="landing-v6-semne.html" aria-label="Deschide gama semne">
-        <span class="dot" style="--dot:#3E4336"></span>
-        <img class="gama-logo" src="assets/logos/locus-semne.png" alt="Locus — gama semne">
-        <h2 class="title">Semne</h2>
+        <span class="dot" style="--dot:#A89D8D"></span>
+        <img class="gama-logo gama-logo-lg" src="assets/logos/locus-semne.png" alt="Locus — gama semne">
         <p class="sub">Gama premium &middot; trei vinuri &middot; <em>pentru mesele care merit&#259; timp</em></p>
         <span class="enter-cue">intr&#259; &icirc;n gam&#259;</span>
       </a>
     </section>
 
     <!-- 04 · Pauze -->
-    <section class="panel" data-label="pauze" data-color="#4A3C2D" aria-label="Pauze — rezerve în pregătire">
-      <div class="collage">
-        <img class="c-curbe" src="assets/graphics/curbe-nivel.png" alt="">
-        <img class="c-pauze" src="assets/logos/locus-pauze.png" alt="">
-        <span class="c-note">&icirc;n preg&#259;tire</span>
-      </div>
+    <section class="panel" data-label="pauze" data-color="#3E4336" aria-label="Pauze — rezerve în pregătire">
       <a class="center" href="landing-v6-pauze.html" aria-label="Deschide gama pauze">
-        <span class="dot" style="--dot:#4A3C2D"></span>
-        <img class="gama-logo" src="assets/logos/locus-pauze.png" alt="Locus — gama pauze">
-        <h2 class="title">Pauze</h2>
+        <span class="dot" style="--dot:#3E4336"></span>
+        <img class="gama-logo gama-logo-pauze" src="assets/logos/locus-pauze.png" alt="Locus — pauze">
         <p class="sub">Rezerve &middot; <em>&icirc;n preg&#259;tire</em></p>
         <span class="enter-cue">vezi capitolul</span>
       </a>
@@ -462,7 +494,7 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
   var stage = document.getElementById('stage');
   var pbar  = document.getElementById('pbar');
   var cnow  = document.getElementById('cnow');
-  var BASE  = '#EBE1DA';
+  var BASE  = '#faf9f6';
 
   /* ---------- color helpers ---------- */
   function hex2rgb(h){h=h.replace('#','');return[parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
@@ -522,19 +554,21 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
     active = i;
     items.forEach(function(g,k){g.classList.toggle('is-active',k===i);});
     panels.forEach(function(p,k){p.classList.toggle('is-active',k===i);});
-    lineNodes.forEach(function(c,k){c.classList.toggle('is-active',k===i);});
+    bgLayers.forEach(function(l,k){l.classList.toggle('is-active',k===i);});
     cnow.textContent = (i+1<10?'0':'')+(i+1);
     if(typeof gsap!=='undefined' && !reduced){
-      gsap.to(document.body,{backgroundColor:tints[i],duration:1,ease:'power2.out',overwrite:'auto'});
+      gsap.to(document.body,{backgroundColor:tints[i],duration:.55,ease:'power2.out',overwrite:'auto'});
     }else{
       document.body.style.backgroundColor = tints[i];
     }
   }
 
+  /* ---------- background stack (crossfade at each panel) ---------- */
+  var bgLayers = Array.prototype.slice.call(document.querySelectorAll('.bg-layer'));
+
   /* =====================================================
      VERTICAL fallback (mobile / reduced motion)
      ===================================================== */
-  var lineNodes = [];
   if(vertical){
     document.documentElement.classList.add('is-vertical');
     setActive(0);
@@ -564,6 +598,7 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
   var lineSvg = document.getElementById('lineSvg');
   var lineClipRect = null;
   var lineTotalW = 0;
+  var linePts = [];
 
   function catmullRom2bezier(pts){
     if(pts.length<2) return '';
@@ -590,13 +625,26 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
     lineSvg.setAttribute('height', H);
     lineSvg.setAttribute('viewBox','0 0 '+W+' '+H);
     lineSvg.innerHTML='';
-    lineNodes = [];
 
     var pts = panels.map(function(p){
       var d = p.querySelector('.dot');
       var r = d.getBoundingClientRect();
       return { x: r.left - trackRect.left + r.width/2, y: r.top - trackRect.top + r.height/2 };
     });
+
+    /* ---------- build wavy path (undulating between dots) ---------- */
+    var wavyPts = [];
+    var AMP = Math.min(140, window.innerHeight * 0.12);
+    for (var wi = 0; wi < pts.length; wi++) {
+      wavyPts.push(pts[wi]);
+      if (wi < pts.length - 1) {
+        var a = pts[wi], b = pts[wi+1];
+        var baseY = (a.y + b.y) / 2;
+        var dir   = (wi % 2 === 0) ? -1 : 1;
+        wavyPts.push({ x: a.x + (b.x - a.x) * 0.33, y: baseY + AMP * dir });
+        wavyPts.push({ x: a.x + (b.x - a.x) * 0.67, y: baseY - AMP * dir });
+      }
+    }
 
     var defs = document.createElementNS(SVGNS,'defs');
     var clip = document.createElementNS(SVGNS,'clipPath');
@@ -613,18 +661,11 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
     g.setAttribute('clip-path','url(#lineClip)');
 
     var path = document.createElementNS(SVGNS,'path');
-    path.setAttribute('d', catmullRom2bezier(pts));
+    path.setAttribute('d', catmullRom2bezier(wavyPts));
     path.setAttribute('class','line-path');
     g.appendChild(path);
 
-    lineNodes = pts.map(function(pt,k){
-      var c = document.createElementNS(SVGNS,'circle');
-      c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); c.setAttribute('r', 5);
-      c.setAttribute('class','line-node'+(k===active?' is-active':''));
-      g.appendChild(c);
-      return c;
-    });
-
+    linePts = pts;
     lineSvg.appendChild(g);
     lineTotalW = W;
   }
@@ -650,13 +691,13 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
       start:'top top',
       end:function(){return '+='+ maxX()*1.15;},
       pin:true,
-      scrub:1,
+      scrub:.5,
       invalidateOnRefresh:true,
       snap:{
         snapTo:1/(N-1),
-        duration:{min:.35,max:.9},
-        ease:'power2.inOut',
-        delay:.05,
+        duration:{min:.18,max:.42},
+        ease:'power3.out',
+        delay:.02,
         inertia:false
       },
       onUpdate:function(self){
@@ -666,8 +707,16 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
         gsap.set(wheel,{rotation:cont*STEP, svgOrigin:CX+' '+CY});
         pbar.style.transform = 'scaleX('+p+')';
         setActive(Math.round(cont));
-        setMegaX(p*maxX()*0.35);
-        if(lineClipRect) lineClipRect.setAttribute('width', p*lineTotalW);
+        setMegaX(p*maxX()*0.6);
+        if(lineClipRect && linePts.length){
+          /* reveal aligns exactly to star centers at each panel */
+          var idx  = Math.floor(cont);
+          var frac = cont - idx;
+          var nxt  = Math.min(idx + 1, linePts.length - 1);
+          var xL   = linePts[idx].x;
+          var xR   = linePts[nxt].x;
+          lineClipRect.setAttribute('width', xL + (xR - xL) * frac);
+        }
 
         for(var k=0;k<N;k++){
           var doff = k - cont;
