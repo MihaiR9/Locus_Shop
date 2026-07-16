@@ -7,7 +7,7 @@
 <meta name="description" content="Domeniul Locus — vinuri din Buciumeni, între Panciu și Nicorești. Gamele cuvinte, semne și pauze.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 <!-- preload panel backgrounds so crossfade never stalls -->
 <link rel="preload" as="image" href="assets/Imagini/homepage-desaturat.jpg">
@@ -92,7 +92,7 @@ button{font:inherit}
 .brand{position:absolute;top:20px;left:26px;display:block}
 .brand-clip{display:block;overflow:hidden}
 .brand-logo{
-  height:clamp(68px,7vw,88px);width:auto;display:block;
+  height:clamp(56px,5vw,78px);width:auto;display:block;
   clip-path:inset(0 100% 0 0);
   animation:logoReveal 1.2s var(--ease) .2s forwards;
 }
@@ -102,9 +102,9 @@ button{font:inherit}
   100%{clip-path:inset(0 0 0 0);opacity:1}
 }
 .nav{
-  position:absolute;top:44px;right:36px;
-  display:flex;align-items:center;gap:30px;
-  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  position:absolute;top:36px;right:32px;
+  display:flex;align-items:center;gap:26px;
+  font-size:12.5px;letter-spacing:.06em;
   color:var(--ink-soft);
 }
 .nav a{position:relative;padding:4px 0}
@@ -117,23 +117,26 @@ button{font:inherit}
 .nav-shop{
   position:relative;isolation:isolate;overflow:hidden;
   display:inline-flex;align-items:center;justify-content:center;
-  padding:12px 28px;border:1px solid var(--ink);border-radius:999px;
+  padding:13px 54px;border:1px solid var(--ink);border-radius:999px;
+  background:var(--ink);
+  transition:background .5s var(--ease),border-color .5s var(--ease);
 }
-.nav-shop span{position:relative;z-index:1;font-size:9.5px;letter-spacing:.22em;color:var(--ink);transition:color .5s var(--ease)}
+.nav-shop span{position:relative;z-index:1;font-size:12.5px;letter-spacing:.06em;color:var(--bg);transition:color .5s var(--ease)}
 .nav-shop::after{
-  content:"";position:absolute;inset:0;background:var(--ink);z-index:0;
+  content:"";position:absolute;inset:0;background:var(--bg);z-index:0;
   transform:translateY(101%);transition:transform .5s var(--ease);
 }
+.nav-shop:hover{background:transparent}
 .nav-shop:hover::after{transform:translateY(0)}
-.nav-shop:hover span{color:var(--bg)}
+.nav-shop:hover span{color:var(--ink)}
 .lang{display:flex;gap:8px;align-items:center;color:var(--ink-mute)}
 .lang b{font-weight:500;color:var(--ink);border-bottom:1px solid currentColor;padding-bottom:3px}
 .lang span:not(b){opacity:.55}
 
 /* ---------- rotating semicircle nav (4 stații) ---------- */
 .arc-wrap{
-  position:fixed;top:-70px;left:50%;transform:translateX(-50%);
-  width:clamp(760px,72vw,1180px);z-index:60;pointer-events:none;
+  position:fixed;top:-130px;left:50%;transform:translateX(-50%);
+  width:clamp(660px,62vw,1020px);z-index:60;pointer-events:none;
 }
 .arc-wrap svg{display:block;width:100%;height:auto;overflow:visible}
 .arc-ring{fill:none;stroke:var(--line);stroke-width:1}
@@ -144,13 +147,13 @@ button{font:inherit}
   pointer-events:auto;cursor:pointer;
 }
 .arc-item text{
-  font-family:var(--mono);font-size:17px;letter-spacing:2.6px;
-  text-transform:uppercase;fill:var(--ink-mute);
+  font-family:var(--mono);font-size:20px;letter-spacing:.6px;
+  text-transform:none;fill:var(--ink-soft);
   transition:fill .6s var(--ease),opacity .6s var(--ease);
-  opacity:.72;pointer-events:auto;cursor:pointer;
+  opacity:.55;pointer-events:auto;cursor:pointer;
 }
-.arc-item.is-active circle{fill:var(--ink);transform:scale(2.2)}
-.arc-item.is-active text{fill:var(--ink);opacity:1}
+.arc-item.is-active circle{fill:var(--ink);transform:scale(2)}
+.arc-item.is-active text{fill:var(--ink);opacity:1;font-weight:500}
 .arc-pointer{fill:none;stroke:var(--ink);stroke-width:1}
 
 /* ---------- stage / horizontal track ---------- */
@@ -162,13 +165,13 @@ button{font:inherit}
   overflow:hidden;
 }
 .line-svg{position:absolute;top:0;left:0;z-index:2;pointer-events:none;overflow:visible}
-.line-path{fill:none;stroke:var(--auriu);stroke-width:2.6;stroke-linecap:round;stroke-dasharray:1 17;opacity:.6;animation:antsMove 46s linear infinite}
+.line-path{fill:none;stroke:var(--auriu);stroke-width:3.4;stroke-linecap:round;stroke-dasharray:9 22;opacity:.9;animation:antsMove 46s linear infinite}
 @keyframes antsMove{to{stroke-dashoffset:-306px}}
 .mega-backdrop{
   position:absolute;left:6vw;bottom:-.12em;
   font-family:var(--belle);font-weight:400;white-space:nowrap;
-  font-size:clamp(160px,20vw,300px);line-height:.9;
-  color:var(--ink);opacity:.075;z-index:1;
+  font-size:clamp(110px,12vw,180px);line-height:.9;
+  color:var(--ink);opacity:.08;z-index:1;
   will-change:transform;pointer-events:none;
 }
 
@@ -189,38 +192,31 @@ a.center{cursor:pointer}
   width:auto;object-fit:contain;
   margin-top:36px;margin-bottom:16px;opacity:.95;
 }
+/* Wordmark text — same font (IBM Plex Mono 700) as the original PNGs, but as text
+   for flexibility (scaling, styling, fast load). Applies to cuvinte / semne / pauze. */
 .gama-wordmark{
-  font-family:var(--cormo);font-style:italic;font-weight:400;
-  font-size:clamp(56px,7vw,88px);line-height:1;letter-spacing:-.01em;
-  color:var(--ink);opacity:.95;
-  margin-top:36px;margin-bottom:16px;
   display:inline-block;
+  font-family:var(--mono);
+  font-weight:700;font-style:normal;
+  font-size:clamp(44px,5.2vw,82px);
+  line-height:.95;letter-spacing:-.05em;
+  color:var(--ink);text-transform:lowercase;
+  margin-top:28px;margin-bottom:14px;opacity:.95;
 }
-.gama-wordmark b{font-weight:400;font-family:var(--serif);letter-spacing:.02em}
-.gama-wordmark span{margin:0 .18em;opacity:.5;font-family:var(--cormo);font-style:normal}
 .gama-wordmark-solo{
   font-family:var(--serif);font-style:normal;
   font-size:clamp(64px,8vw,100px);letter-spacing:.005em;
 }
-.gama-logo-pauze{
-  /* emblem is square 1:1, so bigger — "pauze" text within it is only ~35% of height */
-  height:clamp(220px,24vw,320px);
-  width:auto;object-fit:contain;
-  /* tighter than wordmark spacing — the emblem already includes internal padding */
-  margin-top:8px;margin-bottom:0;opacity:.95;
-}
-/* Pauze center block pushed lower so star clears the arc nav */
-.panel[data-label="pauze"] .center{transform:translateY(14vh)}
 .welcome-lead{
-  font-family:var(--cormo);font-style:italic;font-weight:400;
-  font-size:clamp(40px,5vw,68px);line-height:1;letter-spacing:.005em;
+  font-family:var(--serif);font-style:normal;font-weight:400;
+  font-size:clamp(52px,6.4vw,88px);line-height:1;letter-spacing:.005em;
   color:var(--ink);opacity:.94;
   margin-top:38px;margin-bottom:14px;
 }
 .dot{
   position:relative;
-  width:clamp(72px,8vw,104px);
-  height:clamp(72px,8vw,104px);
+  width:clamp(52px,5.6vw,80px);
+  height:clamp(52px,5.6vw,80px);
   background:var(--dot,#4A3C2D);
   -webkit-mask-image:url('assets/graphics/simbol-negru.png');
           mask-image:url('assets/graphics/simbol-negru.png');
@@ -325,26 +321,53 @@ a.center:hover .enter-cue::after{transform:translateX(6px)}
 }
 .counter span{color:var(--ink-mute);font-size:14px}
 .legal{
-  position:fixed;left:36px;bottom:24px;z-index:65;
+  position:fixed;left:36px;bottom:24px;right:36px;z-index:65;
   font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
   color:var(--ink-mute);transition:opacity .3s;
+  display:flex;flex-wrap:wrap;gap:0 .35em;justify-content:center;
 }
+.legal span,.legal a{white-space:nowrap}
+.legal a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:1px;transition:border-color .3s var(--ease),color .3s var(--ease)}
+.legal a:hover{color:var(--ink);border-bottom-color:currentColor}
+@media (max-width:768px){.legal{font-size:7.5px;left:16px;right:16px;gap:0 .28em}}
 
 /* ---------- custom cursor ---------- */
 .cursor{
   position:fixed;top:0;left:0;z-index:1001;pointer-events:none;
-  width:10px;height:10px;border-radius:99px;background:var(--ink);
+  width:38px;height:38px;border-radius:999px;
+  background:transparent;border:1px solid var(--ink-soft);
   transform:translate(-50%,-50%);
-  display:flex;align-items:center;justify-content:center;
-  transition:width .35s var(--ease),height .35s var(--ease),background .35s var(--ease),opacity .3s;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  transition:width .3s var(--ease),height .3s var(--ease),background .3s var(--ease),border-color .3s var(--ease),opacity .3s;
   opacity:0;
 }
+.cursor .arr{
+  width:6px;height:10px;
+  color:var(--ink-soft);
+  opacity:.6;transition:opacity .25s var(--ease),transform .25s var(--ease);
+}
+.cursor .arr svg{display:block;width:100%;height:100%}
+.cursor .dot-c{
+  width:5px;height:5px;border-radius:99px;background:var(--ink-soft);
+  opacity:0;transition:opacity .25s var(--ease);
+  position:absolute;
+}
+.cursor.is-left .arr-r{opacity:0;transform:translateX(-4px)}
+.cursor.is-left .arr-l{opacity:1}
+.cursor.is-right .arr-l{opacity:0;transform:translateX(4px)}
+.cursor.is-right .arr-r{opacity:1}
+.cursor:not(.is-left):not(.is-right):not(.is-nav) .arr{opacity:.85}
+/* Când e peste meniul/arcul din top → doar punct central, fără săgeți */
+.cursor.is-nav .arr{opacity:0}
+.cursor.is-nav .dot-c{opacity:1}
 .cursor small{
   font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--bg);opacity:0;white-space:nowrap;transition:opacity .3s var(--ease) .1s;
+  position:absolute;
 }
 .cursor.is-on{opacity:1}
-.cursor.is-hover{width:132px;height:34px;background:var(--ink)}
+.cursor.is-hover{width:116px;height:34px;background:var(--ink);border-color:var(--ink);gap:0}
+.cursor.is-hover .arr,.cursor.is-hover .dot-c{display:none}
 .cursor.is-hover small{opacity:1}
 @media (pointer:coarse){.cursor{display:none}}
 
@@ -405,7 +428,12 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
 <div class="bg-dither" aria-hidden="true"></div>
 
 <div class="grain" aria-hidden="true"></div>
-<div class="cursor" aria-hidden="true"><small>trage &rarr;</small></div>
+<div class="cursor" aria-hidden="true">
+  <span class="arr arr-l"><svg viewBox="0 0 8 12"><path d="M6 1 L2 6 L6 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <span class="arr arr-r"><svg viewBox="0 0 8 12"><path d="M2 1 L6 6 L2 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <span class="dot-c"></span>
+  <small>vezi gama</small>
+</div>
 
 <!-- chrome -->
 <header class="chrome">
@@ -414,9 +442,9 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
   </a>
   <nav class="nav" aria-label="Navigație principală">
     <a href="#" data-goto="0">Home</a>
-    <a href="#">Despre</a>
+    <a href="#">Descoperă</a>
     <a href="#">Contact</a>
-    <a href="#" class="nav-shop"><span>Shop Now</span></a>
+    <a href="#" class="nav-shop"><span>Shop now</span></a>
     <span class="lang" aria-label="Limbă"><b>RO</b><span aria-hidden="true">/</span><span title="în curând">EN</span></span>
   </nav>
 </header>
@@ -431,14 +459,14 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
   <div class="track" id="track">
 
     <svg class="line-svg" id="lineSvg" aria-hidden="true"></svg>
-    <span class="mega-backdrop" id="megaBackdrop" aria-hidden="true">un loc &middot; un timp &middot; un vin</span>
+    <span class="mega-backdrop" id="megaBackdrop" aria-hidden="true">domeniul lócus &middot; buciumeni &middot; panciu &middot; vinuri crescute din răbdare, tăcere și mărturia locului</span>
 
     <!-- 01 · Welcome -->
-    <section class="panel" data-label="buciumeni" data-color="#4A3C2D" aria-label="Bun venit">
+    <section class="panel" data-label="descoperă" data-color="#4A3C2D" aria-label="Bun venit">
       <div class="center">
-        <span class="dot" style="--dot:#4A3C2D" role="img" aria-label="Punct de reper Buciumeni"></span>
+        <span class="dot" style="--dot:#4A3C2D" role="img" aria-label="Punct de reper — Descoperă"></span>
         <p class="welcome-lead">un loc &middot; un timp &middot; un vin</p>
-        <p class="sub">Buciumeni &middot; Panciu &middot; Nicore&#537;ti &middot; 45.98&deg;N</p>
+        <p class="sub">45.98&deg;N &middot; 27.30&deg;E</p>
       </div>
     </section>
 
@@ -446,7 +474,7 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
     <section class="panel" data-label="cuvinte" data-color="#8B7841" aria-label="Gama cuvinte">
       <a class="center" href="landing-v6-cuvinte.html" aria-label="Deschide gama cuvinte">
         <span class="dot" style="--dot:#8B7841"></span>
-        <img class="gama-logo gama-logo-lg" src="assets/logos/locus-cuvinte.png" alt="Locus — gama cuvinte">
+        <span class="gama-wordmark" aria-label="cuvinte">cuvinte</span>
         <p class="sub">Gama de baz&#259; &middot; trei vinuri &middot; <em>din grija zilei</em></p>
         <span class="enter-cue">intr&#259; &icirc;n gam&#259;</span>
       </a>
@@ -456,7 +484,7 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
     <section class="panel" data-label="semne" data-color="#A89D8D" aria-label="Gama semne">
       <a class="center" href="landing-v6-semne.html" aria-label="Deschide gama semne">
         <span class="dot" style="--dot:#A89D8D"></span>
-        <img class="gama-logo gama-logo-lg" src="assets/logos/locus-semne.png" alt="Locus — gama semne">
+        <span class="gama-wordmark" aria-label="semne">semne</span>
         <p class="sub">Gama premium &middot; trei vinuri &middot; <em>pentru mesele care merit&#259; timp</em></p>
         <span class="enter-cue">intr&#259; &icirc;n gam&#259;</span>
       </a>
@@ -466,7 +494,7 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
     <section class="panel" data-label="pauze" data-color="#3E4336" aria-label="Pauze — rezerve în pregătire">
       <a class="center" href="landing-v6-pauze.html" aria-label="Deschide gama pauze">
         <span class="dot" style="--dot:#3E4336"></span>
-        <img class="gama-logo gama-logo-pauze" src="assets/logos/locus-pauze.png" alt="Locus — pauze">
+        <span class="gama-wordmark" aria-label="pauze">pauze</span>
         <p class="sub">Rezerve &middot; <em>&icirc;n preg&#259;tire</em></p>
         <span class="enter-cue">vezi capitolul</span>
       </a>
@@ -476,10 +504,16 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
 </main>
 
 <!-- fixed hud -->
-<p class="hint">trage sau scrolleaz&#259;</p>
 <div class="progress" aria-hidden="true"><i id="pbar"></i></div>
 <p class="counter"><b id="cnow">01</b> <span>/ 04</span></p>
-<p class="legal">consum responsabil &middot; con&#539;ine sulfi&#539;i</p>
+<p class="legal">
+  <span>consum responsabil</span> &middot;
+  <span>con&#539;ine sulfi&#539;i</span> &middot;
+  <a href="#" title="Termeni și condiții">termeni</a> &middot;
+  <a href="#" title="Politica de confidențialitate">confiden&#539;ialitate</a> &middot;
+  <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer">ANPC</a> &middot;
+  <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">SOL</a>
+</p>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
@@ -507,7 +541,7 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
   /* ---------- build the semicircle nav (SVG, 4 stații) ---------- */
   var SVGNS='http://www.w3.org/2000/svg';
   var svg = document.getElementById('arc');
-  var CX=700, CY=-150, R=470, STEP=17;
+  var CX=700, CY=-150, R=470, STEP=32;
   var wheel = document.createElementNS(SVGNS,'g');
 
   var ring = document.createElementNS(SVGNS,'circle');
@@ -632,9 +666,10 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
       return { x: r.left - trackRect.left + r.width/2, y: r.top - trackRect.top + r.height/2 };
     });
 
-    /* ---------- build wavy path (undulating between dots) ---------- */
+    /* ---------- build wavy path — amplitude moderată, unduire clară dar
+       linia trece FIX prin centrul octagramei pe fiecare panel. */
     var wavyPts = [];
-    var AMP = Math.min(140, window.innerHeight * 0.12);
+    var AMP = Math.min(90, window.innerHeight * 0.09);
     for (var wi = 0; wi < pts.length; wi++) {
       wavyPts.push(pts[wi]);
       if (wi < pts.length - 1) {
@@ -691,13 +726,13 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
       start:'top top',
       end:function(){return '+='+ maxX()*1.15;},
       pin:true,
-      scrub:.5,
+      scrub:1.0,
       invalidateOnRefresh:true,
       snap:{
         snapTo:1/(N-1),
-        duration:{min:.18,max:.42},
-        ease:'power3.out',
-        delay:.02,
+        duration:{min:.4,max:.75},
+        ease:'power2.inOut',
+        delay:.05,
         inertia:false
       },
       onUpdate:function(self){
@@ -707,7 +742,9 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
         gsap.set(wheel,{rotation:cont*STEP, svgOrigin:CX+' '+CY});
         pbar.style.transform = 'scaleX('+p+')';
         setActive(Math.round(cont));
-        setMegaX(p*maxX()*0.6);
+        /* multiplier 0 = backdropul se mișcă odată cu track-ul → user citește
+           textul complet din partea stângă în dreapta pe durata full a scroll-ului */
+        setMegaX(0);
         if(lineClipRect && linePts.length){
           /* reveal aligns exactly to star centers at each panel */
           var idx  = Math.floor(cont);
@@ -799,6 +836,14 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
     window.addEventListener('mousemove',function(e){
       tx=e.clientX; ty=e.clientY;
       cur.classList.add('is-on');
+      var w = window.innerWidth;
+      var z = tx / w;
+      /* Zonă TOP — peste nav / arc (~y < 220px) → doar punct central, fără săgeți. */
+      var isNav = ty < 220;
+      cur.classList.toggle('is-nav', isNav);
+      /* Restul: zona x stânga/dreapta pentru săgeți. */
+      cur.classList.toggle('is-left',  !isNav && z < 0.33);
+      cur.classList.toggle('is-right', !isNav && z > 0.67);
     });
     gsap.ticker.add(function(){
       cx += (tx-cx)*.18; cy += (ty-cy)*.18;
@@ -806,7 +851,7 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
     });
     document.querySelectorAll('a.center').forEach(function(d){
       d.addEventListener('mouseenter',function(){cur.classList.add('is-hover');curSmall.textContent='vezi gama';});
-      d.addEventListener('mouseleave',function(){cur.classList.remove('is-hover');curSmall.textContent='trage →';});
+      d.addEventListener('mouseleave',function(){cur.classList.remove('is-hover');});
     });
   }
 
