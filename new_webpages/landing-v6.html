@@ -10,9 +10,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 <!-- preload panel backgrounds so crossfade never stalls -->
-<link rel="preload" as="image" href="assets/Imagini/homepage-desaturat.jpg">
 <link rel="preload" as="image" href="assets/Imagini/dealuri-cu-vii.jpg">
+<link rel="preload" as="image" href="assets/Imagini/Cuvintepage.png">
 <link rel="preload" as="image" href="assets/Imagini/frunze.jpeg">
+<link rel="preload" as="image" href="assets/Imagini/homepage-desaturat.jpg">
 <style>
 /* ============================================================
    DOMENIUL LOCUS — landing v6
@@ -74,10 +75,10 @@ button{font:inherit}
   background-size:cover;background-position:center;
   opacity:0;will-change:opacity;
   transition:opacity .5s ease-out;
-  filter:saturate(.32) contrast(1.06) brightness(1.05) sepia(.06);
+  filter:saturate(.75) contrast(1.05) brightness(1.02) sepia(.02);
   transform:translateZ(0); /* GPU layer */
 }
-.bg-layer.is-active{opacity:.18}
+.bg-layer.is-active{opacity:.34}
 /* dithered noise overlay — creates the pixel-dissolve feel during crossfade */
 .bg-dither{
   position:fixed;inset:0;z-index:1;pointer-events:none;
@@ -420,8 +421,8 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
 
 <!-- background layer stack (crossfade per panel) -->
 <div class="bg-stack" aria-hidden="true">
-  <div class="bg-layer" data-idx="0" style="background-image:url('assets/Imagini/homepage-desaturat.jpg')"></div>
-  <div class="bg-layer" data-idx="1" style="background-image:url('assets/Imagini/dealuri-cu-vii.jpg')"></div>
+  <div class="bg-layer" data-idx="0" style="background-image:url('assets/Imagini/dealuri-cu-vii.jpg')"></div>
+  <div class="bg-layer" data-idx="1" style="background-image:url('assets/Imagini/Cuvintepage.png')"></div>
   <div class="bg-layer" data-idx="2" style="background-image:url('assets/Imagini/frunze.jpeg')"></div>
   <div class="bg-layer" data-idx="3" style="background-image:url('assets/Imagini/homepage-desaturat.jpg')"></div>
 </div>
@@ -459,7 +460,6 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
   <div class="track" id="track">
 
     <svg class="line-svg" id="lineSvg" aria-hidden="true"></svg>
-    <span class="mega-backdrop" id="megaBackdrop" aria-hidden="true">domeniul lócus &middot; buciumeni &middot; panciu &middot; vinuri crescute din răbdare, tăcere și mărturia locului</span>
 
     <!-- 01 · Welcome -->
     <section class="panel" data-label="descoperă" data-color="#4A3C2D" aria-label="Bun venit">
@@ -714,7 +714,7 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
     setCenter.push(gsap.quickSetter(ct,'x','px'));
     setCenterO.push(gsap.quickSetter(ct,'opacity'));
   });
-  var setMegaX = gsap.quickSetter(document.getElementById('megaBackdrop'),'x','px');
+  var setMegaX = function(){};
 
   var st;
   gsap.to(track,{

@@ -4,710 +4,904 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shop · Domeniul Locus</title>
-<meta name="description" content="Cumpără vinurile Domeniului Locus — gamele cuvinte și semne. Livrare în România prin curier sau ridicare personală la cramă.">
+<meta name="description" content="Cumpără vinurile Domeniului Locus — gamele cuvinte și semne. Livrare prin curier în 2–4 zile, plăți sigure.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=IBM+Plex+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@1,400;1,500&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   DOMENIUL LOCUS — landing v6 · SHOP
-   Rebuild simplu, 1:1 cu shop-ul live Next.js:
-   app/(storefront)/shop/page.tsx + components/landing/
-   (wines-grid, wine-card, wines-filters, footer) + globals.css
-   Chrome (header/arc) rămâne cel din landing-v6.
+   DOMENIUL LOCUS — SHOP
+   E-commerce simplu, clean. Structură tip ibuongiorno:
+   header orizontal → hero split → grid produse → newsletter
+   split → trust badges → subscribe bar → footer 4 col →
+   payment logos → copyright.
    ============================================================ */
 :root{
-  --pamant:  #EBE1DA;
-  --nisip:   #CBBEAE;
-  --piatra:  #A89D8D;
-  --vie:     #3E4336;
-  --stejar:  #4A3C2D;
-  --pivnita: #1A1A1A;
+  --pamant:      #EBE1DA;
+  --nisip:       #CBBEAE;
+  --piatra:      #A89D8D;
+  --vie:         #3E4336;
+  --vie-deschis: #5A6154;
+  --stejar:      #4A3C2D;
+  --pivnita:     #1A1A1A;
 
-  --bg:       #faf9f6; /* identic cu --bg din globals.css */
-  --bg-alt:   #f0ede7;
-  --surface:  #f5f2ec;
+  --bg:       #faf9f6;
   --ink:      var(--pivnita);
   --ink-soft: var(--stejar);
   --ink-mute: #6e5e4b;
-  --line:     rgba(74,60,45,.18);
+  --line:     rgba(74,60,45,.16);
 
-  --serif:    'Italiana', serif;
-  --belle:    'Bellefair', serif;
-  --mono:     'IBM Plex Mono', monospace;
+  --serif: 'Italiana', serif;
+  --corm:  'Cormorant Garamond', serif;
+  --mono:  'IBM Plex Mono', monospace;
 
-  --ease:     cubic-bezier(.22,.61,.36,1);
-  --t-fast:   240ms;
-  --t-base:   480ms;
-  --t-slow:   800ms;
+  --ease:   cubic-bezier(.22,.61,.36,1);
+  --t-fast: 200ms;
+  --t-base: 400ms;
 
-  --container: 1320px;
-  --px: clamp(20px, 4.5vw, 56px);
-  --py: clamp(72px, 10vw, 144px);
+  --container: 1280px;
+  --px: clamp(20px, 4vw, 48px);
 }
-*{margin:0;padding:0;box-sizing:border-box}
-@media (prefers-reduced-motion: no-preference){
-  html{scroll-behavior:smooth}
-}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
 body{
   background:var(--bg);
   color:var(--ink);
   font-family:var(--mono);
-  overflow-x:hidden;
+  font-size:13px;
+  line-height:1.6;
   -webkit-font-smoothing:antialiased;
 }
-img{max-width:100%;user-select:none;-webkit-user-drag:none}
-a{color:inherit;text-decoration:none}
-button{font:inherit}
-::selection{background:var(--ink);color:var(--bg)}
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+button{ font-family:inherit; cursor:pointer; }
+input{ font-family:inherit; }
+.wrap{ max-width:var(--container); margin:0 auto; padding:0 var(--px); }
 
-/* ---------- film grain ---------- */
-.grain{
-  position:fixed;inset:0;z-index:1000;pointer-events:none;opacity:.05;
-  mix-blend-mode:multiply;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
-}
+::selection{ background:var(--vie); color:var(--pamant); }
 
-/* ---------- header (identic cu landing-v6) ---------- */
-.chrome{position:fixed;inset:0 0 auto 0;z-index:80;pointer-events:none}
-.chrome > *{pointer-events:auto}
-.brand{position:absolute;top:22px;left:28px;display:block}
-.brand img{height:clamp(56px,5vw,70px);width:auto;display:block}
-.nav{
-  position:absolute;top:32px;right:32px;
-  display:flex;align-items:center;gap:28px;
-  font-size:12.5px;letter-spacing:.06em;
-  color:var(--ink-soft);
-}
-.nav a{position:relative;padding:4px 0}
-.nav a:not(.nav-shop)::after{
-  content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;
-  background:var(--ink);transform:scaleX(0);transform-origin:right;
-  transition:transform .45s var(--ease);
-}
-.nav a:not(.nav-shop):hover::after{transform:scaleX(1);transform-origin:left}
-.nav a[aria-current="page"]::after{transform:scaleX(1)}
-.nav-shop{
-  position:relative;isolation:isolate;overflow:hidden;
-  display:inline-flex;align-items:center;justify-content:center;
-  padding:13px 40px;border:1px solid var(--ink);border-radius:999px;
-  background:var(--ink);
-  transition:background .5s var(--ease);
-}
-.nav-shop span{position:relative;z-index:1;font-size:12.5px;letter-spacing:.06em;color:var(--bg);transition:color .5s var(--ease)}
-.nav-shop::after{
-  content:"";position:absolute;inset:0;background:var(--bg);z-index:0;
-  transform:translateY(101%);transition:transform .5s var(--ease);
-}
-.nav-shop:hover::after{transform:translateY(0)}
-.nav-shop:hover span{color:var(--ink)}
-.lang{display:flex;gap:8px;align-items:center;color:var(--ink-mute)}
-.lang b{font-weight:500;color:var(--ink);border-bottom:1px solid currentColor;padding-bottom:3px}
-.lang span:not(b){opacity:.55}
-
-/* ---------- semicerc gol cu X central (înapoi la landing-v6) ---------- */
-.arc-top{
-  position:fixed;top:0;left:50%;transform:translateX(-50%);
-  width:clamp(560px,54vw,880px);aspect-ratio:1400/380;
-  z-index:75;pointer-events:none;
-}
-.arc-top svg{display:block;width:100%;height:100%;overflow:visible}
-.arc-ring{fill:none;stroke:var(--line);stroke-width:1}
-.arc-x{
-  position:absolute;left:50%;top:84.2%;transform:translate(-50%,-50%);
-  width:64px;height:64px;border-radius:50%;
-  border:1px solid var(--ink);background:var(--bg);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--serif);font-size:24px;font-weight:400;line-height:1;
-  color:var(--ink);pointer-events:auto;cursor:pointer;
-  transition:transform .45s var(--ease),background .45s var(--ease),color .45s var(--ease);
-}
-.arc-x:hover{transform:translate(-50%,-50%) rotate(90deg);background:var(--ink);color:var(--bg)}
-.arc-x small{
-  position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);
-  font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
-  color:var(--ink-mute);white-space:nowrap;opacity:0;transition:opacity .4s var(--ease);
-}
-.arc-x:hover small{opacity:1}
-
-/* ---------- shared utilities (parity cu globals.css) ---------- */
-.eyebrow{
-  font-family:var(--mono);text-transform:uppercase;
-  display:inline-flex;align-items:center;gap:12px;
-  font-size:11px;letter-spacing:.22em;color:var(--ink-mute);
-}
-.eyebrow::before{content:"";width:18px;height:1px;background:currentColor;display:inline-block}
-.h2{font-family:var(--serif);font-weight:400;font-size:clamp(40px,6vw,88px);line-height:1}
-
-/* ---------- reveal (parity cu components/reveal.tsx) ---------- */
-.reveal-stagger > *{
-  opacity:0;transform:translateY(28px);
-  transition:opacity 800ms var(--ease),transform 800ms var(--ease);
-}
-.reveal-stagger.in > *{opacity:1;transform:translateY(0)}
-.reveal-stagger.in > *:nth-child(1){transition-delay:0ms}
-.reveal-stagger.in > *:nth-child(2){transition-delay:120ms}
-.reveal-stagger.in > *:nth-child(3){transition-delay:240ms}
-.reveal-stagger.in > *:nth-child(4){transition-delay:360ms}
-.reveal-stagger.in > *:nth-child(5){transition-delay:480ms}
-.reveal-stagger.in > *:nth-child(6){transition-delay:600ms}
-@media (prefers-reduced-motion:reduce){
-  .reveal-stagger > *{opacity:1 !important;transform:none !important}
+a:focus-visible, button:focus-visible, input:focus-visible{
+  outline:2px solid var(--vie);
+  outline-offset:2px;
 }
 
-/* ============================================================
-   SHOP PAGE (parity cu .shop-page / .shop-hero din globals.css)
-   ============================================================ */
-.shop-page{padding-top:72px}
-.shop-hero{
-  padding:clamp(150px,18vw,200px) var(--px) clamp(40px,5vw,72px);
-  background:var(--bg-alt);
+/* ============ HEADER ============ */
+.site-header{
+  position:sticky; top:0; z-index:100;
+  background:rgba(250,249,246,.94);
+  backdrop-filter:blur(8px);
   border-bottom:1px solid var(--line);
-  text-align:center;
 }
-.shop-hero .eyebrow{justify-content:center;margin-bottom:24px}
-.shop-hero-title{
-  font-family:var(--belle);
-  font-size:clamp(56px,10vw,128px);
-  line-height:.96;letter-spacing:-.02em;
-  color:var(--ink);font-weight:400;
-  margin-bottom:28px;
+.header-row{
+  max-width:var(--container);
+  margin:0 auto;
+  padding:0 var(--px);
+  height:76px;
+  display:flex;
+  align-items:center;
+  gap:24px;
 }
-.shop-hero-lead{
-  font-family:var(--mono);
-  font-size:clamp(13px,1.05vw,15px);
-  line-height:1.85;color:var(--ink-soft);
-  max-width:56ch;margin:0 auto;
-}
+.logo{ flex-shrink:0; display:flex; align-items:center; }
+.logo img{ height:50px; width:auto; }
 
-/* ---------- colecția + filtre ---------- */
-.colectia{padding:var(--py) var(--px);border-bottom:1px solid var(--line)}
-.colectia-head{
-  max-width:var(--container);margin:0 auto clamp(40px,5vw,72px);
-  display:flex;align-items:flex-end;justify-content:space-between;
-  gap:32px;flex-wrap:wrap;
+.main-nav{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  gap:clamp(18px, 3vw, 36px);
 }
-.colectia-head .h2{
-  font-family:var(--belle);
-  font-size:clamp(56px,7vw,112px);
-  line-height:1;font-weight:400;letter-spacing:-.02em;
-  max-width:14ch;
+.main-nav a{
+  font-size:11px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  padding:6px 2px;
+  border-bottom:1px solid transparent;
+  transition:color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  white-space:nowrap;
 }
-.filters{display:flex;flex-wrap:wrap;gap:8px}
-.filter{
-  font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
-  padding:10px 16px;color:var(--ink-mute);border:1px solid var(--line);
-  background:transparent;cursor:pointer;
-  transition:color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),background var(--t-fast) var(--ease);
-}
-.filter:hover{color:var(--ink);border-color:var(--ink-soft)}
-.filter.is-active{color:var(--bg);background:var(--ink);border-color:var(--ink)}
+.main-nav a:hover{ color:var(--ink); border-bottom-color:var(--ink); }
+.main-nav a[aria-current="page"]{ color:var(--ink); border-bottom-color:var(--ink); }
 
-/* ---------- grid vinuri ---------- */
-.wines{
-  max-width:var(--container);margin:0 auto;
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:1px;background:var(--line);border:1px solid var(--line);
-}
-.wine{
-  background:var(--bg);padding:36px 32px 32px;
-  display:flex;flex-direction:column;gap:20px;
-  position:relative;overflow:hidden;
-  transition:background var(--t-base) var(--ease);
-}
-.wine:hover{background:var(--surface)}
-.wine.is-hidden{display:none}
-.wine-header{
-  display:flex;justify-content:space-between;align-items:flex-start;
-  font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+.utility{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:clamp(12px, 1.6vw, 22px);
+  font-size:10px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
   color:var(--ink-mute);
 }
-.wine-bottle{
-  aspect-ratio:3/4;background:var(--bg-alt);border:1px solid var(--line);
-  display:flex;align-items:center;justify-content:center;
-  position:relative;overflow:hidden;
-  transition:background var(--t-base) var(--ease);
-}
-.wine:hover .wine-bottle{background:var(--surface)}
-.wine-bottle img{
-  height:78%;width:auto;max-width:78%;object-fit:contain;
-  filter:drop-shadow(0 14px 28px rgba(26,26,26,.18));
-  transition:transform var(--t-slow) var(--ease);
-}
-.wine:hover .wine-bottle img{transform:translateY(-6px) rotate(-1deg)}
-.wine-name{
-  font-family:var(--mono);font-weight:700;
-  font-size:clamp(22px,2vw,28px);line-height:1.05;
-  color:var(--ink);letter-spacing:-.03em;
-}
-.wine-meta{
-  display:grid;grid-template-columns:1fr auto;gap:4px;
-  font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink-mute);
-  text-transform:uppercase;padding:12px 0;
-  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
-}
-.wine-meta strong{font-weight:500;color:var(--ink-soft)}
-.wine-notes{font-size:12px;line-height:1.7;color:var(--ink-soft);flex:1}
-.wine-foot{
-  display:flex;justify-content:space-between;align-items:center;gap:12px;
-  padding-top:12px;border-top:1px solid var(--line);
-}
-.wine-temp{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--ink-mute)}
-.wine-link{
-  font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;
-  color:var(--ink);display:inline-flex;align-items:center;gap:8px;position:relative;
-}
-.wine-link::after{
-  content:"";position:absolute;left:0;bottom:-4px;width:0;height:1px;background:currentColor;
-  transition:width var(--t-base) var(--ease);
-}
-.wine-link:hover::after{width:100%}
-.wine-link:hover .arrow-svg{transform:translateX(6px)}
-.arrow-svg{width:14px;height:6px;flex-shrink:0;transition:transform var(--t-base) var(--ease)}
-.wine-buy{
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding-top:12px;border-top:1px solid var(--line);
-}
-.wine-price{font-family:var(--serif);font-size:22px;line-height:1;color:var(--ink);letter-spacing:-.005em}
-.wine-price .currency{
-  font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--ink-mute);
-  text-transform:uppercase;margin-left:6px;
-}
-.wine-add{
-  display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;
-  padding:10px 16px;border:1px solid var(--ink);color:var(--ink);background:transparent;cursor:pointer;
-  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease);
-}
-.wine-add:hover{background:var(--ink);color:var(--bg)}
-.wine-add.is-pulse{animation:pulse .6s var(--ease)}
-@keyframes pulse{0%{transform:scale(1)}40%{transform:scale(.94)}100%{transform:scale(1)}}
-
-@media (max-width:1024px){
-  .wines{grid-template-columns:repeat(2,1fr)}
-}
-@media (max-width:640px){
-  .wines{grid-template-columns:1fr}
-  .colectia-head{flex-direction:column;align-items:flex-start}
-}
-
-/* ============================================================
-   FOOTER (copiat 1:1 din components/landing/footer.tsx + globals.css)
-   ============================================================ */
-.footer{background:var(--pivnita);color:var(--pamant);padding:clamp(64px,8vw,112px) var(--px) 24px}
-.footer-grid{
-  max-width:var(--container);margin:0 auto;
-  display:grid;grid-template-columns:1.2fr 1fr 1fr;
-  gap:clamp(40px,5vw,96px);
-  padding-bottom:clamp(40px,5vw,80px);
-  border-bottom:1px solid rgba(235,225,218,.12);
-}
-.footer .brand-img{filter:invert(1);height:56px;display:block}
-.footer-col h4{
-  font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.28em;text-transform:uppercase;
-  color:rgba(235,225,218,.6);margin-bottom:22px;
-}
-.footer-col p,.footer-col li,.footer-col a{
-  font-family:var(--mono);font-size:12px;line-height:1.85;color:rgba(235,225,218,.7);
+.utility a, .utility button{
+  color:inherit;
+  background:none;
+  border:none;
+  font-size:inherit;
+  letter-spacing:inherit;
+  text-transform:inherit;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:4px 0;
   transition:color var(--t-fast) var(--ease);
 }
-.footer-col a:hover{color:var(--pamant)}
-.footer-col p{margin-bottom:20px}
-.footer-col ul{display:flex;flex-direction:column;gap:4px;list-style:none;padding:0}
-.footer-bottom{
-  max-width:var(--container);margin:0 auto;padding-top:24px;
-  display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;
-  font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:rgba(235,225,218,.55);text-transform:uppercase;
+.utility a:hover, .utility button:hover{ color:var(--ink); }
+.lang b{ color:var(--ink); font-weight:700; }
+.lang span{ opacity:.55; }
+.utility svg{ width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.4; }
+.cart-count{ font-size:10px; }
+
+.menu-toggle{
+  display:none;
+  background:none; border:none;
+  padding:6px;
+  color:var(--ink);
 }
-.footer-bottom .legal{max-width:60%}
-@media (max-width:1024px){
-  .footer-grid{grid-template-columns:1fr;gap:40px}
+.menu-toggle svg{ width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.5; }
+
+/* ============ HERO SPLIT ============ */
+.hero{
+  border-bottom:1px solid var(--line);
 }
-@media (max-width:640px){
-  .footer-bottom{flex-direction:column;align-items:flex-start}
-  .footer-bottom .legal{max-width:100%}
+.hero-grid{
+  max-width:var(--container);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1.15fr 1fr;
+  min-height:min(78vh, 680px);
+}
+.hero-visual{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(to bottom, var(--pamant) 0%, var(--pamant) 62%, var(--vie) 62%, var(--vie) 100%);
+}
+.hero-visual .b{
+  position:absolute;
+  width:auto;
+  filter:drop-shadow(0 18px 28px rgba(26,26,26,.28));
+}
+.hero-visual .b1{
+  height:72%;
+  left:14%; bottom:6%;
+  transform:rotate(-7deg);
+}
+.hero-visual .b2{
+  height:80%;
+  left:41%; bottom:9%;
+  transform:rotate(0deg);
+  z-index:2;
+}
+.hero-visual .b3{
+  height:70%;
+  left:66%; bottom:13%;
+  transform:rotate(8deg);
+}
+.hero-copy{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:20px;
+  padding:clamp(40px, 6vw, 80px);
+}
+.hero-eyebrow{
+  font-size:10px;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:var(--ink-mute);
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.hero-eyebrow::before{
+  content:"";
+  width:22px; height:1px;
+  background:var(--ink-mute);
+}
+.hero-copy h1{
+  font-family:var(--serif);
+  font-weight:400;
+  font-size:clamp(36px, 4vw, 50px);
+  line-height:1.05;
+  letter-spacing:.01em;
+}
+.hero-copy .lede{
+  font-family:var(--corm);
+  font-style:italic;
+  font-size:19px;
+  line-height:1.55;
+  color:var(--ink-soft);
+  max-width:42ch;
+}
+.hero-copy .award{
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.02em;
+  color:var(--ink);
+}
+.hero-copy .award em{ font-style:italic; font-weight:700; }
+.hero-cta{
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:var(--ink);
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  width:fit-content;
+  border-bottom:1px solid var(--ink);
+  padding-bottom:3px;
+  transition:gap var(--t-fast) var(--ease);
+}
+.hero-cta:hover{ gap:14px; }
+.hero-arrows{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.hero-arrows button{
+  width:40px; height:40px;
+  border:1px solid var(--line);
+  background:none;
+  color:var(--ink-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+.hero-arrows button:hover{ background:var(--ink); color:var(--pamant); border-color:var(--ink); }
+.hero-arrows svg{ width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.5; }
+
+/* ============ SECTION TITLE ============ */
+.section-title{
+  text-align:center;
+  font-size:13px;
+  font-weight:500;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:var(--ink);
+  padding:clamp(48px, 7vw, 80px) var(--px) clamp(28px, 4vw, 44px);
 }
 
-/* ============================================================
-   RESPONSIVE — chrome (mobil)
-   ============================================================ */
-@media (max-width:820px){
-  .nav{gap:12px;right:18px;top:24px;font-size:9px;flex-wrap:wrap;justify-content:flex-end;max-width:60vw}
-  .nav-shop{padding:9px 18px}
-  .brand{top:16px;left:16px}
-  .brand img{height:40px}
-  .arc-top{width:100vw}
-  .arc-top svg{display:none}
-  .arc-x{position:fixed;left:50%;top:20px;transform:translate(-50%,0);width:46px;height:46px;font-size:19px}
-  .arc-x:hover{transform:translate(-50%,0)}
-  .arc-x small{display:none}
-  .shop-page{padding-top:0}
-  .shop-hero{padding-top:140px}
+/* ============ PRODUCTS GRID ============ */
+.products{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:clamp(20px, 2.5vw, 32px);
+  max-width:var(--container);
+  margin:0 auto;
+  padding:0 var(--px) clamp(56px, 8vw, 96px);
+}
+.product-card{
+  width:calc(25% - 24px);
+  min-width:230px;
+  display:block;
+}
+.card-visual{
+  aspect-ratio:4/5;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+}
+.card-visual img{
+  height:86%;
+  width:auto;
+  filter:drop-shadow(0 12px 18px rgba(26,26,26,.3));
+  transition:transform var(--t-base) var(--ease);
+}
+.product-card:hover .card-visual img{ transform:translateY(-8px) scale(1.02); }
+.card-visual .code{
+  position:absolute;
+  top:14px; left:16px;
+  font-size:9px;
+  letter-spacing:.22em;
+}
+.bg-nisip       { background:var(--nisip); }
+.bg-stejar      { background:var(--stejar); }
+.bg-piatra      { background:var(--piatra); }
+.bg-vie         { background:var(--vie); }
+.bg-pivnita     { background:var(--pivnita); }
+.bg-vie-deschis { background:var(--vie-deschis); }
+.on-dark{ color:rgba(235,225,218,.7); }
+.on-light{ color:rgba(26,26,26,.55); }
+
+.card-info{
+  padding:14px 2px 0;
+  text-align:center;
+}
+.card-info .name{
+  font-family:var(--serif);
+  font-weight:400;
+  font-size:16px;
+  letter-spacing:.03em;
+}
+.card-info .meta{
+  font-size:10px;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--ink-mute);
+  margin-top:3px;
+}
+.card-info .price{
+  font-size:12px;
+  font-weight:500;
+  margin-top:6px;
+}
+
+/* ============ NEWSLETTER SPLIT ============ */
+.promo{
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+.promo-grid{
+  max-width:var(--container);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  min-height:420px;
+}
+.promo-copy{
+  background:var(--pamant);
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  gap:18px;
+  padding:clamp(40px, 6vw, 80px);
+}
+.promo-copy h2{
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+}
+.promo-copy p{
+  font-family:var(--corm);
+  font-style:italic;
+  font-size:19px;
+  line-height:1.55;
+  color:var(--ink-soft);
+  max-width:38ch;
+}
+.btn-dark{
+  display:inline-block;
+  background:var(--pivnita);
+  color:var(--pamant);
+  border:1px solid var(--pivnita);
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  padding:14px 30px;
+  transition:background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.btn-dark:hover{ background:transparent; color:var(--pivnita); }
+
+.promo-visual{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(135deg, var(--nisip) 0%, var(--piatra) 100%);
+}
+.promo-visual .b{
+  position:absolute;
+  filter:drop-shadow(0 16px 24px rgba(26,26,26,.3));
+}
+.promo-visual .b1{
+  height:82%;
+  left:24%; bottom:-4%;
+  transform:rotate(-5deg);
+}
+.promo-visual .b2{
+  height:74%;
+  left:50%; bottom:-2%;
+  transform:rotate(6deg);
+}
+.promo-visual::after{
+  content:"";
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse at 70% 20%, rgba(235,225,218,.35), transparent 55%);
+  pointer-events:none;
+}
+
+/* ============ TRUST BADGES ============ */
+.badges{
+  max-width:var(--container);
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:clamp(16px, 2vw, 24px);
+  padding:clamp(40px, 6vw, 64px) var(--px);
+}
+.badge{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:26px 28px;
+}
+.badge .icon{
+  flex-shrink:0;
+  width:52px; height:52px;
+  border-radius:50%;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.badge .icon svg{
+  width:22px; height:22px;
+  stroke:var(--pivnita);
+  fill:none;
+  stroke-width:1.5;
+}
+.badge h3{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+.badge p{
+  font-size:11px;
+  margin-top:3px;
+  opacity:.8;
+}
+.badge.bg-nisip{ color:var(--pivnita); }
+.badge.bg-vie, .badge.bg-stejar{ color:var(--pamant); }
+
+/* ============ SUBSCRIBE BAR ============ */
+.subscribe{
+  border-top:1px solid var(--line);
+}
+.subscribe-row{
+  max-width:var(--container);
+  margin:0 auto;
+  padding:clamp(28px, 4vw, 40px) var(--px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:28px;
+  flex-wrap:wrap;
+}
+.subscribe-form{
+  display:flex;
+  gap:0;
+  flex:1;
+  max-width:480px;
+  min-width:280px;
+}
+.subscribe-form input{
+  flex:1;
+  border:1px solid var(--line);
+  border-right:none;
+  background:#fff;
+  padding:13px 16px;
+  font-size:12px;
+  color:var(--ink);
+}
+.subscribe-form input::placeholder{ color:var(--ink-mute); letter-spacing:.06em; }
+.subscribe-form .btn-dark{ padding:13px 24px; white-space:nowrap; }
+.socials{
+  display:flex;
+  gap:18px;
+}
+.socials a{
+  color:var(--ink-soft);
+  transition:color var(--t-fast) var(--ease);
+}
+.socials a:hover{ color:var(--ink); }
+.socials svg{ width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.4; }
+
+/* ============ FOOTER ============ */
+.site-footer{
+  background:var(--pamant);
+  border-top:1px solid var(--line);
+}
+.footer-grid{
+  max-width:var(--container);
+  margin:0 auto;
+  padding:clamp(48px, 6vw, 72px) var(--px) clamp(36px, 5vw, 56px);
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:clamp(28px, 4vw, 48px);
+}
+.footer-col h4{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  margin-bottom:18px;
+}
+.footer-col ul{ list-style:none; }
+.footer-col li{ margin-bottom:10px; }
+.footer-col a{
+  font-size:11.5px;
+  color:var(--ink-soft);
+  transition:color var(--t-fast) var(--ease);
+}
+.footer-col a:hover{ color:var(--ink); }
+.footer-col p{
+  font-size:11.5px;
+  color:var(--ink-soft);
+  margin-bottom:8px;
+  line-height:1.55;
+}
+.footer-col .award-line{
+  font-weight:700;
+  font-style:italic;
+  color:var(--ink);
+  margin-top:12px;
+}
+
+/* ============ PAYMENTS + COPYRIGHT ============ */
+.payments{
+  border-top:1px solid var(--line);
+  background:var(--pamant);
+}
+.payments-row{
+  max-width:var(--container);
+  margin:0 auto;
+  padding:20px var(--px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.pay{
+  font-size:9px;
+  font-weight:500;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+  border:1px solid var(--line);
+  background:#fff;
+  padding:6px 12px;
+  border-radius:3px;
+}
+.copyright{
+  background:var(--pamant);
+  border-top:1px solid var(--line);
+  text-align:center;
+  font-size:10px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--ink-mute);
+  padding:18px var(--px) 22px;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1024px){
+  .product-card{ width:calc(50% - 16px); }
+  .hero-grid{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width: 860px){
+  .menu-toggle{ display:block; margin-left:auto; }
+  .main-nav{
+    display:none;
+    position:absolute;
+    top:76px; left:0; right:0;
+    background:var(--bg);
+    border-bottom:1px solid var(--line);
+    flex-direction:column;
+    align-items:center;
+    gap:0;
+    padding:12px 0;
+  }
+  .main-nav.open{ display:flex; }
+  .main-nav a{ padding:12px 0; width:100%; text-align:center; }
+  .utility .hide-m{ display:none; }
+  .hero-grid{ grid-template-columns:1fr; min-height:0; }
+  .hero-visual{ min-height:380px; order:-1; }
+  .promo-grid{ grid-template-columns:1fr; }
+  .promo-visual{ min-height:340px; }
+  .badges{ grid-template-columns:1fr; }
+  .footer-grid{ grid-template-columns:repeat(2, 1fr); }
+  .subscribe-row{ flex-direction:column; align-items:stretch; }
+  .socials{ justify-content:center; }
+}
+@media (max-width: 560px){
+  .product-card{ width:100%; max-width:340px; }
+  .footer-grid{ grid-template-columns:1fr; }
+  .hero-copy{ padding:36px var(--px) 48px; }
+}
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ transition-duration:.01ms !important; animation-duration:.01ms !important; }
+  html{ scroll-behavior:auto; }
 }
 </style>
 </head>
 <body>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="arrow-right" viewBox="0 0 24 12">
-    <path d="M0 6 H22 M16 0 L22 6 L16 12" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  </symbol>
-</svg>
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+  <div class="header-row">
+    <a class="logo" href="landing-v6.html" aria-label="Domeniul Locus — acasă">
+      <img src="assets/logos/locus.png" alt="Domeniul Locus">
+    </a>
 
-<div class="grain" aria-hidden="true"></div>
+    <button class="menu-toggle" aria-label="Deschide meniul" aria-expanded="false" aria-controls="main-nav">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
 
-<!-- ---------- header ---------- -->
-<header class="chrome">
-  <a class="brand" href="landing-v6.html" aria-label="Domeniul Locus — acasă">
-    <img src="assets/logos/locus.png" alt="Domeniul Locus">
-  </a>
-  <nav class="nav" aria-label="Navigație principală">
-    <a href="landing-v6.html">Home</a>
-    <a href="landing-v6-descopera.html">Descoper&#259;</a>
-    <a href="#contact">Contact</a>
-    <a href="landing-v6-shop.html" class="nav-shop" aria-current="page"><span>Shop now</span></a>
-    <span class="lang" aria-label="Limbă"><b>RO</b><span aria-hidden="true">/</span><span title="în curând">EN</span></span>
-  </nav>
+    <nav class="main-nav" id="main-nav" aria-label="Navigare principală">
+      <a href="landing-v6.html">Home</a>
+      <a href="landing-v6-shop.html" aria-current="page">Shop</a>
+      <a href="landing-v6-descopera.html">Descoperă</a>
+      <a href="#parteneri">Parteneri</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="utility">
+      <span class="lang hide-m"><b>RO</b> / <span>EN</span></span>
+      <button class="hide-m" aria-label="Selectează moneda">
+        LEI
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <a href="#cont" class="hide-m">Cont</a>
+      <a href="#cos" aria-label="Coș de cumpărături, 0 produse">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
+        <span class="cart-count">(0)</span>
+      </a>
+      <a href="#cautare" aria-label="Căutare">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
+      </a>
+    </div>
+  </div>
 </header>
 
-<!-- ---------- semicerc gol + X înapoi ---------- -->
-<div class="arc-top">
-  <svg viewBox="0 0 1400 380" aria-hidden="true">
-    <circle class="arc-ring" cx="700" cy="-150" r="470"></circle>
-  </svg>
-  <a class="arc-x" href="landing-v6.html" aria-label="Închide — înapoi la cramă">
-    &times;
-    <small>&icirc;napoi la cram&#259;</small>
-  </a>
-</div>
+<main>
 
-<main class="shop-page">
-
-  <header class="shop-hero">
-    <div class="eyebrow" style="justify-content:center">Shop &middot; Domeniul Locus</div>
-    <h1 class="shop-hero-title">Colec&#539;ia &icirc;n pahar.</h1>
-    <p class="shop-hero-lead">Toate vinurile noastre, &icirc;ntr-un singur loc. Filtreaz&#259; dup&#259; gam&#259;, tip sau dulcea&#539;&#259; &#537;i alege ce &#539;i se potrive&#537;te.</p>
-  </header>
-
-  <div id="vinuri" class="shop-grid-wrap">
-    <section class="colectia" aria-label="Colecția de vinuri">
-      <div class="colectia-head">
-        <div>
-          <div class="eyebrow" style="margin-bottom:16px">Colec&#539;ia 2025</div>
-          <h2 class="h2">&#536;ase sticle.<br>Un singur loc.</h2>
-        </div>
-        <div class="filters" role="group" aria-label="Filtre vinuri">
-          <button type="button" class="filter is-active" data-filter="all" aria-pressed="true">Toate</button>
-          <button type="button" class="filter" data-filter="alb" aria-pressed="false">Alb</button>
-          <button type="button" class="filter" data-filter="rosu" aria-pressed="false">Ro&#537;u</button>
-          <button type="button" class="filter" data-filter="sec" aria-pressed="false">Sec</button>
-          <button type="button" class="filter" data-filter="demisec" aria-pressed="false">Demisec</button>
-          <button type="button" class="filter" data-filter="cuvinte" aria-pressed="false">Cuvinte</button>
-          <button type="button" class="filter" data-filter="semne" aria-pressed="false">Semne</button>
+  <!-- ============ HERO SPLIT ============ -->
+  <section class="hero" aria-label="Colecția Domeniul Locus">
+    <div class="hero-grid">
+      <div class="hero-visual" aria-hidden="true">
+        <img class="b b1" src="assets/bottles/cuvinte-feteasca-neagra.png" alt="">
+        <img class="b b2" src="assets/bottles/semne.png" alt="">
+        <img class="b b3" src="assets/bottles/cuvinte-feteasca-regala.png" alt="">
+      </div>
+      <div class="hero-copy">
+        <p class="hero-eyebrow">Buciumeni · Panciu — Nicorești</p>
+        <h1>Colecția noastră.</h1>
+        <p class="lede">Adu răbdarea locului la masa ta. Fiecare sticlă poartă mărturia unei recolte anume — o poveste, un timp, un vin.</p>
+        <p class="award">Vinuri recomandate de ghidul <em>Vinuri de România 2026</em></p>
+        <a class="hero-cta" href="#vinuri">Descoperă vinurile ›</a>
+        <div class="hero-arrows">
+          <button aria-label="Produsul anterior">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          </button>
+          <button aria-label="Produsul următor">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="wines reveal-stagger" id="winesGrid">
+  <!-- ============ PRODUCTS ============ -->
+  <h2 class="section-title" id="vinuri">Vinurile noastre</h2>
 
-        <article class="wine" data-id="LC01" data-price="79" data-tags="alb demisec cuvinte">
-          <div class="wine-header">
-            <span>cuvinte &middot; LC01</span>
-            <span>2025</span>
-          </div>
-          <div class="wine-bottle">
-            <img src="assets/bottles/cuvinte-feteasca-regala.png" alt="Fetească Regală — gama cuvinte" loading="lazy">
-          </div>
-          <h3 class="wine-name">Feteasc&#259; Regal&#259;</h3>
-          <div class="wine-meta">
-            <strong>Alb &middot; Demisec</strong>
-            <span>13,5% VOL</span>
-          </div>
-          <p class="wine-notes">Note de floare de salc&acirc;m &#537;i piersic&#259; alb&#259;, un fir mineral, un final calm. Vinul de fiecare zi.</p>
-          <div class="wine-foot">
-            <span class="wine-temp">Servire 9&ndash;11&deg;C</span>
-            <a class="wine-link" href="#">
-              Vezi fi&#537;a
-              <svg class="arrow-svg" width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"></use></svg>
-            </a>
-          </div>
-          <div class="wine-buy">
-            <span class="wine-price">79<span class="currency">lei</span></span>
-            <button type="button" class="wine-add" aria-label="Adaugă Fetească Regală cuvinte în coș">
-              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
-              Adaug&#259;
-            </button>
-          </div>
-        </article>
+  <section class="products" aria-label="Lista vinurilor">
 
-        <article class="wine" data-id="LC02" data-price="89" data-tags="rosu demisec cuvinte">
-          <div class="wine-header">
-            <span>cuvinte &middot; LC02</span>
-            <span>2025</span>
-          </div>
-          <div class="wine-bottle">
-            <img src="assets/bottles/cuvinte-feteasca-neagra.png" alt="Fetească Neagră — gama cuvinte" loading="lazy">
-          </div>
-          <h3 class="wine-name">Feteasc&#259; Neagr&#259;</h3>
-          <div class="wine-meta">
-            <strong>Ro&#537;u &middot; Demisec</strong>
-            <span>14,9% VOL</span>
-          </div>
-          <p class="wine-notes">Cire&#537;e negre &#537;i prun&#259; coapt&#259;, o urm&#259; de cui&#537;oare, tanin bl&acirc;nd. St&#259; bine la masa de fiecare sear&#259;.</p>
-          <div class="wine-foot">
-            <span class="wine-temp">Servire 14&ndash;16&deg;C</span>
-            <a class="wine-link" href="#">
-              Vezi fi&#537;a
-              <svg class="arrow-svg" width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"></use></svg>
-            </a>
-          </div>
-          <div class="wine-buy">
-            <span class="wine-price">89<span class="currency">lei</span></span>
-            <button type="button" class="wine-add" aria-label="Adaugă Fetească Neagră cuvinte în coș">
-              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
-              Adaug&#259;
-            </button>
-          </div>
-        </article>
-
-        <article class="wine" data-id="LC04" data-price="79" data-tags="alb sec cuvinte">
-          <div class="wine-header">
-            <span>cuvinte &middot; LC04</span>
-            <span>2025</span>
-          </div>
-          <div class="wine-bottle">
-            <img src="assets/bottles/cuvinte-riesling.png" alt="Riesling Italian — gama cuvinte" loading="lazy">
-          </div>
-          <h3 class="wine-name">Riesling Italian</h3>
-          <div class="wine-meta">
-            <strong>Alb &middot; Sec</strong>
-            <span>13% VOL</span>
-          </div>
-          <p class="wine-notes">Citrice verzi &#537;i flori de c&acirc;mp, o aciditate limpede. Se bea rece, &icirc;n dup&#259;-amiezi f&#259;r&#259; grab&#259;.</p>
-          <div class="wine-foot">
-            <span class="wine-temp">Servire 8&ndash;10&deg;C</span>
-            <a class="wine-link" href="#">
-              Vezi fi&#537;a
-              <svg class="arrow-svg" width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"></use></svg>
-            </a>
-          </div>
-          <div class="wine-buy">
-            <span class="wine-price">79<span class="currency">lei</span></span>
-            <button type="button" class="wine-add" aria-label="Adaugă Riesling Italian cuvinte în coș">
-              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
-              Adaug&#259;
-            </button>
-          </div>
-        </article>
-
-        <article class="wine" data-id="LS01" data-price="109" data-tags="alb demisec semne">
-          <div class="wine-header">
-            <span>semne &middot; LS01</span>
-            <span>2024</span>
-          </div>
-          <div class="wine-bottle">
-            <img src="assets/bottles/semne.png" alt="Fetească Regală — gama semne" loading="lazy">
-          </div>
-          <h3 class="wine-name">Feteasc&#259; Regal&#259;</h3>
-          <div class="wine-meta">
-            <strong>Alb &middot; Demisec</strong>
-            <span>13,5% VOL</span>
-          </div>
-          <p class="wine-notes">Acela&#537;i soi, un an de a&#537;teptare &icirc;n plus. Mai dens, mai t&#259;cut, pentru mesele care merit&#259; timp.</p>
-          <div class="wine-foot">
-            <span class="wine-temp">Servire 9&ndash;11&deg;C</span>
-            <a class="wine-link" href="#">
-              Vezi fi&#537;a
-              <svg class="arrow-svg" width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"></use></svg>
-            </a>
-          </div>
-          <div class="wine-buy">
-            <span class="wine-price">109<span class="currency">lei</span></span>
-            <button type="button" class="wine-add" aria-label="Adaugă Fetească Regală semne în coș">
-              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
-              Adaug&#259;
-            </button>
-          </div>
-        </article>
-
-        <article class="wine" data-id="LS02" data-price="119" data-tags="rosu demisec semne">
-          <div class="wine-header">
-            <span>semne &middot; LS02</span>
-            <span>2024</span>
-          </div>
-          <div class="wine-bottle">
-            <img src="assets/bottles/semne.png" alt="Fetească Neagră — gama semne" loading="lazy">
-          </div>
-          <h3 class="wine-name">Feteasc&#259; Neagr&#259;</h3>
-          <div class="wine-meta">
-            <strong>Ro&#537;u &middot; Demisec</strong>
-            <span>14,9% VOL</span>
-          </div>
-          <p class="wine-notes">Macera&#539;ie mai lung&#259;, tanin mai ad&acirc;nc. M&#259;rturia unui parcurs care nu s-a gr&#259;bit s&#259; ajung&#259; &icirc;n sticl&#259;.</p>
-          <div class="wine-foot">
-            <span class="wine-temp">Servire 14&ndash;16&deg;C</span>
-            <a class="wine-link" href="#">
-              Vezi fi&#537;a
-              <svg class="arrow-svg" width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"></use></svg>
-            </a>
-          </div>
-          <div class="wine-buy">
-            <span class="wine-price">119<span class="currency">lei</span></span>
-            <button type="button" class="wine-add" aria-label="Adaugă Fetească Neagră semne în coș">
-              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
-              Adaug&#259;
-            </button>
-          </div>
-        </article>
-
-        <article class="wine" data-id="LS04" data-price="109" data-tags="alb sec semne">
-          <div class="wine-header">
-            <span>semne &middot; LS04</span>
-            <span>2024</span>
-          </div>
-          <div class="wine-bottle">
-            <img src="assets/bottles/semne.png" alt="Riesling Italian — gama semne" loading="lazy">
-          </div>
-          <h3 class="wine-name">Riesling Italian</h3>
-          <div class="wine-meta">
-            <strong>Alb &middot; Sec</strong>
-            <span>13% VOL</span>
-          </div>
-          <p class="wine-notes">Aceea&#537;i claritate, dus&#259; mai departe. O rezerv&#259; mic&#259; de sec, p&#259;strat&#259; pentru cine &#537;tie s-o a&#537;tepte.</p>
-          <div class="wine-foot">
-            <span class="wine-temp">Servire 8&ndash;10&deg;C</span>
-            <a class="wine-link" href="#">
-              Vezi fi&#537;a
-              <svg class="arrow-svg" width="14" height="6" viewBox="0 0 24 12" aria-hidden="true"><use href="#arrow-right"></use></svg>
-            </a>
-          </div>
-          <div class="wine-buy">
-            <span class="wine-price">109<span class="currency">lei</span></span>
-            <button type="button" class="wine-add" aria-label="Adaugă Riesling Italian semne în coș">
-              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 4 L4 14 H12 L13 4 Z M5 4 V2.5 A3 3 0 0 1 11 2.5 V4" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
-              Adaug&#259;
-            </button>
-          </div>
-        </article>
-
+    <a class="product-card" href="landing-v6-cuvinte.html">
+      <div class="card-visual bg-nisip">
+        <span class="code on-light">LC01</span>
+        <img src="assets/bottles/cuvinte-feteasca-regala.png" alt="Sticlă Fetească Regală, gama cuvinte">
       </div>
-    </section>
-  </div>
+      <div class="card-info">
+        <p class="name">Fetească Regală</p>
+        <p class="meta">cuvinte · alb · demisec</p>
+        <p class="price">79 lei</p>
+      </div>
+    </a>
+
+    <a class="product-card" href="landing-v6-cuvinte.html">
+      <div class="card-visual bg-stejar">
+        <span class="code on-dark">LC02</span>
+        <img src="assets/bottles/cuvinte-feteasca-neagra.png" alt="Sticlă Fetească Neagră, gama cuvinte">
+      </div>
+      <div class="card-info">
+        <p class="name">Fetească Neagră</p>
+        <p class="meta">cuvinte · roșu · demisec</p>
+        <p class="price">89 lei</p>
+      </div>
+    </a>
+
+    <a class="product-card" href="landing-v6-cuvinte.html">
+      <div class="card-visual bg-piatra">
+        <span class="code on-light">LC04</span>
+        <img src="assets/bottles/cuvinte-riesling.png" alt="Sticlă Riesling Italian, gama cuvinte">
+      </div>
+      <div class="card-info">
+        <p class="name">Riesling Italian</p>
+        <p class="meta">cuvinte · alb · sec</p>
+        <p class="price">79 lei</p>
+      </div>
+    </a>
+
+    <a class="product-card" href="landing-v6-semne.html">
+      <div class="card-visual bg-vie">
+        <span class="code on-dark">LS01</span>
+        <img src="assets/bottles/semne.png" alt="Sticlă Fetească Regală, gama semne">
+      </div>
+      <div class="card-info">
+        <p class="name">Fetească Regală</p>
+        <p class="meta">semne · alb · demisec</p>
+        <p class="price">109 lei</p>
+      </div>
+    </a>
+
+    <a class="product-card" href="landing-v6-semne.html">
+      <div class="card-visual bg-pivnita">
+        <span class="code on-dark">LS02</span>
+        <img src="assets/bottles/semne.png" alt="Sticlă Fetească Neagră, gama semne">
+      </div>
+      <div class="card-info">
+        <p class="name">Fetească Neagră</p>
+        <p class="meta">semne · roșu · demisec</p>
+        <p class="price">119 lei</p>
+      </div>
+    </a>
+
+    <a class="product-card" href="landing-v6-semne.html">
+      <div class="card-visual bg-vie-deschis">
+        <span class="code on-dark">LS04</span>
+        <img src="assets/bottles/semne.png" alt="Sticlă Riesling Italian, gama semne">
+      </div>
+      <div class="card-info">
+        <p class="name">Riesling Italian</p>
+        <p class="meta">semne · alb · sec</p>
+        <p class="price">109 lei</p>
+      </div>
+    </a>
+
+  </section>
+
+  <!-- ============ NEWSLETTER SPLIT ============ -->
+  <section class="promo" aria-label="Ofertă newsletter">
+    <div class="promo-grid">
+      <div class="promo-copy">
+        <h2>Primește 10% reducere</h2>
+        <p>Abonează-te la <em>Newsletter</em> și primești o reducere specială pentru prima comandă!</p>
+        <a class="btn-dark" href="#abonare">Abonează-te</a>
+      </div>
+      <div class="promo-visual" aria-hidden="true">
+        <img class="b b1" src="assets/bottles/cuvinte-feteasca-regala.png" alt="">
+        <img class="b b2" src="assets/bottles/semne.png" alt="">
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TRUST BADGES ============ -->
+  <section class="badges" aria-label="Garanții magazin">
+    <div class="badge bg-nisip">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>
+      </span>
+      <div>
+        <h3>Livrare prin curier</h3>
+        <p>în 2–4 zile</p>
+      </div>
+    </div>
+    <div class="badge bg-vie">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="1"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      </span>
+      <div>
+        <h3>Plăți sigure</h3>
+        <p>card sau ramburs</p>
+      </div>
+    </div>
+    <div class="badge bg-stejar" id="contact">
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 7l9 6 9-6"/></svg>
+      </span>
+      <div>
+        <h3>Contactează-ne</h3>
+        <p>contact@domeniul-locus.ro</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SUBSCRIBE BAR ============ -->
+  <section class="subscribe" id="abonare" aria-label="Abonare newsletter">
+    <div class="subscribe-row">
+      <form class="subscribe-form" action="#" method="post">
+        <label for="nl-email" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);">Adresa de email</label>
+        <input type="email" id="nl-email" name="email" placeholder="Adresa ta de email" required>
+        <button type="submit" class="btn-dark">Abonează-te</button>
+      </form>
+      <div class="socials">
+        <a href="#" aria-label="Facebook">
+          <svg viewBox="0 0 24 24"><path d="M14 8h3V5h-3a4 4 0 0 0-4 4v2H7v3h3v6h3v-6h3l1-3h-4V9a1 1 0 0 1 1-1z"/></svg>
+        </a>
+        <a href="#" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".8"/></svg>
+        </a>
+        <a href="mailto:contact@domeniul-locus.ro" aria-label="Email">
+          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 7l9 6 9-6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
 
 </main>
 
-<!-- ---------- footer (1:1 din components/landing/footer.tsx) ---------- -->
-<footer class="footer" id="contact">
+<!-- ============ FOOTER ============ -->
+<footer class="site-footer">
   <div class="footer-grid">
     <div class="footer-col">
-      <a href="landing-v6.html" class="brand" style="margin-bottom:32px;display:inline-flex">
-        <img src="assets/logos/locus.png" alt="Domeniul Locus" class="brand-img">
-      </a>
-      <p>
-        Sediu social<br>
-        Jud. Gala&#539;i, mun. Gala&#539;i,<br>
-        str. Portului, nr. 20, tronson 1, camera 211<br>
-        <br>
-        Punct de lucru<br>
-        Centrul de Vinifica&#539;ie Buciumeni,<br>
-        jud. Gala&#539;i, com. Buciumeni
-      </p>
-      <p>
-        <a href="tel:+40752232912">(0752) 232 912</a><br>
-        <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>
-      </p>
-    </div>
-
-    <div class="footer-col">
-      <h4>Navigheaz&#259;</h4>
+      <h4>Meniu</h4>
       <ul>
-        <li><a href="landing-v6.html">Acas&#259;</a></li>
+        <li><a href="landing-v6.html">Acasă</a></li>
+        <li><a href="#cautare">Căutare</a></li>
+        <li><a href="#vinuri">Toate produsele</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Informații</h4>
+      <ul>
         <li><a href="landing-v6-descopera.html">Despre noi</a></li>
-        <li><a href="landing-v6-shop.html">Shop</a></li>
-        <li><a href="#">Parteneri</a></li>
         <li><a href="#contact">Contact</a></li>
-      </ul>
-      <h4 style="margin-top:32px">Cump&#259;r&#259;</h4>
-      <ul>
-        <li><a href="#">Cum cumperi</a></li>
+        <li><a href="#contact">Cere informații</a></li>
         <li><a href="#">Livrare</a></li>
-        <li><a href="#">Retur</a></li>
-      </ul>
-      <h4 style="margin-top:32px">Legal</h4>
-      <ul>
-        <li><a href="#">Termeni</a></li>
-        <li><a href="#">Confiden&#539;ialitate</a></li>
-        <li><a href="#">Cookies</a></li>
       </ul>
     </div>
-
+    <div class="footer-col" id="parteneri">
+      <h4>Suport client</h4>
+      <ul>
+        <li><a href="#">Termeni și condiții</a></li>
+        <li><a href="#">Plăți sigure</a></li>
+        <li><a href="#">Politica de confidențialitate</a></li>
+        <li><a href="#">Politica de cookies</a></li>
+      </ul>
+    </div>
     <div class="footer-col">
-      <h4>Urm&#259;re&#537;te-ne</h4>
-      <ul>
-        <li><a href="#" target="_blank" rel="noopener noreferrer">Instagram &#8599;</a></li>
-        <li><a href="#" target="_blank" rel="noopener noreferrer">Facebook &#8599;</a></li>
-      </ul>
-      <h4 style="margin-top:32px">Reclama&#539;ii</h4>
-      <ul>
-        <li><a href="https://anpc.ro" target="_blank" rel="noopener noreferrer">ANPC &#8599;</a></li>
-        <li><a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">SOL &mdash; solu&#539;ionare online &#8599;</a></li>
-      </ul>
-      <p style="margin-top:32px;font-size:11px;line-height:1.7">
-        SC ROMVINTEC SRL &middot; 18+ &middot; Con&#539;ine sulfi&#539;i.<br>
-        Consumul excesiv de alcool d&#259;uneaz&#259; s&#259;n&#259;t&#259;&#539;ii.
-      </p>
+      <h4>Domeniul Locus</h4>
+      <p>Domeniul Locus © Copyright 2026</p>
+      <p>SC ROMVINTEC SRL</p>
+      <p>Buciumeni, între Panciu și Nicorești,<br>jud. Galați, România</p>
+      <p>CIF/CUI: RO12345678</p>
+      <p class="award-line">Recomandat de <em>Vinuri de România 2026</em></p>
     </div>
   </div>
 
-  <div class="footer-bottom">
-    <span class="coords-line">45.98&deg;N 27.30&deg;E &middot; Buciumeni &middot; Rom&acirc;nia</span>
-    <span class="legal">&copy; 2026 Domeniul Locus &middot; Identitate vizual&#259;: STUDIOMASURA</span>
+  <!-- ============ PAYMENT LOGOS ============ -->
+  <div class="payments">
+    <div class="payments-row" aria-label="Metode de plată acceptate">
+      <span class="pay">American Express</span>
+      <span class="pay">Apple Pay</span>
+      <span class="pay">Diners Club</span>
+      <span class="pay">Discover</span>
+      <span class="pay">Mastercard</span>
+      <span class="pay">PayPal</span>
+      <span class="pay">Visa</span>
+    </div>
+  </div>
+
+  <!-- ============ COPYRIGHT ============ -->
+  <div class="copyright">
+    © 2026 Domeniul Locus · Consum responsabil
   </div>
 </footer>
 
 <script>
 (function(){
-  "use strict";
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ---------- reveal la scroll (parity cu components/reveal.tsx) ---------- */
-  var target = document.getElementById('winesGrid');
-  if(reduced){
-    target.classList.add('in');
-  }else{
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
-      });
-    },{threshold:.12, rootMargin:'0px 0px -8% 0px'});
-    io.observe(target);
-  }
-
-  /* ---------- filtre (parity cu components/landing/wines-filters.tsx) ---------- */
-  var buttons = document.querySelectorAll('.filter');
-  var cards = document.querySelectorAll('#winesGrid .wine[data-tags]');
-  buttons.forEach(function(btn){
-    btn.addEventListener('click',function(){
-      var val = btn.dataset.filter;
-      buttons.forEach(function(b){
-        b.classList.toggle('is-active', b===btn);
-        b.setAttribute('aria-pressed', b===btn ? 'true' : 'false');
-      });
-      cards.forEach(function(c){
-        var tags = (c.dataset.tags || '').split(' ');
-        var match = val === 'all' || tags.indexOf(val) !== -1;
-        c.classList.toggle('is-hidden', !match);
-      });
-    });
+  var toggle = document.querySelector('.menu-toggle');
+  var nav = document.getElementById('main-nav');
+  toggle.addEventListener('click', function(){
+    var open = nav.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    toggle.setAttribute('aria-label', open ? 'Închide meniul' : 'Deschide meniul');
   });
-
-  /* ---------- adaugă în coș (prototip — fără backend, doar aspect) ---------- */
-  document.querySelectorAll('.wine-add').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      btn.classList.add('is-pulse');
-      window.setTimeout(function(){ btn.classList.remove('is-pulse'); },600);
-    });
+  nav.addEventListener('click', function(e){
+    if(e.target.tagName === 'A'){ nav.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }
   });
 })();
 </script>
+
 </body>
 </html>
