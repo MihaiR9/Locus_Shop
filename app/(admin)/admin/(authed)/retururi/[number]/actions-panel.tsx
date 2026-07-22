@@ -115,18 +115,16 @@ export function ReturnActions({
                 </Button>
               )}
 
-              {status !== "rejected" && (
-                <Button
-                  onClick={() => doUpdate("rejected")}
-                  variant="outline"
-                  size="sm"
-                  disabled={isPending}
-                  className="w-full text-red-700 hover:bg-red-50 hover:text-red-800"
-                >
-                  <XCircle className="mr-1.5 h-3.5 w-3.5" />
-                  Respinge cererea
-                </Button>
-              )}
+              <Button
+                onClick={() => doUpdate("rejected")}
+                variant="outline"
+                size="sm"
+                disabled={isPending}
+                className="w-full text-red-700 hover:bg-red-50 hover:text-red-800"
+              >
+                <XCircle className="mr-1.5 h-3.5 w-3.5" />
+                Respinge cererea
+              </Button>
             </div>
           )}
 
