@@ -11,8 +11,7 @@
 
 <!-- preload panel backgrounds so crossfade never stalls -->
 <link rel="preload" as="image" href="assets/Imagini/dealuri-cu-vii.jpg">
-<link rel="preload" as="image" href="assets/Imagini/Landing2.png">
-<link rel="preload" as="image" href="assets/Imagini/homepage-desaturat.jpg">
+<link rel="preload" as="image" href="assets/Imagini/2.%20Landing%20bun%202.png">
 <style>
 /* ============================================================
    DOMENIUL LOCUS — landing v6
@@ -84,7 +83,7 @@ button{font:inherit}
    user trece de la Cuvinte spre Semne). Imaginea „stă fixă" iar user vede
    secțiuni diferite. */
 .bg-layer.bg-pan{
-  background-size:auto 100%;
+  background-size:auto 125%;
   background-repeat:no-repeat;
   background-position:0% center;
   will-change:background-position;
@@ -219,10 +218,17 @@ a.center{cursor:pointer}
   font-size:clamp(64px,8vw,100px);letter-spacing:.005em;
 }
 .welcome-lead{
-  font-family:var(--serif);font-style:normal;font-weight:400;
-  font-size:clamp(52px,6.4vw,88px);line-height:1;letter-spacing:.005em;
+  font-family:var(--mono);font-style:italic;font-weight:400;
+  font-size:clamp(38px,5vw,62px);line-height:1.02;letter-spacing:-.01em;
   color:var(--ink);opacity:.94;
-  margin-top:38px;margin-bottom:14px;
+  margin-top:32px;margin-bottom:22px;
+}
+.manifesto-text{
+  font-family:var(--mono);font-style:normal;font-weight:300;
+  font-size:clamp(11px,1vw,13.5px);line-height:1.75;letter-spacing:.005em;
+  color:var(--ink-soft);opacity:.9;
+  max-width:min(560px,86vw);
+  margin:0 auto 18px;text-align:center;
 }
 .dot{
   position:relative;
@@ -425,6 +431,68 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
   .pos-l .c-semn{left:8vw}
   .c-pauze{height:16vh}
 }
+
+/* ---------- arc nav ascuns pe mobil + tabletă (nu are sens la ecrane mici) ---------- */
+@media (max-width:1024px){
+  .arc-wrap{display:none}
+  .hint{font-size:9px}
+}
+
+/* ---------- laptop tier: MacBook Air 13/13.6, Pro 14 (1025-1600w, 800-1000h) ---------- */
+@media (min-width:1025px) and (max-width:1600px), (max-height:1000px) and (min-height:721px){
+  .arc-wrap{top:-160px;width:clamp(560px,58vw,900px)}
+  .arc-item text{font-size:16px}
+  .arc-item.is-active circle{transform:scale(1.8)}
+
+  .brand-logo{height:clamp(48px,4.4vw,64px)}
+  .nav{gap:20px;font-size:11.5px}
+  .nav-shop{padding:11px 34px}
+
+  .center{transform:translateY(4vh)}
+  .dot{width:clamp(58px,6.4vw,84px);height:clamp(58px,6.4vw,84px)}
+  .welcome-lead{font-size:clamp(38px,4.6vw,60px);margin-top:26px;margin-bottom:18px}
+  .manifesto-text{font-size:clamp(11px,.9vw,12.5px);line-height:1.7;max-width:min(520px,84vw);margin-bottom:14px}
+  .gama-wordmark{font-size:clamp(40px,4.8vw,68px);margin-top:24px;margin-bottom:12px}
+  .gama-wordmark-solo{font-size:clamp(52px,6.4vw,82px)}
+  .gama-logo-pauze{height:clamp(180px,20vw,260px);margin-top:8px}
+}
+
+/* ---------- short viewport (Nest Hub 1024x600, landscape iPad, laptop-uri mici) ---------- */
+@media (max-height:720px){
+  .arc-wrap{top:-200px;width:clamp(520px,54vw,860px)}
+  .arc-item text{font-size:14px;letter-spacing:.4px}
+  .arc-item.is-active circle{transform:scale(1.6)}
+
+  .brand{top:12px;left:16px}
+  .brand-logo{height:44px}
+  .nav{top:18px;right:18px;gap:14px;font-size:10.5px}
+  .nav-shop{padding:8px 22px}
+  .nav-shop span{font-size:10.5px}
+
+  .center{transform:translateY(0)}
+  .dot{width:clamp(44px,4.6vw,64px);height:clamp(44px,4.6vw,64px)}
+  .welcome-lead{font-size:clamp(28px,3.8vw,44px);margin-top:22px;margin-bottom:14px}
+  .manifesto-text{font-size:clamp(10.5px,.85vw,12px);line-height:1.6;max-width:min(480px,84vw);margin-bottom:12px}
+  .gama-logo-lg{height:clamp(50px,5.8vw,70px);margin-top:22px;margin-bottom:12px}
+  .gama-wordmark{font-size:clamp(34px,4vw,58px);margin-top:20px;margin-bottom:10px}
+  .gama-wordmark-solo{font-size:clamp(46px,5.6vw,72px)}
+  .gama-logo-pauze{height:clamp(160px,18vw,230px);margin-top:6px}
+  .sub{font-size:10px;letter-spacing:.2em;margin-top:12px}
+  .enter-cue{margin-top:18px;font-size:8.5px}
+  .mega-backdrop{font-size:clamp(80px,9vw,140px)}
+
+  .counter{bottom:12px;right:20px;font-size:15px}
+  .counter span{font-size:11px}
+  .legal{bottom:14px;left:20px;right:20px;font-size:7.5px;letter-spacing:.14em}
+  .progress{height:1px}
+}
+
+@media (max-height:560px){
+  .arc-wrap{top:-240px;width:clamp(440px,48vw,700px)}
+  .welcome-lead{font-size:clamp(24px,3.2vw,36px)}
+  .manifesto-text{font-size:10px;max-width:min(440px,80vw)}
+  .gama-wordmark{font-size:clamp(28px,3.6vw,44px)}
+}
 </style>
 </head>
 <body>
@@ -432,9 +500,9 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
 <!-- background layer stack (crossfade per panel) -->
 <div class="bg-stack" aria-hidden="true">
   <div class="bg-layer" data-idx="0" style="background-image:url('assets/Imagini/dealuri-cu-vii.jpg')"></div>
-  <div class="bg-layer bg-pan" data-idx="1" style="background-image:url('assets/Imagini/Landing2.png')"></div>
-  <div class="bg-layer bg-pan" data-idx="2" style="background-image:url('assets/Imagini/Landing2.png')"></div>
-  <div class="bg-layer" data-idx="3" style="background-image:url('assets/Imagini/homepage-desaturat.jpg')"></div>
+  <div class="bg-layer bg-pan" data-idx="1" style="background-image:url('assets/Imagini/2.%20Landing%20bun%202.png')"></div>
+  <div class="bg-layer bg-pan" data-idx="2" style="background-image:url('assets/Imagini/2.%20Landing%20bun%202.png')"></div>
+  <div class="bg-layer bg-pan" data-idx="3" style="background-image:url('assets/Imagini/2.%20Landing%20bun%202.png')"></div>
 </div>
 <div class="bg-dither" aria-hidden="true"></div>
 
@@ -476,6 +544,7 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
       <div class="center" id="welcomeCenter" role="link" tabindex="0" aria-label="Descoperă povestea domeniului" style="cursor:pointer">
         <span class="dot" style="--dot:#4A3C2D" role="img" aria-label="Punct de reper — Descoperă"></span>
         <p class="welcome-lead">un loc &middot; un timp &middot; un vin</p>
+        <p class="manifesto-text">Vinul &icirc;ncepe &icirc;n vie, acolo unde timpul &#537;i natura &icirc;&#537;i urmeaz&#259; cursul firesc. Se na&#537;te din r&#259;bdare, se formeaz&#259; prin echilibru &#537;i prinde expresie prin grija pentru detaliu. Fiecare recolt&#259; p&#259;streaz&#259; amprenta locului. Sticla devine o m&#259;rturie a unui parcurs dus cu respect &#537;i m&#259;sur&#259;. &Icirc;ntre tradi&#539;ie &#537;i viziune, vinul r&#259;m&acirc;ne sincer, purt&acirc;nd &icirc;n el identitatea locului din care provine. La Domeniul Locus, vinul spune o poveste &icirc;n cuvinte nerostite despre origine, timp &#537;i sens.</p>
         <p class="sub">45.98&deg;N &middot; 27.30&deg;E</p>
       </div>
     </section>
@@ -593,8 +662,9 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
 
   /* ---------- environment ---------- */
   var reduced  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var small    = window.matchMedia('(max-width: 768px)').matches;
-  var vertical = reduced || small || typeof gsap === 'undefined';
+  /* horizontal scroll rămâne activ și pe mobil/tabletă — se navighează
+     natural cu scroll vertical, dar conținutul se mișcă orizontal. */
+  var vertical = reduced || typeof gsap === 'undefined';
 
   var active = -1;
   function setActive(i){
@@ -798,12 +868,16 @@ html.is-vertical .enter-cue{opacity:1;transform:none}
            dinspre Welcome și la ieșirea spre Pauze, dar acele bg-layers au
            opacity 0 acolo, deci user nu vede pan-ul dinafara secțiunii asr.
            smoothStep aplicat suplimentar pentru mișcare cu accelerație lină. */
-        var panRaw  = (cont - 0.5) / 2.0;
+        /* Pan 2. Landing bun 2.png între Cuvinte (idx 1), Semne (idx 2) și
+           Pauze (idx 3). Interval cont extins la [0.5, 3.5] — imaginea
+           acoperă toate cele 3 game. smoothStep aplicat pentru mișcare lină. */
+        var panRaw  = (cont - 0.5) / 3.0;
         var panFrac = Math.max(0, Math.min(1, panRaw));
         panFrac     = panFrac * panFrac * (3 - 2 * panFrac); // smoothStep
         var panPos  = (panFrac * 100).toFixed(2) + '%';
         if(bgLayers[1]) bgLayers[1].style.backgroundPositionX = panPos;
         if(bgLayers[2]) bgLayers[2].style.backgroundPositionX = panPos;
+        if(bgLayers[3]) bgLayers[3].style.backgroundPositionX = panPos;
         if(lineClipRect && linePts.length){
           /* reveal aligns exactly to star centers at each panel */
           var idx  = Math.floor(cont);

@@ -4,15 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cuvinte — Domeniul Locus</title>
-<meta name="description" content="Cuvinte — gama de bază Domeniul Locus. Trei vinuri din grija zilei: Fetească Regală, Fetească Neagră, Riesling Italian.">
+<meta name="description" content="Cuvinte — gama de bază Domeniul Locus. Fetească Regală, Fetească Neagră, Riesling Italian. Din grija zilei.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Bellefair&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400;1,500&display=swap" rel="stylesheet">
+
+<!-- preload panel backgrounds so crossfade never stalls -->
+<link rel="preload" as="image" href="assets/Imagini/dealuri-cu-vii.jpg">
+<link rel="preload" as="image" href="assets/bottles/cuvinte-feteasca-regala.png">
+<link rel="preload" as="image" href="assets/bottles/cuvinte-feteasca-neagra.png">
+<link rel="preload" as="image" href="assets/bottles/cuvinte-riesling.png">
 <style>
 /* ============================================================
-   DOMENIUL LOCUS — landing v6 · pagina de gamă CUVINTE
-   Scroll vertical natural: hero gamă → 3 vinuri
-   (hero / story / sticlă adnotată / acțiuni) → footer
+   DOMENIUL LOCUS — landing v6
+   Restructurare v5: semicerc rotativ cu 4 secțiuni
+   (Welcome · Cuvinte · Semne · Pauze) — gamele deschid
+   pagini dedicate, nu drawer.
    Paletă brandbook: Pământ / Nisip / Piatră / Vie / Stejar / Pivniță
    ============================================================ */
 :root{
@@ -28,8 +35,7 @@
   --ink-soft:  var(--stejar);
   --ink-mute:  var(--piatra);
   --line:      rgba(74,60,45,.16);
-
-  --gama:      var(--nisip); /* culoarea gamei cuvinte */
+  --auriu:     #8B7841;
 
   --serif:  'Italiana', serif;
   --cormo:  'Cormorant Garamond', serif;
@@ -37,21 +43,20 @@
   --mono:   'IBM Plex Mono', monospace;
 
   --ease:   cubic-bezier(.22,.61,.36,1);
+  --n: 3;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-@media (prefers-reduced-motion: no-preference){
-  html{scroll-behavior:smooth}
-}
+html{scroll-behavior:auto}
 body{
   background:var(--bg);
   color:var(--ink);
   font-family:var(--mono);
-  font-weight:300;
   overflow-x:hidden;
   -webkit-font-smoothing:antialiased;
 }
 img{max-width:100%;user-select:none;-webkit-user-drag:none}
 a{color:inherit;text-decoration:none}
+button{font:inherit}
 ::selection{background:var(--ink);color:var(--bg)}
 
 /* ---------- film grain ---------- */
@@ -61,15 +66,57 @@ a{color:inherit;text-decoration:none}
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* ---------- header sticky ---------- */
-.chrome{position:fixed;inset:0 0 auto 0;z-index:80;pointer-events:none}
+/* ---------- background stack (cross-dissolve per panel) ---------- */
+.bg-stack{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.bg-layer{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  opacity:0;will-change:opacity;
+  transition:opacity .5s ease-out;
+  filter:saturate(.9) contrast(1.05) brightness(1.02) sepia(0);
+  transform:translateZ(0); /* GPU layer */
+}
+.bg-layer.is-active{opacity:0}
+/* Pan mode — folosit pe panourile Cuvinte + Semne care împart aceeași
+   imagine panoramică (asr.png). Background e scalat mai lat decât viewportul,
+   iar `background-position-x` e animat de JS pe scroll (0% → 100% când
+   user trece de la Cuvinte spre Semne). Imaginea „stă fixă" iar user vede
+   secțiuni diferite. */
+.bg-layer.bg-pan{
+  background-size:auto 100%;
+  background-repeat:no-repeat;
+  background-position:0% center;
+  will-change:background-position;
+}
+/* dithered noise overlay — creates the pixel-dissolve feel during crossfade */
+.bg-dither{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  opacity:.06;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.35' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 30 -15'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23d)'/%3E%3C/svg%3E");
+  background-size:320px 320px;
+}
+
+/* ---------- chrome: logo + nav ---------- */
+.chrome{position:fixed;inset:0 0 auto 0;z-index:70;pointer-events:none;transition:opacity .3s}
 .chrome > *{pointer-events:auto}
-.brand{position:absolute;top:22px;left:28px;display:block}
-.brand img{height:50px;width:auto;display:block}
+.brand{position:absolute;top:20px;left:26px;display:block}
+.brand-clip{display:block;overflow:hidden}
+.brand-logo{
+  height:clamp(56px,5vw,78px);width:auto;display:block;
+  clip-path:inset(0 100% 0 0);
+  animation:logoReveal 1.2s var(--ease) .2s forwards;
+}
+@keyframes logoReveal{
+  0%{clip-path:inset(0 100% 0 0);opacity:0}
+  55%{opacity:1}
+  100%{clip-path:inset(0 0 0 0);opacity:1}
+}
 .nav{
-  position:absolute;top:32px;right:32px;
-  display:flex;align-items:center;gap:28px;
-  font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  position:absolute;top:36px;right:32px;
+  display:flex;align-items:center;gap:26px;
+  font-size:12.5px;letter-spacing:.06em;
   color:var(--ink-soft);
 }
 .nav a{position:relative;padding:4px 0}
@@ -82,713 +129,930 @@ a{color:inherit;text-decoration:none}
 .nav-shop{
   position:relative;isolation:isolate;overflow:hidden;
   display:inline-flex;align-items:center;justify-content:center;
-  padding:11px 26px;border:1px solid var(--ink);border-radius:999px;
+  padding:13px 54px;border:1px solid var(--ink);border-radius:999px;
+  background:var(--ink);
+  transition:background .5s var(--ease),border-color .5s var(--ease);
 }
-.nav-shop span{position:relative;z-index:1;font-size:9.5px;letter-spacing:.22em;color:var(--ink);transition:color .5s var(--ease)}
+.nav-shop span{position:relative;z-index:1;font-size:12.5px;letter-spacing:.06em;color:var(--bg);transition:color .5s var(--ease)}
 .nav-shop::after{
-  content:"";position:absolute;inset:0;background:var(--ink);z-index:0;
+  content:"";position:absolute;inset:0;background:var(--bg);z-index:0;
   transform:translateY(101%);transition:transform .5s var(--ease);
 }
+.nav-shop:hover{background:transparent}
 .nav-shop:hover::after{transform:translateY(0)}
-.nav-shop:hover span{color:var(--bg)}
+.nav-shop:hover span{color:var(--ink)}
 .lang{display:flex;gap:8px;align-items:center;color:var(--ink-mute)}
 .lang b{font-weight:500;color:var(--ink);border-bottom:1px solid currentColor;padding-bottom:3px}
 .lang span:not(b){opacity:.55}
 
-/* ---------- semicerc gol cu X central ---------- */
-.arc-top{
-  position:fixed;top:0;left:50%;transform:translateX(-50%);
-  width:clamp(560px,54vw,880px);aspect-ratio:1400/380;
-  z-index:75;pointer-events:none;
+/* ---------- rotating semicircle nav (4 stații) ---------- */
+.arc-wrap{
+  position:fixed;top:-130px;left:50%;transform:translateX(-50%);
+  width:clamp(660px,62vw,1020px);z-index:60;pointer-events:none;
 }
-.arc-top svg{display:block;width:100%;height:100%;overflow:visible}
+.arc-wrap svg{display:block;width:100%;height:auto;overflow:visible}
 .arc-ring{fill:none;stroke:var(--line);stroke-width:1}
-.arc-x{
-  position:absolute;left:50%;top:84.2%;transform:translate(-50%,-50%);
-  width:64px;height:64px;border-radius:50%;
-  border:1px solid var(--ink);background:var(--bg);
+.arc-item circle{
+  fill:var(--ink-mute);
+  transform-box:fill-box;transform-origin:center;
+  transition:transform .6s var(--ease),fill .6s var(--ease);
+  pointer-events:auto;cursor:pointer;
+}
+.arc-item text{
+  font-family:var(--mono);font-size:20px;letter-spacing:.6px;
+  text-transform:none;fill:var(--ink-soft);
+  transition:fill .6s var(--ease),opacity .6s var(--ease);
+  opacity:.55;pointer-events:auto;cursor:pointer;
+}
+.arc-item.is-active circle{fill:var(--ink);transform:scale(2)}
+.arc-item.is-active text{fill:var(--ink);opacity:1;font-weight:500}
+.arc-pointer{fill:none;stroke:var(--ink);stroke-width:1}
+
+/* ---------- stage / horizontal track ---------- */
+.stage{position:relative;width:100%;height:100svh;overflow:hidden}
+.track{position:relative;display:flex;height:100%;width:calc(var(--n) * 100vw);will-change:transform}
+.panel{
+  position:relative;flex:0 0 100vw;height:100%;
   display:flex;align-items:center;justify-content:center;
-  font-family:var(--cormo);font-size:26px;font-weight:300;line-height:1;
-  color:var(--ink);pointer-events:auto;cursor:pointer;
-  transition:transform .45s var(--ease),background .45s var(--ease),color .45s var(--ease);
+  overflow:hidden;
 }
-.arc-x:hover{transform:translate(-50%,-50%) rotate(90deg);background:var(--ink);color:var(--bg)}
-.arc-x small{
-  position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);
-  font-family:var(--mono);font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
-  color:var(--ink-mute);white-space:nowrap;opacity:0;transition:opacity .4s var(--ease);
-}
-.arc-x:hover small{opacity:1}
-
-/* ---------- utilitare tipografice ---------- */
-.eyebrow{
-  font-size:10px;letter-spacing:.26em;text-transform:uppercase;
-  color:var(--ink-mute);display:inline-flex;align-items:center;gap:14px;
-}
-.eyebrow::before{content:"";width:22px;height:1px;background:var(--ink-mute)}
-
-/* textul care traversează cercurile — inversare prin difference:
-   pe fundal Pământ devine negru, pe cercuri închise devine deschis */
-.blend{mix-blend-mode:difference;color:var(--pamant)}
-
-/* ---------- cercuri mari ---------- */
-.w-circle{
-  position:absolute;border-radius:50%;
-  background:var(--c,var(--gama));
-  transform:scale(.9);opacity:0;
-  transition:transform 1.4s var(--ease),opacity 1.2s var(--ease);
-  will-change:transform;
-}
-.is-in .w-circle{transform:scale(1);opacity:var(--co,1)}
-
-/* ---------- reveal ---------- */
-.rv{opacity:0;transform:translateY(22px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
-.is-in .rv{opacity:1;transform:none}
-.is-in .rv:nth-child(2){transition-delay:.12s}
-.is-in .rv:nth-child(3){transition-delay:.24s}
-.is-in .rv:nth-child(4){transition-delay:.36s}
-
-/* ============================================================
-   HERO GAMĂ
-   ============================================================ */
-.gama-hero{
-  position:relative;min-height:100svh;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;overflow:hidden;padding:120px 24px 80px;
-}
-.gama-hero .w-circle{
-  left:50%;top:56%;
-  width:clamp(300px,38vw,520px);aspect-ratio:1;
-  margin-left:calc(clamp(300px,38vw,520px) / -2);
-  margin-top:calc(clamp(300px,38vw,520px) / -2);
-}
-.gama-title{
-  position:relative;z-index:2;
-  font-family:var(--serif);font-weight:400;
-  font-size:clamp(96px,18vw,210px);line-height:.9;letter-spacing:.01em;
-}
-.gama-sub{
-  position:relative;z-index:2;margin-top:26px;
-  font-family:var(--cormo);font-style:italic;font-weight:300;
-  font-size:clamp(19px,2.2vw,25px);color:var(--ink-soft);
-  max-width:34ch;
-}
-.gama-hero .eyebrow{position:relative;z-index:2;margin-bottom:30px}
-.scroll-cue{
-  position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
-  font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-mute);
-  display:flex;align-items:center;gap:14px;white-space:nowrap;z-index:2;
-}
-.scroll-cue::before,.scroll-cue::after{content:"";width:26px;height:1px;background:var(--line)}
-
-/* ============================================================
-   WINE HERO
-   ============================================================ */
-.w-hero{
-  position:relative;min-height:96svh;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;overflow:hidden;padding:100px 24px;
-}
-.w-hero .w-circle{
-  left:50%;top:52%;
-  width:clamp(260px,32vw,440px);aspect-ratio:1;
-  margin-left:calc(clamp(260px,32vw,440px) / -2);
-  margin-top:calc(clamp(260px,32vw,440px) / -2);
-}
-.w-hero .eyebrow{margin-bottom:26px;position:relative;z-index:2}
-.w-name{
-  position:relative;z-index:2;
-  font-family:var(--serif);font-weight:400;
-  font-size:clamp(56px,10vw,120px);line-height:.96;letter-spacing:.01em;
-  max-width:12ch;
-}
-.w-meta{
-  position:relative;z-index:2;margin-top:24px;
-  font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);
+.line-svg{position:absolute;top:0;left:0;z-index:2;pointer-events:none;overflow:visible}
+.line-path{fill:none;stroke:var(--auriu);stroke-width:3.4;stroke-linecap:round;stroke-dasharray:9 22;opacity:.9;animation:antsMove 46s linear infinite}
+@keyframes antsMove{to{stroke-dashoffset:-306px}}
+.mega-backdrop{
+  position:absolute;left:6vw;bottom:-.12em;
+  font-family:var(--belle);font-weight:400;white-space:nowrap;
+  font-size:clamp(110px,12vw,180px);line-height:.9;
+  color:var(--ink);opacity:.08;z-index:1;
+  will-change:transform;pointer-events:none;
 }
 
-/* ============================================================
-   WINE STORY — editorial, text peste marginea cercului
-   ============================================================ */
-.w-story{
-  position:relative;min-height:88svh;
-  display:flex;align-items:center;
-  overflow:hidden;padding:14vh 8vw;
+/* ---------- center block ---------- */
+.center{
+  position:relative;z-index:5;text-align:center;
+  display:flex;flex-direction:column;align-items:center;
+  transform:translateY(9vh);
+  will-change:transform,opacity;
 }
-.w-story .w-circle{
-  right:-10vw;top:50%;
-  width:clamp(340px,46vw,640px);aspect-ratio:1;
-  margin-top:calc(clamp(340px,46vw,640px) / -2);
+a.center{cursor:pointer}
+.gama-logo{
+  height:clamp(36px,4.4vw,50px);width:auto;
+  margin-top:32px;margin-bottom:22px;opacity:.9;
 }
-.w-story.flip .w-circle{right:auto;left:-10vw}
-.s-num{
-  position:absolute;top:6vh;left:6vw;z-index:1;
-  font-family:var(--belle);font-size:clamp(140px,22vw,280px);line-height:1;
-  color:var(--ink);opacity:.05;pointer-events:none;
+.gama-logo-lg{
+  height:clamp(66px,7.6vw,96px);
+  width:auto;object-fit:contain;
+  margin-top:36px;margin-bottom:16px;opacity:.95;
 }
-.w-story.flip .s-num{left:auto;right:6vw}
-.s-text{
-  position:relative;z-index:2;
-  font-family:var(--cormo);font-style:italic;font-weight:300;
-  font-size:clamp(23px,2.9vw,34px);line-height:1.55;
-  max-width:26ch;margin-left:4vw;
+/* Wordmark text — same font (IBM Plex Mono 700) as the original PNGs, but as text
+   for flexibility (scaling, styling, fast load). Applies to cuvinte / semne / pauze. */
+.gama-wordmark{
+  display:inline-block;
+  font-family:var(--mono);
+  font-weight:700;font-style:normal;
+  font-size:clamp(44px,5.2vw,82px);
+  line-height:.95;letter-spacing:-.05em;
+  color:var(--ink);text-transform:lowercase;
+  margin-top:28px;margin-bottom:14px;opacity:.95;
 }
-.w-story.flip .s-text{margin-left:auto;margin-right:4vw}
-.s-sign{
-  display:block;margin-top:34px;
-  font-family:var(--mono);font-style:normal;font-size:9.5px;
-  letter-spacing:.26em;text-transform:uppercase;
+.gama-wordmark-solo{
+  font-family:var(--serif);font-style:normal;
+  font-size:clamp(64px,8vw,100px);letter-spacing:.005em;
 }
-
-/* ============================================================
-   WINE DETAIL — sticla adnotată
-   ============================================================ */
-.w-bottle{
-  position:relative;min-height:108svh;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;padding:12vh 4vw;
+.welcome-lead{
+  font-family:var(--serif);font-style:normal;font-weight:400;
+  font-size:clamp(52px,6.4vw,88px);line-height:1;letter-spacing:.005em;
+  color:var(--ink);opacity:.94;
+  margin-top:38px;margin-bottom:14px;
 }
-.b-stage{position:relative;width:min(1160px,94vw);height:min(84vh,840px)}
-.w-bottle .w-circle{
-  left:50%;top:44%;
-  width:clamp(300px,34vw,500px);aspect-ratio:1;
-  margin-left:calc(clamp(300px,34vw,500px) / -2);
-  margin-top:calc(clamp(300px,34vw,500px) / -2);
-}
-.b-img{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  height:min(74vh,740px);width:auto;z-index:2;
-  filter:drop-shadow(0 40px 50px rgba(26,26,26,.18));
-  will-change:transform;
-}
-.b-anns{position:absolute;inset:0;z-index:3;pointer-events:none}
-.ann{
-  position:absolute;max-width:200px;
-  opacity:0;transform:translateY(12px);
-  transition:opacity .8s var(--ease),transform .8s var(--ease);
-}
-.is-in .ann{opacity:1;transform:none}
-.is-in .ann:nth-of-type(1){transition-delay:.15s}
-.is-in .ann:nth-of-type(2){transition-delay:.3s}
-.is-in .ann:nth-of-type(3){transition-delay:.45s}
-.is-in .ann:nth-of-type(4){transition-delay:.6s}
-.is-in .ann:nth-of-type(5){transition-delay:.75s}
-.ann-label{
-  display:block;font-size:8.5px;letter-spacing:.26em;text-transform:uppercase;
-  color:var(--ink-mute);margin-bottom:6px;
-}
-.ann-value{
-  display:block;font-size:11px;line-height:1.75;color:var(--ink-soft);
-}
-.ann-value b{font-family:var(--belle);font-weight:400;font-size:22px;color:var(--ink);letter-spacing:.04em}
-.ann-line{
-  position:absolute;top:.6em;height:1px;background:var(--stejar);opacity:.35;
-  width:clamp(46px,8vw,140px);
-}
-.ann-line::after{
-  content:"";position:absolute;width:5px;height:5px;border-radius:50%;
-  background:var(--stejar);top:-2px;
-}
-.ann--l{text-align:right}
-.ann--l .ann-line{left:calc(100% + 16px)}
-.ann--l .ann-line::after{right:-2px}
-.ann--r{text-align:left}
-.ann--r .ann-line{right:calc(100% + 16px)}
-.ann--r .ann-line::after{left:-2px}
-/* poziții */
-.ann-soi   {left:1%;  top:13%}
-.ann-forma {left:1%;  bottom:17%}
-.ann-an    {right:1%; top:9%}
-.ann-prov  {right:1%; top:42%}
-.ann-matur {right:1%; bottom:15%}
-/* rândul de jos, centru: cules + vinificație */
-.b-row{
-  position:absolute;left:50%;bottom:-2%;transform:translateX(-50%);
-  display:flex;gap:clamp(36px,6vw,90px);text-align:center;z-index:3;
-}
-.b-row .ann{position:static;max-width:230px}
-.ann-vline{
-  display:block;width:1px;height:32px;margin:0 auto 10px;
-  background:var(--stejar);opacity:.35;position:relative;
-}
-.ann-vline::before{
-  content:"";position:absolute;top:-4px;left:-2px;
-  width:5px;height:5px;border-radius:50%;background:var(--stejar);
-}
-
-/* ============================================================
-   WINE ACTIONS
-   ============================================================ */
-.w-actions{
+.dot{
   position:relative;
-  display:flex;flex-direction:column;align-items:center;gap:46px;
-  padding:4vh 6vw 16vh;
+  width:clamp(52px,5.6vw,80px);
+  height:clamp(52px,5.6vw,80px);
+  background:var(--dot,#4A3C2D);
+  -webkit-mask-image:url('assets/graphics/simbol-negru.png');
+          mask-image:url('assets/graphics/simbol-negru.png');
+  -webkit-mask-size:contain;         mask-size:contain;
+  -webkit-mask-position:center;      mask-position:center;
+  -webkit-mask-repeat:no-repeat;     mask-repeat:no-repeat;
+  animation:breath 5.5s ease-in-out infinite;
 }
-.act-bar{
-  display:flex;width:min(860px,100%);
-  border:1px solid var(--ink);border-radius:999px;overflow:hidden;
+@keyframes breath{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.045)}
 }
-.act{
-  position:relative;isolation:isolate;overflow:hidden;
-  flex:1;display:flex;align-items:center;justify-content:center;gap:14px;
-  padding:24px 20px;
-  font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink);
+.title{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(48px,7.4vw,94px);line-height:1.0;
+  letter-spacing:.01em;margin-top:0;
+  max-width:14ch;
 }
-.act + .act{border-left:1px solid var(--ink)}
-.act::after{
-  content:"";position:absolute;inset:0;background:var(--ink);z-index:0;
-  transform:translateY(101%);transition:transform .5s var(--ease);
+.sub{
+  margin-top:18px;
+  font-size:11px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink-soft);
 }
-.act:hover::after{transform:translateY(0)}
-.act > *{position:relative;z-index:1;transition:color .5s var(--ease)}
-.act:hover > *{color:var(--bg)}
-.act svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.4}
-.act em{font-family:var(--belle);font-style:normal;font-size:15px;letter-spacing:.08em}
-.act-next{
-  display:flex;align-items:baseline;gap:30px;flex-wrap:wrap;justify-content:center;
+.sub em{font-family:var(--cormo);font-style:italic;text-transform:none;letter-spacing:.05em;font-size:14px}
+.enter-cue{
+  margin-top:26px;display:inline-flex;align-items:center;gap:12px;
+  font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-mute);
+  opacity:0;transform:translateY(6px);
+  transition:opacity .7s var(--ease) .15s,transform .7s var(--ease) .15s;
 }
-.act-count{font-family:var(--belle);font-size:19px;letter-spacing:.1em;color:var(--ink-mute)}
-.next-link{
-  display:inline-flex;align-items:baseline;gap:16px;
-  font-family:var(--cormo);font-style:italic;font-weight:300;
-  font-size:clamp(22px,2.6vw,30px);color:var(--ink);
-}
-.next-link small{
-  font-family:var(--mono);font-style:normal;font-size:9px;
-  letter-spacing:.26em;text-transform:uppercase;color:var(--ink-mute);
-}
-.next-link i{font-style:normal;transition:transform .4s var(--ease)}
-.next-link:hover i{transform:translateX(8px)}
+.enter-cue::after{content:"\2192";font-family:var(--cormo);font-size:16px;letter-spacing:0;transition:transform .4s var(--ease)}
+.panel.is-active .enter-cue{opacity:1;transform:translateY(0)}
+a.center:hover .enter-cue::after{transform:translateX(6px)}
 
-/* separator subțire între vinuri */
-.w-sep{
-  width:min(560px,70vw);height:1px;background:var(--line);
-  margin:0 auto;border:none;
+/* ---------- wine panel layout: bottle LEFT, content RIGHT ---------- */
+.wine-panel .center{
+  transform:translateY(2vh);
+  max-width:min(1200px,90vw);
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);
+  gap:clamp(32px,5vw,80px);
+  align-items:center;
+  text-align:left;
 }
+.wine-bottle-col{display:flex;justify-content:center;align-items:center}
+.wine-bottle-img{
+  height:clamp(360px,62vh,620px);
+  width:auto;object-fit:contain;
+  filter:drop-shadow(0 30px 40px rgba(26,26,26,.14));
+  margin:0;
+}
+.wine-content-col{
+  display:flex;flex-direction:column;
+  align-items:flex-start;
+}
+.wine-code{
+  font-family:var(--mono);font-weight:400;
+  font-size:10px;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--ink-mute);margin-bottom:10px;
+}
+.wine-title{
+  font-family:var(--mono);font-style:italic;font-weight:400;
+  font-size:clamp(38px,5.4vw,80px);line-height:1.02;
+  letter-spacing:-.01em;color:var(--ink);
+  margin-bottom:14px;
+}
+.wine-meta{
+  font-family:var(--mono);font-weight:500;
+  font-size:10.5px;
+  letter-spacing:.24em;text-transform:uppercase;
+  color:var(--ink-mute);margin-bottom:22px;
+}
+.wine-text{
+  font-family:var(--mono);font-style:normal;font-weight:300;
+  font-size:clamp(12px,1.05vw,14px);
+  line-height:1.75;color:var(--ink-soft);
+  max-width:48ch;margin:0 0 28px 0;
+  letter-spacing:.005em;
+}
+.wine-price-row{
+  display:inline-flex;align-items:baseline;gap:24px;
+  padding:16px 0;
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  margin-bottom:26px;
+}
+@media (max-width:768px){
+  .wine-panel .center{
+    grid-template-columns:1fr;
+    gap:20px;
+    text-align:center;
+  }
+  .wine-content-col{align-items:center}
+  .wine-text{margin-left:auto;margin-right:auto}
+}
+.wine-price{
+  font-family:var(--mono);font-weight:500;
+  font-size:clamp(30px,3.2vw,42px);color:var(--ink);
+  letter-spacing:-.015em;
+}
+.wine-price .currency{
+  font-family:var(--mono);font-weight:400;font-size:11px;
+  letter-spacing:.28em;text-transform:uppercase;
+  color:var(--ink-mute);margin-left:8px;
+}
+.wine-shop-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  padding:16px 44px;border-radius:999px;
+  background:var(--ink);color:var(--bg);
+  border:1px solid var(--ink);
+  font-family:var(--mono);font-size:12px;font-weight:500;
+  letter-spacing:.22em;text-transform:uppercase;
+  cursor:pointer;
+  transition:background .5s var(--ease),color .5s var(--ease),gap .5s var(--ease);
+}
+.wine-shop-btn:hover{background:transparent;color:var(--ink);gap:18px}
+.wine-shop-btn::after{content:"→";font-family:var(--cormo);font-size:16px}
+
+/* ---------- collage layer ---------- */
+.collage{position:absolute;inset:0;z-index:1;pointer-events:none}
+.c-bottle{
+  position:absolute;bottom:-5vh;height:60vh;width:auto;
+  filter:drop-shadow(0 30px 40px rgba(26,26,26,.16));
+  will-change:transform;
+}
+.pos-r .c-bottle{left:62%}
+.pos-l .c-bottle{right:64%}
+.c-trio{
+  position:absolute;left:57%;bottom:-4vh;
+  display:flex;align-items:flex-end;
+  filter:drop-shadow(0 30px 40px rgba(26,26,26,.16));
+  will-change:transform;
+}
+.c-trio img{width:auto}
+.c-trio img:nth-child(1){height:46vh;margin-right:-2.4vw}
+.c-trio img:nth-child(2){height:57vh;position:relative;z-index:1}
+.c-trio img:nth-child(3){height:44vh;margin-left:-2.4vw}
+.c-mark{
+  position:absolute;width:36px;height:36px;opacity:.8;
+  animation:spin 60s linear infinite;
+}
+.pos-r .c-mark{left:16vw;bottom:34vh}
+.pos-l .c-mark{right:16vw;bottom:34vh}
+.c-curbe{
+  position:absolute;left:50%;bottom:-8vh;transform:translateX(-50%);
+  width:min(96vw,1500px);opacity:.32;
+}
+.c-simbol{
+  position:absolute;width:58px;height:58px;
+  left:20vw;bottom:36vh;
+  animation:spin 90s linear infinite;
+}
+.c-semn{position:absolute;opacity:.65;height:120px;width:auto}
+.pos-l .c-semn{left:14vw;bottom:38vh}
+.c-pauze{
+  position:absolute;left:50%;bottom:13vh;transform:translateX(-50%);
+  height:21vh;width:auto;opacity:.78;
+}
+.c-note{
+  position:absolute;left:50%;bottom:7.5vh;transform:translateX(-50%);
+  font-family:var(--cormo);font-style:italic;font-weight:300;
+  font-size:18px;color:var(--ink-soft);
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- fixed hud ---------- */
+.hint{
+  position:fixed;bottom:26px;left:50%;transform:translateX(-50%);
+  z-index:65;font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ink-mute);display:flex;align-items:center;gap:16px;
+  white-space:nowrap;transition:opacity .3s;
+}
+.hint::before,.hint::after{content:"";width:26px;height:1px;background:var(--line)}
+.progress{
+  position:fixed;left:0;bottom:0;z-index:66;height:2px;width:100%;
+  background:var(--line);transition:opacity .3s;
+}
+.progress i{
+  display:block;height:100%;width:100%;background:var(--ink);
+  transform:scaleX(0);transform-origin:left;
+}
+.counter{
+  position:fixed;right:36px;bottom:22px;z-index:65;
+  font-family:var(--belle);font-size:20px;letter-spacing:.08em;
+  color:var(--ink-soft);transition:opacity .3s;
+}
+.counter span{color:var(--ink-mute);font-size:14px}
+.legal{
+  position:fixed;left:36px;bottom:24px;right:36px;z-index:65;
+  font-size:8.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--ink-mute);transition:opacity .3s;
+  display:flex;flex-wrap:wrap;gap:0 .35em;justify-content:center;
+}
+.legal span,.legal a{white-space:nowrap}
+.legal a{color:var(--ink-soft);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:1px;transition:border-color .3s var(--ease),color .3s var(--ease)}
+.legal a:hover{color:var(--ink);border-bottom-color:currentColor}
+@media (max-width:768px){.legal{font-size:7.5px;left:16px;right:16px;gap:0 .28em}}
+
+/* ---------- custom cursor ---------- */
+.cursor{
+  position:fixed;top:0;left:0;z-index:1001;pointer-events:none;
+  width:38px;height:38px;border-radius:999px;
+  background:transparent;border:1px solid var(--ink-soft);
+  transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  transition:width .3s var(--ease),height .3s var(--ease),background .3s var(--ease),border-color .3s var(--ease),opacity .3s;
+  opacity:0;
+}
+.cursor .arr{
+  width:6px;height:10px;
+  color:var(--ink-soft);
+  opacity:.6;transition:opacity .25s var(--ease),transform .25s var(--ease);
+}
+.cursor .arr svg{display:block;width:100%;height:100%}
+.cursor .dot-c{
+  width:5px;height:5px;border-radius:99px;background:var(--ink-soft);
+  opacity:0;transition:opacity .25s var(--ease);
+  position:absolute;
+}
+.cursor.is-left .arr-r{opacity:0;transform:translateX(-4px)}
+.cursor.is-left .arr-l{opacity:1}
+.cursor.is-right .arr-l{opacity:0;transform:translateX(4px)}
+.cursor.is-right .arr-r{opacity:1}
+.cursor:not(.is-left):not(.is-right):not(.is-nav) .arr{opacity:.85}
+/* Când e peste meniul/arcul din top → doar punct central, fără săgeți */
+.cursor.is-nav .arr{opacity:0}
+.cursor.is-nav .dot-c{opacity:1}
+.cursor small{
+  font-family:var(--mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--bg);opacity:0;white-space:nowrap;transition:opacity .3s var(--ease) .1s;
+  position:absolute;
+}
+.cursor.is-on{opacity:1}
+.cursor.is-hover{width:116px;height:34px;background:var(--ink);border-color:var(--ink);gap:0}
+.cursor.is-hover .arr,.cursor.is-hover .dot-c{display:none}
+.cursor.is-hover small{opacity:1}
+@media (pointer:coarse){.cursor{display:none}}
 
 /* ============================================================
-   FOOTER
+   VERTICAL FALLBACK — mobile & prefers-reduced-motion
    ============================================================ */
-.g-footer{
-  border-top:1px solid var(--line);
-  padding:56px 6vw 44px;
-  display:flex;justify-content:space-between;align-items:center;
-  flex-wrap:wrap;gap:26px;
-}
-.f-back{
-  font-family:var(--cormo);font-style:italic;font-weight:300;
-  font-size:22px;color:var(--ink);
-  display:inline-flex;align-items:baseline;gap:14px;
-}
-.f-back i{font-style:normal;transition:transform .4s var(--ease)}
-.f-back:hover i{transform:translateX(-6px)}
-.f-meta{
-  font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--ink-mute);text-align:right;line-height:2.2;
-}
-
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+html.is-vertical .stage{height:auto;overflow:visible}
+html.is-vertical .track{display:block;width:100%}
+html.is-vertical .panel{width:100%;min-height:100svh}
+html.is-vertical .arc-wrap,
+html.is-vertical .line-svg,
+html.is-vertical .mega-backdrop,
+html.is-vertical .hint,
+html.is-vertical .progress{display:none}
+html.is-vertical .center{transform:none}
+html.is-vertical .enter-cue{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){
-  .rv,.ann,.w-circle{opacity:1;transform:none;transition:none}
-  .b-img{transform:translate(-50%,-50%) !important}
+  .dot,.c-mark,.c-simbol,.line-path{animation:none}
+  body{transition:none}
+  .brand-logo{animation:none;clip-path:none;opacity:1}
 }
-@media (max-width:820px){
-  .nav{gap:12px;right:18px;top:24px;font-size:9px;flex-wrap:wrap;justify-content:flex-end;max-width:60vw}
+@media (max-width:768px){
+  .nav{gap:12px;right:20px;top:26px;font-size:9px;flex-wrap:wrap;justify-content:flex-end;max-width:62vw}
   .nav-shop{padding:9px 18px}
-  .brand{top:16px;left:16px}
-  .brand img{height:40px}
-  .arc-top{width:100vw}
-  .arc-top svg{display:none}
-  .arc-x{position:fixed;left:50%;top:20px;transform:translate(-50%,0);width:46px;height:46px;font-size:21px}
-  .arc-x:hover{transform:translate(-50%,0)}
-  .arc-x small{display:none}
+  .brand{top:18px;left:18px}
+  .brand-logo{height:52px}
+  .dot{width:82px;height:82px}
+  .gama-logo{height:32px;margin-top:22px;margin-bottom:16px}
+  .title{font-size:clamp(38px,11vw,58px)}
+  .c-bottle{height:44vh}
+  .pos-r .c-bottle{left:56%}
+  .pos-l .c-bottle{right:52%}
+  .c-trio{left:50%;transform:translateX(-50%)}
+  .c-trio img:nth-child(1){height:32vh}
+  .c-trio img:nth-child(2){height:40vh}
+  .c-trio img:nth-child(3){height:30vh}
+  .counter{right:18px}
+  .legal{left:18px;max-width:46vw}
+  .c-simbol{width:40px;height:40px;left:7vw;bottom:auto;top:17vh}
+  .c-mark{bottom:6vh}
+  .pos-r .c-mark{left:10vw}
+  .pos-l .c-mark{right:10vw}
+  .c-semn{height:76px;bottom:auto;top:17vh}
+  .pos-l .c-semn{left:8vw}
+  .c-pauze{height:16vh}
+}
 
-  .gama-hero{padding-top:140px}
-  .gama-title{font-size:clamp(78px,22vw,120px)}
-  .w-name{font-size:clamp(44px,13vw,72px)}
+/* ---------- arc nav ascuns pe mobil + tabletă ---------- */
+@media (max-width:1024px){
+  .arc-wrap{display:none}
+  .hint{font-size:9px}
+}
 
-  .w-story{padding:10vh 8vw}
-  .s-text{margin:0;max-width:none;font-size:clamp(21px,6vw,26px)}
-  .w-story .w-circle{right:-40vw;width:78vw;margin-top:-39vw}
-  .w-story.flip .w-circle{left:-40vw}
+/* ---------- laptop tier: MacBook Air 13/13.6, Pro 14 (1280-1600w, 800-1000h) ---------- */
+@media (min-width:1025px) and (max-width:1600px), (max-height:1000px) and (min-height:721px){
+  .arc-wrap{top:-160px;width:clamp(560px,58vw,900px)}
+  .arc-item text{font-size:16px}
+  .arc-item.is-active circle{transform:scale(1.8)}
 
-  .w-bottle{padding:8vh 7vw}
-  .b-stage{height:auto;display:flex;flex-direction:column;align-items:center}
-  .w-bottle .w-circle{top:24vh;width:66vw;margin-left:-33vw;margin-top:-33vw}
-  .b-img{position:relative;left:auto;top:auto;transform:none;height:52vh;margin-bottom:48px}
-  .b-anns{position:relative;inset:auto;width:100%;
-    display:grid;grid-template-columns:1fr 1fr;gap:26px 20px;pointer-events:auto}
-  .ann{position:static;max-width:none;text-align:left}
-  .ann--l{text-align:left}
-  .ann-line{display:none}
-  .b-row{position:static;transform:none;display:contents;text-align:left}
-  .ann-vline{display:none}
+  .brand-logo{height:clamp(48px,4.4vw,64px)}
+  .nav{gap:20px;font-size:11.5px}
+  .nav-shop{padding:11px 34px}
 
-  .act-bar{flex-direction:column;border-radius:28px}
-  .act + .act{border-left:none;border-top:1px solid var(--ink)}
-  .g-footer{flex-direction:column;align-items:flex-start}
-  .f-meta{text-align:left}
+  /* wine panel — scale mai gentle */
+  .wine-panel .center{
+    max-width:min(1140px,90vw);
+    gap:clamp(28px,4vw,64px);
+    transform:translateY(1vh);
+  }
+  .wine-bottle-img{height:clamp(320px,55vh,500px)}
+  .wine-title{font-size:clamp(34px,4.6vw,60px)}
+  .wine-text{font-size:clamp(11.5px,.95vw,13px);line-height:1.7;max-width:46ch}
+  .wine-price{font-size:clamp(28px,2.8vw,36px)}
+  .wine-shop-btn{padding:14px 36px;font-size:11.5px}
+}
+
+/* ---------- short viewport (Nest Hub, laptop-uri mici, landscape iPad) ---------- */
+@media (max-height:720px){
+  /* arc nav mai sus + mai mic ca să nu cadă peste conținut */
+  .arc-wrap{top:-200px;width:clamp(520px,54vw,860px)}
+  .arc-item text{font-size:14px;letter-spacing:.4px}
+  .arc-item.is-active circle{transform:scale(1.6)}
+
+  /* chrome mai compact */
+  .brand{top:12px;left:16px}
+  .brand-logo{height:44px}
+  .nav{top:18px;right:18px;gap:14px;font-size:10.5px}
+  .nav-shop{padding:8px 22px}
+  .nav-shop span{font-size:10.5px}
+
+  /* wine panel — layout mai strâns pe verticală */
+  .wine-panel .center{
+    transform:translateY(-1vh);
+    gap:clamp(24px,3vw,44px);
+    max-width:min(1080px,92vw);
+  }
+  .wine-bottle-img{height:clamp(240px,68vh,400px)}
+  .wine-code{font-size:9.5px;margin-bottom:6px;letter-spacing:.3em}
+  .wine-title{
+    font-size:clamp(26px,3.6vw,44px);
+    line-height:1.02;margin-bottom:8px;
+  }
+  .wine-meta{font-size:9.5px;letter-spacing:.22em;margin-bottom:12px}
+  .wine-text{
+    font-size:clamp(10.5px,.85vw,12px);
+    line-height:1.6;margin-bottom:16px;
+    max-width:46ch;
+  }
+  .wine-price-row{padding:10px 0;margin-bottom:16px;gap:16px}
+  .wine-price{font-size:clamp(22px,2.4vw,30px)}
+  .wine-price .currency{font-size:9.5px}
+  .wine-shop-btn{padding:12px 28px;font-size:10.5px;letter-spacing:.2em;gap:10px}
+
+  /* HUD fix la jos ca să nu se calce peste conținut */
+  .counter{bottom:12px;right:20px;font-size:15px}
+  .counter span{font-size:11px}
+  .legal{bottom:14px;left:20px;right:20px;font-size:7.5px;letter-spacing:.14em}
+  .progress{height:1px}
+}
+
+/* ---------- foarte scurt (< 560h) — extra compact ---------- */
+@media (max-height:560px){
+  .arc-wrap{top:-240px;width:clamp(440px,48vw,700px)}
+  .wine-bottle-img{height:clamp(200px,66vh,320px)}
+  .wine-title{font-size:clamp(22px,3vw,36px)}
+  .wine-text{font-size:10px;line-height:1.55;max-width:42ch}
+  .wine-shop-btn{padding:10px 22px;font-size:10px}
 }
 </style>
 </head>
 <body>
 
-<div class="grain" aria-hidden="true"></div>
+<!-- background layer stack (crossfade per wine) -->
+<div class="bg-stack" aria-hidden="true">
+  <div class="bg-layer" data-idx="0" style="background-image:url('assets/Imagini/dealuri-cu-vii.jpg')"></div>
+  <div class="bg-layer" data-idx="1" style="background-image:url('assets/Imagini/dealuri-cu-vii.jpg')"></div>
+  <div class="bg-layer" data-idx="2" style="background-image:url('assets/Imagini/dealuri-cu-vii.jpg')"></div>
+</div>
+<div class="bg-dither" aria-hidden="true"></div>
 
-<!-- ---------- header ---------- -->
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true">
+  <span class="arr arr-l"><svg viewBox="0 0 8 12"><path d="M6 1 L2 6 L6 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <span class="arr arr-r"><svg viewBox="0 0 8 12"><path d="M2 1 L6 6 L2 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <span class="dot-c"></span>
+  <small>vezi gama</small>
+</div>
+
+<!-- chrome -->
 <header class="chrome">
-  <a class="brand" href="landing-v6.html" aria-label="Domeniul Locus — acasă">
-    <img src="assets/logos/locus.png" alt="Domeniul Locus">
+  <a class="brand" href="landing-v6.html" aria-label="Domeniul Locus">
+    <span class="brand-clip"><img class="brand-logo" src="assets/logos/locus.png" alt="Domeniul Locus"></span>
   </a>
   <nav class="nav" aria-label="Navigație principală">
     <a href="landing-v6.html">Home</a>
-    <a href="#">Despre</a>
-    <a href="#">Contacts</a>
-    <a href="#" class="nav-shop"><span>Shop Now</span></a>
+    <a href="landing-v6.html#gama">&larr; gamele</a>
+    <a href="#" class="nav-shop"><span>Shop now</span></a>
     <span class="lang" aria-label="Limbă"><b>RO</b><span aria-hidden="true">/</span><span title="în curând">EN</span></span>
   </nav>
 </header>
 
-<!-- ---------- semicerc gol + X înapoi ---------- -->
-<div class="arc-top" aria-hidden="false">
-  <svg viewBox="0 0 1400 380" aria-hidden="true">
-    <circle class="arc-ring" cx="700" cy="-150" r="470"></circle>
-  </svg>
-  <a class="arc-x" href="landing-v6.html" aria-label="Închide gama — înapoi la cramă">
-    &times;
-    <small>&icirc;napoi la cram&#259;</small>
-  </a>
+<!-- rotating semicircle — built by JS -->
+<div class="arc-wrap" aria-hidden="true">
+  <svg id="arc" viewBox="0 0 1400 380"></svg>
 </div>
 
-<main>
+<!-- ============ horizontal stage ============ -->
+<main class="stage" id="stage">
+  <div class="track" id="track">
 
-  <!-- ============ HERO GAMĂ ============ -->
-  <section class="gama-hero io is-in" aria-label="Gama cuvinte">
-    <span class="w-circle" style="--c:var(--nisip)" aria-hidden="true"></span>
-    <p class="eyebrow rv">Domeniul Locus &middot; gama de baz&#259;</p>
-    <h1 class="gama-title blend rv">Cuvinte</h1>
-    <p class="gama-sub rv">Gama de baz&#259; &mdash; trei vinuri din grija zilei. Se beau t&acirc;n&#259;r, se beau simplu.</p>
-    <p class="scroll-cue">scrolleaz&#259; pentru vinuri</p>
-  </section>
+    <svg class="line-svg" id="lineSvg" aria-hidden="true"></svg>
 
-  <!-- ==================================================
-       VIN 1 · LC01 — Fetească Regală
-       ================================================== -->
-  <article id="vin-1" aria-label="Fetească Regală, gama cuvinte">
-
-    <section class="w-hero io">
-      <span class="w-circle" style="--c:var(--nisip)" aria-hidden="true"></span>
-      <p class="eyebrow rv">Cuvinte &middot; unu din trei</p>
-      <h2 class="w-name blend rv">Feteasc&#259; Regal&#259;</h2>
-      <p class="w-meta rv">LC01 &middot; Alb Demisec &middot; 13.5% vol &middot; DOC-CMD Panciu</p>
-    </section>
-
-    <section class="w-story io">
-      <span class="s-num" aria-hidden="true">01</span>
-      <span class="w-circle" style="--c:var(--nisip)" aria-hidden="true"></span>
-      <p class="s-text blend rv">Un alb n&#259;scut din r&#259;bdarea locului. Feteasca regal&#259; cre&#537;te aici de c&acirc;nd &#539;ine minte dealul, iar noi nu am schimbat mare lucru &mdash; doar am ascultat. Note de floare de salc&acirc;m &#537;i piersic&#259; alb&#259;, un fir mineral adus de solul calcaros, un final calm, f&#259;r&#259; grab&#259;. Vinul de fiecare zi, m&#259;sura de la care pornesc toate celelalte.
-        <span class="s-sign">origine &middot; timp &middot; m&#259;sur&#259;</span>
-      </p>
-    </section>
-
-    <section class="w-bottle io" data-parallax>
-      <div class="b-stage">
-        <span class="w-circle" style="--c:var(--nisip)" aria-hidden="true"></span>
-        <img class="b-img" src="assets/bottles/cuvinte-feteasca-regala.png" alt="Sticlă de Fetească Regală, gama cuvinte">
-        <div class="b-anns">
-          <div class="ann ann--l ann-soi">
-            <span class="ann-label">Soi</span>
-            <span class="ann-value">100% Feteasc&#259; Regal&#259;</span>
-            <i class="ann-line" aria-hidden="true"></i>
+    <!-- 01 · Riesling Italian (LC04) -->
+    <section class="panel wine-panel" data-label="riesling italian" data-color="#4C5240" aria-label="Riesling Italian">
+      <div class="center">
+        <div class="wine-bottle-col"><img class="wine-bottle-img" src="assets/bottles/cuvinte-riesling.png" alt="Riesling Italian"></div>
+        <div class="wine-content-col">
+          <p class="wine-code">LC04 &middot; cuvinte</p>
+          <h1 class="wine-title">Riesling Italian</h1>
+          <p class="wine-meta">alb &middot; sec &middot; 13% vol &middot; DOC-CMD Panciu</p>
+          <p class="wine-text">Un vin proasp&#259;t &#537;i precis, cu note de citrice, m&#259;r verde &#537;i accente florale discrete. Structura este sus&#539;inut&#259; de o aciditate bine definit&#259;, care &icirc;i confer&#259; tensiune &#537;i un final curat, r&#259;coritor. Se potrive&#537;te cu preparate u&#537;oare, pe&#537;te, fructe de mare, salate sau br&acirc;nzeturi fine. Temperatura de servire: 8&ndash;12&deg;C.</p>
+          <div class="wine-price-row">
+            <span class="wine-price">79<span class="currency">lei</span></span>
           </div>
-          <div class="ann ann--l ann-forma">
-            <span class="ann-label">Form&#259; de condus</span>
-            <span class="ann-value">Vi&#539;a moldoveneasc&#259;, semi-&icirc;nalt&#259;</span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="ann ann--r ann-an">
-            <span class="ann-label">Anul</span>
-            <span class="ann-value"><b>2025</b></span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="ann ann--r ann-prov">
-            <span class="ann-label">Provenien&#539;&#259;</span>
-            <span class="ann-value">Buciumeni &middot; Panciu &middot; Vrancea</span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="ann ann--r ann-matur">
-            <span class="ann-label">Maturare</span>
-            <span class="ann-value">Cuve de inox, 4 luni</span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="b-row">
-            <div class="ann">
-              <i class="ann-vline" aria-hidden="true"></i>
-              <span class="ann-label">Culesul</span>
-              <span class="ann-value">Manual, decada a treia din septembrie</span>
-            </div>
-            <div class="ann">
-              <i class="ann-vline" aria-hidden="true"></i>
-              <span class="ann-label">Vinifica&#539;ie</span>
-              <span class="ann-value">Fermenta&#539;ie lent&#259; la 15&deg;C, pe drojdii fine</span>
-            </div>
-          </div>
+          <a class="wine-shop-btn" href="landing-v6-shop.html">Cump&#259;r&#259; din shop</a>
         </div>
       </div>
     </section>
 
-    <section class="w-actions io">
-      <div class="act-bar rv">
-        <a class="act" href="#" aria-label="Descarcă fișa tehnică LC01">
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M5 7l3 3 3-3M3 13h10"/></svg>
-          <span>download &middot; fi&#537;a tehnic&#259;</span>
-        </a>
-        <a class="act" href="#" aria-label="Cumpără Fetească Regală cuvinte">
-          <span>shop now</span><em>79 lei</em>
-        </a>
-      </div>
-      <div class="act-next rv">
-        <span class="act-count">1 / 3</span>
-        <a class="next-link" href="#vin-2">
-          <small>next</small> Feteasc&#259; Neagr&#259; <i>&rarr;</i>
-        </a>
-      </div>
-    </section>
-
-  </article>
-
-  <hr class="w-sep">
-
-  <!-- ==================================================
-       VIN 2 · LC02 — Fetească Neagră
-       ================================================== -->
-  <article id="vin-2" aria-label="Fetească Neagră, gama cuvinte">
-
-    <section class="w-hero io">
-      <span class="w-circle" style="--c:var(--pivnita)" aria-hidden="true"></span>
-      <p class="eyebrow rv">Cuvinte &middot; doi din trei</p>
-      <h2 class="w-name blend rv">Feteasc&#259; Neagr&#259;</h2>
-      <p class="w-meta rv">LC02 &middot; Ro&#537;u Demisec &middot; 14.9% vol &middot; DOC-CMD Panciu</p>
-    </section>
-
-    <section class="w-story flip io">
-      <span class="s-num" aria-hidden="true">02</span>
-      <span class="w-circle" style="--c:var(--pivnita)" aria-hidden="true"></span>
-      <p class="s-text blend rv">Din vi&#539;a coborâtoare a dealului Buciumeni, &icirc;ngrijit&#259; cu gestul mic al zilei. Cire&#537;e negre &#537;i prun&#259; coapt&#259;, o urm&#259; de cui&#537;oare, tanin bl&acirc;nd care nu cere nimic &icirc;n schimb. Un ro&#537;u care st&#259; bine la masa de fiecare sear&#259; &mdash; m&#259;rturia unui loc care nu se gr&#259;be&#537;te.
-        <span class="s-sign">locul &middot; parcurs &middot; m&#259;rturie</span>
-      </p>
-    </section>
-
-    <section class="w-bottle io" data-parallax>
-      <div class="b-stage">
-        <span class="w-circle" style="--c:var(--pivnita)" aria-hidden="true"></span>
-        <img class="b-img" src="assets/bottles/cuvinte-feteasca-neagra.png" alt="Sticlă de Fetească Neagră, gama cuvinte">
-        <div class="b-anns">
-          <div class="ann ann--l ann-soi">
-            <span class="ann-label">Soi</span>
-            <span class="ann-value">100% Feteasc&#259; Neagr&#259;</span>
-            <i class="ann-line" aria-hidden="true"></i>
+    <!-- 02 · Fetească Neagră (LC02) -->
+    <section class="panel wine-panel" data-label="feteasca neagră" data-color="#7A2E2E" aria-label="Fetească Neagră">
+      <div class="center">
+        <div class="wine-bottle-col"><img class="wine-bottle-img" src="assets/bottles/cuvinte-feteasca-neagra.png" alt="Fetească Neagră"></div>
+        <div class="wine-content-col">
+          <p class="wine-code">LC02 &middot; cuvinte</p>
+          <h1 class="wine-title">Feteasc&#259; Neagr&#259;</h1>
+          <p class="wine-meta">ro&#537;u &middot; demisec &middot; 14,9% vol &middot; DOC-CMD Panciu</p>
+          <p class="wine-text">Un vin intens &#537;i bine definit, cu arome de fructe negre coapte, prune uscate &#537;i accente fine de condimente. Structura este ampl&#259; &#537;i catifelat&#259;, cu taninuri bine integrate &#537;i un final persistent. Se asociaz&#259; cu carne ro&#537;ie, v&acirc;nat, preparate condimentate sau br&acirc;nzeturi maturate. Temperatura de servire: 14&ndash;16&deg;C.</p>
+          <div class="wine-price-row">
+            <span class="wine-price">89<span class="currency">lei</span></span>
           </div>
-          <div class="ann ann--l ann-forma">
-            <span class="ann-label">Form&#259; de condus</span>
-            <span class="ann-value">Cordon bilateral</span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="ann ann--r ann-an">
-            <span class="ann-label">Anul</span>
-            <span class="ann-value"><b>2024</b></span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="ann ann--r ann-prov">
-            <span class="ann-label">Provenien&#539;&#259;</span>
-            <span class="ann-value">Buciumeni &middot; Nicore&#537;ti &middot; Gala&#539;i</span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="ann ann--r ann-matur">
-            <span class="ann-label">Maturare</span>
-            <span class="ann-value">Cuve de inox, 6 luni</span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="b-row">
-            <div class="ann">
-              <i class="ann-vline" aria-hidden="true"></i>
-              <span class="ann-label">Culesul</span>
-              <span class="ann-value">Manual, prima decad&#259; din octombrie</span>
-            </div>
-            <div class="ann">
-              <i class="ann-vline" aria-hidden="true"></i>
-              <span class="ann-label">Vinifica&#539;ie</span>
-              <span class="ann-value">Macera&#539;ie 12 zile, fermenta&#539;ie la 26&deg;C</span>
-            </div>
-          </div>
+          <a class="wine-shop-btn" href="landing-v6-shop.html">Cump&#259;r&#259; din shop</a>
         </div>
       </div>
     </section>
 
-    <section class="w-actions io">
-      <div class="act-bar rv">
-        <a class="act" href="#" aria-label="Descarcă fișa tehnică LC02">
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M5 7l3 3 3-3M3 13h10"/></svg>
-          <span>download &middot; fi&#537;a tehnic&#259;</span>
-        </a>
-        <a class="act" href="#" aria-label="Cumpără Fetească Neagră cuvinte">
-          <span>shop now</span><em>89 lei</em>
-        </a>
-      </div>
-      <div class="act-next rv">
-        <span class="act-count">2 / 3</span>
-        <a class="next-link" href="#vin-3">
-          <small>next</small> Riesling Italian <i>&rarr;</i>
-        </a>
-      </div>
-    </section>
-
-  </article>
-
-  <hr class="w-sep">
-
-  <!-- ==================================================
-       VIN 3 · LC04 — Riesling Italian
-       ================================================== -->
-  <article id="vin-3" aria-label="Riesling Italian, gama cuvinte">
-
-    <section class="w-hero io">
-      <span class="w-circle" style="--c:var(--piatra)" aria-hidden="true"></span>
-      <p class="eyebrow rv">Cuvinte &middot; trei din trei</p>
-      <h2 class="w-name blend rv">Riesling Italian</h2>
-      <p class="w-meta rv">LC04 &middot; Alb Sec &middot; 13% vol &middot; DOC-CMD Panciu</p>
-    </section>
-
-    <section class="w-story io">
-      <span class="s-num" aria-hidden="true">03</span>
-      <span class="w-circle" style="--c:var(--piatra)" aria-hidden="true"></span>
-      <p class="s-text blend rv">Sec, limpede, f&#259;r&#259; ornamente. Citrice verzi &#537;i flori de c&acirc;mp, o aciditate care &#539;ine pasul cu verile lungi de la Nicore&#537;ti. Un vin care spune pu&#539;in &#537;i las&#259; locul s&#259; vorbeasc&#259; &mdash; se bea rece, &icirc;n dup&#259;-amiezi care nu duc nic&#259;ieri anume.
-        <span class="s-sign">origine &middot; timp &middot; m&#259;sur&#259;</span>
-      </p>
-    </section>
-
-    <section class="w-bottle io" data-parallax>
-      <div class="b-stage">
-        <span class="w-circle" style="--c:var(--piatra)" aria-hidden="true"></span>
-        <img class="b-img" src="assets/bottles/cuvinte-riesling.png" alt="Sticlă de Riesling Italian, gama cuvinte">
-        <div class="b-anns">
-          <div class="ann ann--l ann-soi">
-            <span class="ann-label">Soi</span>
-            <span class="ann-value">100% Riesling Italian</span>
-            <i class="ann-line" aria-hidden="true"></i>
+    <!-- 03 · Fetească Regală (LC01) -->
+    <section class="panel wine-panel" data-label="feteasca regală" data-color="#8B7841" aria-label="Fetească Regală">
+      <div class="center">
+        <div class="wine-bottle-col"><img class="wine-bottle-img" src="assets/bottles/cuvinte-feteasca-regala.png" alt="Fetească Regală"></div>
+        <div class="wine-content-col">
+          <p class="wine-code">LC01 &middot; cuvinte</p>
+          <h1 class="wine-title">Feteasc&#259; Regal&#259;</h1>
+          <p class="wine-meta">alb &middot; demisec &middot; 13,5% vol &middot; DOC-CMD Panciu</p>
+          <p class="wine-text">Un vin elegant &#537;i armonios, &icirc;n care aromele de flori albe se &icirc;mpletesc cu note de fructe galbene coapte, citrice fine &#537;i accente discrete de miere. Textura este echilibrat&#259;, cu o prospe&#539;ime bine definit&#259; &#537;i un final curat, delicat. Se potrive&#537;te cu preparate din carne alb&#259;, paste, risotto sau br&acirc;nzeturi cremoase. Temperatura de servire: 8&ndash;10&deg;C.</p>
+          <div class="wine-price-row">
+            <span class="wine-price">79<span class="currency">lei</span></span>
           </div>
-          <div class="ann ann--l ann-forma">
-            <span class="ann-label">Form&#259; de condus</span>
-            <span class="ann-value">Guyot simplu</span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="ann ann--r ann-an">
-            <span class="ann-label">Anul</span>
-            <span class="ann-value"><b>2025</b></span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="ann ann--r ann-prov">
-            <span class="ann-label">Provenien&#539;&#259;</span>
-            <span class="ann-value">Buciumeni &middot; Panciu &middot; Vrancea</span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="ann ann--r ann-matur">
-            <span class="ann-label">Maturare</span>
-            <span class="ann-value">Cuve de inox, 4 luni pe drojdii</span>
-            <i class="ann-line" aria-hidden="true"></i>
-          </div>
-          <div class="b-row">
-            <div class="ann">
-              <i class="ann-vline" aria-hidden="true"></i>
-              <span class="ann-label">Culesul</span>
-              <span class="ann-value">Manual, decada a doua din septembrie</span>
-            </div>
-            <div class="ann">
-              <i class="ann-vline" aria-hidden="true"></i>
-              <span class="ann-label">Vinifica&#539;ie</span>
-              <span class="ann-value">Presare direct&#259;, fermenta&#539;ie la 14&deg;C</span>
-            </div>
-          </div>
+          <a class="wine-shop-btn" href="landing-v6-shop.html">Cump&#259;r&#259; din shop</a>
         </div>
       </div>
     </section>
 
-    <section class="w-actions io">
-      <div class="act-bar rv">
-        <a class="act" href="#" aria-label="Descarcă fișa tehnică LC04">
-          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M5 7l3 3 3-3M3 13h10"/></svg>
-          <span>download &middot; fi&#537;a tehnic&#259;</span>
-        </a>
-        <a class="act" href="#" aria-label="Cumpără Riesling Italian cuvinte">
-          <span>shop now</span><em>79 lei</em>
-        </a>
-      </div>
-      <div class="act-next rv">
-        <span class="act-count">3 / 3</span>
-        <a class="next-link" href="landing-v6-semne.html">
-          <small>urm&#259;toarea gam&#259;</small> Semne <i>&rarr;</i>
-        </a>
-      </div>
-    </section>
-
-  </article>
-
+  </div>
 </main>
 
-<!-- ---------- footer ---------- -->
-<footer class="g-footer">
-  <a class="f-back" href="landing-v6.html"><i>&larr;</i> &icirc;napoi la cram&#259;</a>
-  <p class="f-meta">
-    &copy; 2026 Domeniul Locus &middot; Buciumeni &middot; 45.98&deg;N<br>
-    consum responsabil &middot; con&#539;ine sulfi&#539;i
-  </p>
-</footer>
+<!-- fixed hud -->
+<div class="progress" aria-hidden="true"><i id="pbar"></i></div>
+<p class="counter"><b id="cnow">01</b> <span>/ 03</span></p>
+<p class="legal">
+  <span>consum responsabil</span> &middot;
+  <span>con&#539;ine sulfi&#539;i</span> &middot;
+  <a href="#" title="Termeni și condiții">termeni</a> &middot;
+  <a href="#" title="Politica de confidențialitate">confiden&#539;ialitate</a> &middot;
+  <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer">ANPC</a> &middot;
+  <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">SOL</a>
+</p>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/Draggable.min.js"></script>
 <script>
 (function(){
   "use strict";
-  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ---------- reveal la scroll ---------- */
-  var io = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){
-        e.target.classList.add('is-in');
-        io.unobserve(e.target);
-      }
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+  var N = panels.length;
+  var track = document.getElementById('track');
+  var stage = document.getElementById('stage');
+  var pbar  = document.getElementById('pbar');
+  var cnow  = document.getElementById('cnow');
+  var BASE  = '#faf9f6';
+
+  /* ---------- color helpers ---------- */
+  function hex2rgb(h){h=h.replace('#','');return[parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
+  function mix(a,b,t){
+    var A=hex2rgb(a),B=hex2rgb(b);
+    return 'rgb('+Math.round(A[0]+(B[0]-A[0])*t)+','+Math.round(A[1]+(B[1]-A[1])*t)+','+Math.round(A[2]+(B[2]-A[2])*t)+')';
+  }
+  var tints = panels.map(function(p){return mix(BASE, p.dataset.color, 0.09);});
+
+  /* ---------- build the semicircle nav (SVG, 4 stații) ---------- */
+  var SVGNS='http://www.w3.org/2000/svg';
+  var svg = document.getElementById('arc');
+  /* STEP mai mare pentru numele lungi de vin (feteasca regală / riesling italian) */
+  var CX=700, CY=-150, R=470, STEP=44;
+  var wheel = document.createElementNS(SVGNS,'g');
+
+  var ring = document.createElementNS(SVGNS,'circle');
+  ring.setAttribute('cx',CX); ring.setAttribute('cy',CY); ring.setAttribute('r',R);
+  ring.setAttribute('class','arc-ring');
+  svg.appendChild(ring);
+
+  var ptr = document.createElementNS(SVGNS,'line');
+  ptr.setAttribute('x1',CX); ptr.setAttribute('y1',R+CY-18);
+  ptr.setAttribute('x2',CX); ptr.setAttribute('y2',R+CY-10);
+  ptr.setAttribute('class','arc-pointer');
+  svg.appendChild(ptr);
+
+  var items=[];
+  panels.forEach(function(p,i){
+    var g = document.createElementNS(SVGNS,'g');
+    g.setAttribute('class','arc-item');
+    g.setAttribute('transform','rotate('+(-i*STEP)+' '+CX+' '+CY+')');
+
+    var c = document.createElementNS(SVGNS,'circle');
+    c.setAttribute('cx',CX); c.setAttribute('cy',CY+R); c.setAttribute('r',3.5);
+    g.appendChild(c);
+
+    var t = document.createElementNS(SVGNS,'text');
+    t.setAttribute('x',CX); t.setAttribute('y',CY+R+40);
+    t.setAttribute('text-anchor','middle');
+    t.textContent = p.dataset.label;
+    g.appendChild(t);
+
+    g.addEventListener('click',function(){ goTo(i); });
+    wheel.appendChild(g);
+    items.push(g);
+  });
+  svg.appendChild(wheel);
+
+  /* ---------- environment ---------- */
+  var reduced  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* horizontal scroll rămâne activ și pe mobil/tabletă */
+  var vertical = reduced || typeof gsap === 'undefined';
+
+  var active = -1;
+  function setActive(i){
+    if(i===active) return;
+    active = i;
+    items.forEach(function(g,k){g.classList.toggle('is-active',k===i);});
+    panels.forEach(function(p,k){p.classList.toggle('is-active',k===i);});
+    bgLayers.forEach(function(l,k){l.classList.toggle('is-active',k===i);});
+    cnow.textContent = (i+1<10?'0':'')+(i+1);
+    if(typeof gsap!=='undefined' && !reduced){
+      gsap.to(document.body,{backgroundColor:tints[i],duration:.55,ease:'power2.out',overwrite:'auto'});
+    }else{
+      document.body.style.backgroundColor = tints[i];
+    }
+  }
+
+  /* ---------- background stack (crossfade at each panel) ---------- */
+  var bgLayers = Array.prototype.slice.call(document.querySelectorAll('.bg-layer'));
+
+  /* =====================================================
+     VERTICAL fallback (mobile / reduced motion)
+     ===================================================== */
+  if(vertical){
+    document.documentElement.classList.add('is-vertical');
+    setActive(0);
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting) setActive(panels.indexOf(e.target));
+      });
+    },{threshold:.55});
+    panels.forEach(function(p){io.observe(p);});
+    document.querySelectorAll('[data-goto]').forEach(function(a){
+      a.addEventListener('click',function(ev){
+        ev.preventDefault();
+        panels[+a.dataset.goto].scrollIntoView({behavior: reduced?'auto':'smooth'});
+      });
     });
-  },{threshold:.28});
-  document.querySelectorAll('.io').forEach(function(s){
-    if(reduced){ s.classList.add('is-in'); return; }
-    io.observe(s);
+    return;
+  }
+
+  /* =====================================================
+     HORIZONTAL mode — GSAP pin + scrub + drag
+     ===================================================== */
+  gsap.registerPlugin(ScrollTrigger, Draggable);
+
+  var maxX = function(){return (N-1)*window.innerWidth;};
+
+  /* ---------- continuous dotted spine ---------- */
+  var lineSvg = document.getElementById('lineSvg');
+  var lineClipRect = null;
+  var lineTotalW = 0;
+  var linePts = [];
+
+  function catmullRom2bezier(pts){
+    if(pts.length<2) return '';
+    var d = 'M'+pts[0].x+','+pts[0].y+' ';
+    for(var i=0;i<pts.length-1;i++){
+      var p0 = pts[i-1] || pts[i];
+      var p1 = pts[i];
+      var p2 = pts[i+1];
+      var p3 = pts[i+2] || p2;
+      var c1x = p1.x + (p2.x - p0.x)/6;
+      var c1y = p1.y + (p2.y - p0.y)/6;
+      var c2x = p2.x - (p3.x - p1.x)/6;
+      var c2y = p2.y - (p3.y - p1.y)/6;
+      d += 'C'+c1x+','+c1y+' '+c2x+','+c2y+' '+p2.x+','+p2.y+' ';
+    }
+    return d;
+  }
+
+  function buildLine(){
+    var trackRect = track.getBoundingClientRect();
+    var W = Math.round(track.scrollWidth || (N*window.innerWidth));
+    var H = Math.round(stage.clientHeight);
+    lineSvg.setAttribute('width', W);
+    lineSvg.setAttribute('height', H);
+    lineSvg.setAttribute('viewBox','0 0 '+W+' '+H);
+    lineSvg.innerHTML='';
+
+    var pts = panels.map(function(p){
+      var d = p.querySelector('.dot');
+      var r = d.getBoundingClientRect();
+      return { x: r.left - trackRect.left + r.width/2, y: r.top - trackRect.top + r.height/2 };
+    });
+
+    /* ---------- build wavy path — amplitude moderată, unduire clară dar
+       linia trece FIX prin centrul octagramei pe fiecare panel. */
+    var wavyPts = [];
+    var AMP = Math.min(90, window.innerHeight * 0.09);
+    for (var wi = 0; wi < pts.length; wi++) {
+      wavyPts.push(pts[wi]);
+      if (wi < pts.length - 1) {
+        var a = pts[wi], b = pts[wi+1];
+        var baseY = (a.y + b.y) / 2;
+        var dir   = (wi % 2 === 0) ? -1 : 1;
+        wavyPts.push({ x: a.x + (b.x - a.x) * 0.33, y: baseY + AMP * dir });
+        wavyPts.push({ x: a.x + (b.x - a.x) * 0.67, y: baseY - AMP * dir });
+      }
+    }
+
+    var defs = document.createElementNS(SVGNS,'defs');
+    var clip = document.createElementNS(SVGNS,'clipPath');
+    clip.setAttribute('id','lineClip');
+    clip.setAttribute('clipPathUnits','userSpaceOnUse');
+    lineClipRect = document.createElementNS(SVGNS,'rect');
+    lineClipRect.setAttribute('x',0); lineClipRect.setAttribute('y',0);
+    lineClipRect.setAttribute('width',0); lineClipRect.setAttribute('height',H);
+    clip.appendChild(lineClipRect);
+    defs.appendChild(clip);
+    lineSvg.appendChild(defs);
+
+    var g = document.createElementNS(SVGNS,'g');
+    g.setAttribute('clip-path','url(#lineClip)');
+
+    var path = document.createElementNS(SVGNS,'path');
+    path.setAttribute('d', catmullRom2bezier(wavyPts));
+    path.setAttribute('class','line-path');
+    g.appendChild(path);
+
+    linePts = pts;
+    lineSvg.appendChild(g);
+    lineTotalW = W;
+  }
+
+  /* per-panel parallax setters */
+  var setBottle=[], setCenter=[], setCenterO=[];
+  panels.forEach(function(p){
+    var bt = p.querySelector('.wine-bottle-img') || p.querySelector('.c-bottle') || p.querySelector('.c-trio') || p.querySelector('.c-pauze') || p.querySelector('.c-simbol');
+    var ct = p.querySelector('.center');
+    setBottle.push(bt? gsap.quickSetter(bt,'x','px') : null);
+    setCenter.push(gsap.quickSetter(ct,'x','px'));
+    setCenterO.push(gsap.quickSetter(ct,'opacity'));
+  });
+  var setMegaX = function(){};
+
+  var st;
+  gsap.to(track,{
+    x:function(){return -maxX();},
+    ease:'none',
+    scrollTrigger:{
+      id:'hscroll',
+      trigger:stage,
+      start:'top top',
+      end:function(){return '+='+ maxX()*1.15;},
+      pin:true,
+      scrub:1.0,
+      invalidateOnRefresh:true,
+      snap:{
+        snapTo:1/(N-1),
+        duration:{min:.4,max:.75},
+        ease:'power2.inOut',
+        delay:.05,
+        inertia:false
+      },
+      onUpdate:function(self){
+        var p = self.progress;
+        var cont = p*(N-1);
+
+        gsap.set(wheel,{rotation:cont*STEP, svgOrigin:CX+' '+CY});
+        pbar.style.transform = 'scaleX('+p+')';
+        setActive(Math.round(cont));
+        setMegaX(0);
+        if(lineClipRect && linePts.length){
+          /* reveal aligns exactly to star centers at each panel */
+          var idx  = Math.floor(cont);
+          var frac = cont - idx;
+          var nxt  = Math.min(idx + 1, linePts.length - 1);
+          var xL   = linePts[idx].x;
+          var xR   = linePts[nxt].x;
+          lineClipRect.setAttribute('width', xL + (xR - xL) * frac);
+        }
+
+        for(var k=0;k<N;k++){
+          var doff = k - cont;
+          items[k].style.opacity = Math.max(0, 1 - Math.abs(doff)*0.42);
+        }
+
+        for(var i=0;i<N;i++){
+          var off = i - cont;
+          if(Math.abs(off)>1.4) continue;
+          if(setBottle[i]) setBottle[i](off*52);
+          setCenter[i](off*-64);
+          var o = 1 - Math.min(1, Math.abs(off)*1.15);
+          setCenterO[i](Math.max(0,o));
+        }
+      }
+    }
+  });
+  st = ScrollTrigger.getById('hscroll');
+  buildLine();
+  setActive(0);
+  items.forEach(function(g,k){ g.style.opacity = Math.max(0, 1 - Math.abs(k)*0.42); });
+
+  /* ---------- drag to scroll (proxy) ---------- */
+  var proxy = document.createElement('div');
+  var startScroll = 0;
+  var dragMoved = false;
+  Draggable.create(proxy,{
+    type:'x',
+    trigger:stage,
+    onPress:function(){
+      startScroll = st.scroll();
+      dragMoved = false;
+      gsap.set(proxy,{x:0});
+      this.update();
+      document.body.style.cursor='grabbing';
+    },
+    onDrag:function(){
+      if(Math.abs(this.x)>6) dragMoved = true;
+      var ratio = (st.end - st.start)/maxX();
+      st.scroll(startScroll - this.x*ratio);
+    },
+    onRelease:function(){document.body.style.cursor='';}
   });
 
-  /* ---------- parallax subtil pe sticle ---------- */
-  if(!reduced){
-    var secs = Array.prototype.slice.call(document.querySelectorAll('[data-parallax]'));
-    var items = secs.map(function(s){
-      return { sec:s, img:s.querySelector('.b-img'), circ:s.querySelector('.w-circle') };
+  /* nu naviga la gamă dacă gestul a fost drag, nu click */
+  document.querySelectorAll('a.center').forEach(function(a){
+    a.addEventListener('click',function(e){
+      if(dragMoved) e.preventDefault();
     });
-    var ticking = false;
-    function frame(){
-      ticking = false;
-      if(window.innerWidth <= 820) return; /* pe mobil sticla e în flux static */
-      var vh = window.innerHeight;
-      items.forEach(function(it){
-        var r = it.sec.getBoundingClientRect();
-        if(r.bottom < 0 || r.top > vh) return;
-        var t = (r.top + r.height/2 - vh/2)/vh; /* -1 .. 1 */
-        if(it.img) it.img.style.transform = 'translate(-50%,calc(-50% + '+(t*46).toFixed(1)+'px))';
-        if(it.circ) it.circ.style.marginTop = 'calc(clamp(300px,34vw,500px) / -2 + '+(t*-24).toFixed(1)+'px)';
-      });
+  });
+
+  /* ---------- horizontal trackpad wheel ---------- */
+  window.addEventListener('wheel',function(e){
+    if(Math.abs(e.deltaX)>Math.abs(e.deltaY)){
+      window.scrollBy(0,e.deltaX);
     }
-    window.addEventListener('scroll',function(){
-      if(!ticking){ ticking = true; requestAnimationFrame(frame); }
-    },{passive:true});
-    frame();
+  },{passive:true});
+
+  /* ---------- keyboard ---------- */
+  window.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight') goTo(Math.min(N-1,active+1));
+    if(e.key==='ArrowLeft')  goTo(Math.max(0,active-1));
+  });
+
+  /* ---------- goto section ---------- */
+  function goTo(i){
+    var y = st.start + (st.end - st.start)*(i/(N-1));
+    window.scrollTo({top:y,behavior:'smooth'});
   }
+  window.goTo = goTo;
+  document.querySelectorAll('[data-goto]').forEach(function(a){
+    a.addEventListener('click',function(ev){ev.preventDefault();goTo(+a.dataset.goto);});
+  });
+
+  /* ---------- custom cursor ---------- */
+  var cur = document.querySelector('.cursor');
+  var curSmall = cur.querySelector('small');
+  if(window.matchMedia('(pointer:fine)').matches){
+    var cx=0,cy=0,tx=0,ty=0;
+    window.addEventListener('mousemove',function(e){
+      tx=e.clientX; ty=e.clientY;
+      cur.classList.add('is-on');
+      var w = window.innerWidth;
+      var z = tx / w;
+      /* Zonă TOP — peste nav / arc (~y < 220px) → doar punct central, fără săgeți. */
+      var isNav = ty < 220;
+      cur.classList.toggle('is-nav', isNav);
+      /* Restul: zona x stânga/dreapta pentru săgeți. */
+      cur.classList.toggle('is-left',  !isNav && z < 0.33);
+      cur.classList.toggle('is-right', !isNav && z > 0.67);
+    });
+    gsap.ticker.add(function(){
+      cx += (tx-cx)*.18; cy += (ty-cy)*.18;
+      cur.style.transform='translate('+ (cx-cur.offsetWidth/2) +'px,'+ (cy-cur.offsetHeight/2) +'px)';
+    });
+    document.querySelectorAll('a.center, #welcomeCenter').forEach(function(d){
+      d.addEventListener('mouseenter',function(){
+        cur.classList.add('is-hover');
+        curSmall.textContent = (d.id==='welcomeCenter') ? 'descoperă' : 'vezi gama';
+      });
+      d.addEventListener('mouseleave',function(){cur.classList.remove('is-hover');});
+    });
+  }
+
+  /* ---------- resize ---------- */
+  var rid;
+  window.addEventListener('resize',function(){
+    clearTimeout(rid);
+    rid=setTimeout(function(){
+      ScrollTrigger.refresh();
+      buildLine();
+    },200);
+  });
+
 })();
 </script>
 </body>
