@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import Stripe from "stripe";
 import { getCurrentAdmin } from "@/lib/auth/current-admin";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe/server";
 import {
   sendShippedNotification,
@@ -310,7 +311,12 @@ export async function refundOrder(
 
   // Restore stoc la refund complet (indiferent de metodă)
   if (full) {
-    const { error: restoreErr } = await supabase.rpc(
+    // Service role, NU sesiunea adminului: migrarea 0013 a revocat EXECUTE
+    // pe funcțiile de stoc de la rolurile `anon` și `authenticated`, ca să
+    // nu poată fi apelate din browser cu cheia publică. Ruta e deja
+    // protejată de gate-ul de admin din proxy.ts, deci escaladarea de aici
+    // e intenționată și limitată la acest apel.
+    const { error: restoreErr } = await getSupabaseAdminClient().rpc(
       "restore_stock_for_order",
       { p_order_id: order.id },
     );
