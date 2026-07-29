@@ -1,16 +1,39 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/landing/footer";
 import { WinesGrid } from "@/components/landing/wines-grid";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbSchema, itemListSchema } from "@/lib/seo/schema";
+import { getAllWines } from "@/lib/wines-queries";
+
+const DESCRIPTION =
+  "Cumpără vinurile Domeniului Locus — gamele cuvinte, semne și pauze. Livrare în România prin curier sau ridicare personală la cramă.";
 
 export const metadata: Metadata = {
   title: "Shop · Domeniul Locus",
-  description:
-    "Cumpără vinurile Domeniului Locus — gamele cuvinte, semne și pauze. Livrare în România prin curier sau ridicare personală la cramă.",
+  description: DESCRIPTION,
+  alternates: { canonical: "/shop" },
+  openGraph: {
+    type: "website",
+    url: "/shop",
+    title: "Shop · Domeniul Locus",
+    description: DESCRIPTION,
+  },
 };
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const wines = await getAllWines();
+
   return (
     <>
+      <JsonLd
+        data={[
+          itemListSchema(wines, "Colecția Domeniul Locus"),
+          breadcrumbSchema([
+            { name: "Acasă", path: "/" },
+            { name: "Shop", path: "/shop" },
+          ]),
+        ]}
+      />
       <main className="shop-page">
         <header className="shop-hero">
           <div className="container-locus">

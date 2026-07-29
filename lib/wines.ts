@@ -20,6 +20,8 @@ export type Wine = {
   servingTemp: string;
   notes: string;
   year: number;
+  stock: number; // feed availability (in_stock / out_of_stock) + JSON-LD Offer
+  heroImage: string | null; // override DB pentru poza principală; null → productPhoto()
 
   // PDP-rich fields
   short: string;

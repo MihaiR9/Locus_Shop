@@ -27,11 +27,10 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
-/** Site URL used to build Stripe success/cancel redirect URLs. */
-export function getSiteUrl(): string {
-  // Vercel sets VERCEL_URL on prod/preview; locally we fall back to
-  // localhost:3000 unless NEXT_PUBLIC_SITE_URL is set explicitly.
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return "http://localhost:3000";
-}
+/**
+ * Site URL used to build Stripe success/cancel redirect URLs.
+ * Re-export din `lib/site.ts` — sursă unică pentru tot ce emite URL-uri
+ * absolute (sitemap, JSON-LD, feed-uri, OG). Păstrat aici ca să nu rup
+ * importurile existente din fluxul de checkout.
+ */
+export { getSiteUrl } from "@/lib/site";

@@ -4,6 +4,7 @@ import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
 import { ThemeScript } from "@/components/theme-script";
 import { SvgSprite } from "@/components/svg-sprite";
+import { getSiteUrl } from "@/lib/site";
 
 const GTM_ID = "GTM-5TNDPL7Z";
 
@@ -60,13 +61,33 @@ const inter = Inter({
   display: "swap",
 });
 
+const SITE_DESCRIPTION =
+  "Vinuri din Buciumeni, între Panciu și Nicorești. Origine, timp, măsură.";
+
 export const metadata: Metadata = {
+  // metadataBase e obligatoriu ca Next să transforme căile relative din
+  // openGraph/twitter în URL-uri absolute. Fără el, orice link partajat pe
+  // Facebook / WhatsApp / Instagram apare fără imagine.
+  metadataBase: new URL(getSiteUrl()),
   title: {
     default: "Domeniul Locus — un loc. un timp. un vin.",
     template: "%s · Domeniul Locus",
   },
-  description:
-    "Vinuri din Buciumeni, între Panciu și Nicorești. Origine, timp, măsură.",
+  description: SITE_DESCRIPTION,
+  applicationName: "Domeniul Locus",
+  openGraph: {
+    type: "website",
+    siteName: "Domeniul Locus",
+    locale: "ro_RO",
+    title: "Domeniul Locus — un loc. un timp. un vin.",
+    description: SITE_DESCRIPTION,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Domeniul Locus — un loc. un timp. un vin.",
+    description: SITE_DESCRIPTION,
+  },
 };
 
 /**

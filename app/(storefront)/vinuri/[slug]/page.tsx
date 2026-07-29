@@ -7,7 +7,13 @@ import { WineHero } from "@/components/pdp/wine-hero";
 import { WinePairing } from "@/components/pdp/wine-pairing";
 import { WineSpecs } from "@/components/pdp/wine-specs";
 import { WineRelated } from "@/components/pdp/wine-related";
+import { JsonLd } from "@/components/seo/json-ld";
 import { metaLine } from "@/lib/wines";
+import {
+  breadcrumbSchema,
+  productSchema,
+  wineDescription,
+} from "@/lib/seo/schema";
 import {
   getAllSlugs,
   getWineBySlug,
@@ -33,9 +39,28 @@ export async function generateMetadata({
   const wine = await getWineBySlug(slug);
   if (!wine) return { title: "Vin negăsit" };
 
+  const title = `${wine.name} ${wine.code} · ${wine.gama}`;
+  const description = `${wine.name} (${wine.code}) — gama ${wine.gama}. ${metaLine(wine)} · ${wine.priceRon} lei.`;
+  const url = `/vinuri/${wine.slug}`;
+
+  // Imaginea OG NU se setează aici: o generează `opengraph-image.tsx` din
+  // acest segment (card de brand cu nume, specificație și preț). Dacă am
+  // pune și `openGraph.images`, pagina ar emite două tag-uri `og:image`.
   return {
-    title: `${wine.name} ${wine.code} · ${wine.gama}`,
-    description: `${wine.name} (${wine.code}) — gama ${wine.gama}. ${metaLine(wine)} · ${wine.priceRon} lei.`,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      url,
+      title,
+      description: wineDescription(wine),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 
@@ -51,6 +76,20 @@ export default async function WinePage({
 
   return (
     <>
+      {/* Product + Offer: sursa pe care Merchant Center o compară cu feed-ul.
+          Preț și disponibilitate trebuie să rămână identice cu cele din
+          app/api/feed/* — ambele se generează din aceleași helper-e. */}
+      <JsonLd
+        data={[
+          productSchema(wine),
+          breadcrumbSchema([
+            { name: "Acasă", path: "/" },
+            { name: "Shop", path: "/shop" },
+            { name: wine.gama, path: `/${wine.gama}` },
+            { name: `${wine.name} ${wine.code}`, path: `/vinuri/${wine.slug}` },
+          ]),
+        ]}
+      />
       <main style={{ paddingTop: 72 }}>
         <Breadcrumbs wine={wine} />
         <WineHero wine={wine} />

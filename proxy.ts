@@ -33,6 +33,10 @@ export async function proxy(req: NextRequest) {
       pathname === "/favicon.ico" ||
       pathname === "/robots.txt" ||
       pathname === "/sitemap.xml" ||
+      // Feed-urile de produse răspund cu XML valid dar GOL cât timp gate-ul
+      // e activ (vezi lib/feed/products.ts). Le lăsăm accesibile ca să poți
+      // configura și testa Merchant Center / Meta înainte de lansare.
+      pathname.startsWith("/api/feed/") ||
       pathname === "/api/stripe/webhook";
 
     if (!isWhitelisted) {

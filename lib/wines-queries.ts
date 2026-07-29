@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { getSupabasePublicClient } from "@/lib/supabase/public";
 import type { Database } from "@/lib/supabase/database.types";
 import type { Wine } from "@/lib/wines";
@@ -24,6 +25,8 @@ function rowToWine(r: ProductRow): Wine {
     servingTemp: r.serving_temp ?? "",
     notes: r.notes ?? "",
     year: r.year ?? new Date().getFullYear(),
+    stock: r.stock,
+    heroImage: r.hero_image,
     short: r.short ?? "",
     taste: r.taste ?? "",
     pair: r.pair ?? "",
@@ -34,8 +37,13 @@ function rowToWine(r: ProductRow): Wine {
   };
 }
 
-/** All active wines, sorted gama (cuvinte → semne → pauze) then code. */
-export async function getAllWines(): Promise<Wine[]> {
+/**
+ * All active wines, sorted gama (cuvinte → semne → pauze) then code.
+ *
+ * `cache()` deduplică apelul în cadrul aceluiași render — /shop îl cere o
+ * dată pentru JSON-LD și o dată pentru grid; DB-ul e lovit o singură dată.
+ */
+export const getAllWines = cache(async function getAllWines(): Promise<Wine[]> {
   const supabase = getSupabasePublicClient();
   const { data, error } = await supabase
     .from("products")
@@ -49,10 +57,37 @@ export async function getAllWines(): Promise<Wine[]> {
     return [];
   }
   return (data ?? []).map(rowToWine);
-}
+});
+
+/**
+ * Ca `getAllWines`, dar ARUNCĂ dacă interogarea eșuează.
+ *
+ * Pentru UI, un catalog gol e o degradare acceptabilă. Pentru feed-urile de
+ * produse NU e: Google și Meta interpretează un feed gol ca „toate produsele
+ * au dispărut" și delistează contul. Mai bine răspundem cu eroare, ca
+ * platforma să păstreze ultima versiune bună a feed-ului.
+ */
+export const getAllWinesStrict = cache(
+  async function getAllWinesStrict(): Promise<Wine[]> {
+    const supabase = getSupabasePublicClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("active", true)
+      .order("gama", { ascending: true })
+      .order("code", { ascending: true });
+
+    if (error) {
+      throw new Error(`products query failed: ${error.message}`);
+    }
+    return (data ?? []).map(rowToWine);
+  },
+);
 
 /** Single wine by slug. `null` if not found / inactive. */
-export async function getWineBySlug(slug: string): Promise<Wine | null> {
+export const getWineBySlug = cache(async function getWineBySlug(
+  slug: string,
+): Promise<Wine | null> {
   const supabase = getSupabasePublicClient();
   const { data, error } = await supabase
     .from("products")
@@ -66,10 +101,12 @@ export async function getWineBySlug(slug: string): Promise<Wine | null> {
     return null;
   }
   return data ? rowToWine(data) : null;
-}
+});
 
 /** Wines belonging to a specific gama (active only). */
-export async function getWinesByGama(gama: Wine["gama"]): Promise<Wine[]> {
+export const getWinesByGama = cache(async function getWinesByGama(
+  gama: Wine["gama"],
+): Promise<Wine[]> {
   const supabase = getSupabasePublicClient();
   const { data, error } = await supabase
     .from("products")
@@ -83,7 +120,7 @@ export async function getWinesByGama(gama: Wine["gama"]): Promise<Wine[]> {
     return [];
   }
   return (data ?? []).map(rowToWine);
-}
+});
 
 /**
  * "Vinuri apropiate" feed for PDP — same gama first, then anything

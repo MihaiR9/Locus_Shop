@@ -2,7 +2,9 @@ import { FilmGrain } from "@/components/film-grain";
 import { SiteHeader } from "@/components/site-header";
 import { HeaderScrollEffect } from "@/components/header-scroll";
 import { StorefrontOverlays } from "@/components/storefront-overlays";
+import { JsonLd } from "@/components/seo/json-ld";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { organizationSchema, websiteSchema } from "@/lib/seo/schema";
 
 /**
  * Storefront layout — wraps all PUBLIC pages (landing, shop, vinuri, despre,
@@ -23,6 +25,9 @@ export default async function StorefrontLayout({
 
   return (
     <>
+      {/* Identitatea brandului, o singură dată pentru tot storefront-ul.
+          Paginile adaugă peste: Product pe PDP, ItemList pe colecții. */}
+      <JsonLd data={[organizationSchema(), websiteSchema()]} />
       <FilmGrain />
       <SiteHeader
         sessionUser={
