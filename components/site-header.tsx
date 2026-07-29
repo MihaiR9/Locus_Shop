@@ -26,6 +26,7 @@ const NAV_LINKS: NavItem[] = [
     ],
   },
   { href: "/shop", label: "Shop" },
+  { href: "/social", label: "Social" },
   { href: "/contact", label: "Contact" },
   { href: "/parteneri", label: "Parteneri" },
 ];

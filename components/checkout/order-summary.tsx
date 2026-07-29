@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ProductBottle } from "@/components/landing/product-bottle";
 import { useCartStore } from "@/lib/cart-store";
 import { useCheckoutStore } from "@/lib/checkout-store";
@@ -11,10 +11,25 @@ import { createOrder } from "@/app/(storefront)/checkout/actions";
 
 const SHIP_FREE_AT = 250;
 const SHIP_FEE = 19;
-const COUPONS: Record<string, number> = { LOCUS10: 10, PARTENER15: 15 };
+// SETCUVINTE / SETSEMNE sunt codurile pe care le prefill-ează cardurile de
+// set de pe home (components/landing/sets-section.tsx). Procentul trebuie
+// să rămână identic cu SET_DISCOUNT_PCT de acolo, altfel prețul afișat pe
+// card nu corespunde cu sumarul comenzii.
+//
+// ⚠️ Lista e hardcodată client-side: oricine o poate citi din bundle și
+// aplica un cod fără verificare de expirare sau număr de utilizări.
+// `lib/coupons.ts` are deja `validateCoupon` pe baza de date — de mutat
+// validarea acolo înainte de lansare.
+const COUPONS: Record<string, number> = {
+  LOCUS10: 10,
+  PARTENER15: 15,
+  SETCUVINTE: 15,
+  SETSEMNE: 15,
+};
 
 export function OrderSummary() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Stable primitives only — same pattern as CartDrawer.
   const items = useCartStore((s) => s.items);
@@ -76,6 +91,24 @@ export function OrderSummary() {
       setCouponErr(true);
     }
   }
+
+  // Cupon venit prin URL (`/checkout?cupon=SETCUVINTE`) — cardurile de set
+  // de pe home trimit aici. Se aplică o singură dată, la montare, ca
+  // prețul din sumar să corespundă cu cel promis pe card.
+  const prefillRef = useRef(false);
+  useEffect(() => {
+    if (prefillRef.current) return;
+    const raw = searchParams.get("cupon");
+    if (!raw) return;
+    prefillRef.current = true;
+
+    const code = raw.trim().toUpperCase();
+    setCoupon(code);
+    if (COUPONS[code]) {
+      setCouponPct(COUPONS[code]);
+      setCouponErr(false);
+    }
+  }, [searchParams]);
 
   function placeOrder() {
     if (!canPlace || !shipping || !billing) return;

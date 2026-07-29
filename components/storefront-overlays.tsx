@@ -30,6 +30,10 @@ const ConsentScripts = dynamic(
   () => import("@/components/legal/consent-scripts").then((m) => m.ConsentScripts),
   { ssr: false },
 );
+const NewsletterPopup = dynamic(
+  () => import("@/components/landing/newsletter-popup").then((m) => m.NewsletterPopup),
+  { ssr: false },
+);
 
 export function StorefrontOverlays() {
   return (
@@ -38,6 +42,7 @@ export function StorefrontOverlays() {
       <AgeGate />
       <CookieBanner />
       <ConsentScripts />
+      <NewsletterPopup />
     </>
   );
 }

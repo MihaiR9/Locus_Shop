@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 
 export function MapSection() {
@@ -139,12 +140,12 @@ export function MapSection() {
               <span>DOC-CMD Panciu</span>
             </div>
           </div>
-          <a href="#despre" className="btn-ghost">
+          <Link href="/despre" className="btn-ghost">
             <span>Vezi povestea locului</span>
             <svg className="arrow-svg" viewBox="0 0 24 12" aria-hidden="true">
               <use href="#arrow-right" />
             </svg>
-          </a>
+          </Link>
         </Reveal>
       </div>
     </section>

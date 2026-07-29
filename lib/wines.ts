@@ -59,13 +59,18 @@ export function abvLabel(w: Pick<Wine, "abv">): string {
 
 // Photo mapping: cuvinte are per-code shots; semne share one gama shot.
 // pauze rămâne fără poză → fallback la BottleSvg.
+//
+// Sufixul `-nobg` nu e cosmetic: fișierele fără el aveau fundal alb, iar
+// înlocuirea lor păstrând același nume lăsa browserele să servească la
+// nesfârșit versiunea veche din cache (URL identic → hit de cache).
+// Numele nou garantează că toată lumea primește decupajul.
 const PRODUCT_PHOTO: Record<string, string> = {
-  LC01: "/photos/products/cuvinte-feteasca-regala.png",
-  LC02: "/photos/products/cuvinte-feteasca-neagra.png",
-  LC04: "/photos/products/cuvinte-riesling-italian.png",
-  LS01: "/photos/products/semne.png",
-  LS02: "/photos/products/semne.png",
-  LS04: "/photos/products/semne.png",
+  LC01: "/photos/products/cuvinte-feteasca-regala-nobg.png",
+  LC02: "/photos/products/cuvinte-feteasca-neagra-nobg.png",
+  LC04: "/photos/products/cuvinte-riesling-italian-nobg.png",
+  LS01: "/photos/products/semne-nobg.png",
+  LS02: "/photos/products/semne-nobg.png",
+  LS04: "/photos/products/semne-nobg.png",
 };
 
 export function productPhoto(code: string): string | null {

@@ -7,11 +7,17 @@ export function Hero() {
   return (
     <section className="hero" id="acasa" aria-label="Hero">
       <div className="hero-stage">
+        {/*
+          Trei cadre care se rotesc (vezi HeroPager). Primele două au
+          fotografii reale; al treilea rămâne pe gradient până primim poza.
+          Desaturarea primului cadru se face din CSS (.frame-1 .ken), nu în
+          fișier — o putem regla fără să reprocesăm imaginea.
+        */}
         <div className="hero-frames" aria-hidden="true">
           <div className="hero-frame frame-1 is-active">
             <div className="ken">
               <Image
-                src="/brand/hero-amfora.webp"
+                src="/photos/hero/dealuri.jpg"
                 alt=""
                 fill
                 priority
@@ -21,7 +27,15 @@ export function Hero() {
             </div>
           </div>
           <div className="hero-frame frame-2">
-            <div className="ken" />
+            <div className="ken">
+              <Image
+                src="/photos/hero/cuvinte-rosu.jpg"
+                alt=""
+                fill
+                sizes="100vw"
+                quality={85}
+              />
+            </div>
           </div>
           <div className="hero-frame frame-3">
             <div className="ken" />
@@ -53,7 +67,9 @@ export function Hero() {
 
           <div className="hero-cta-row">
             <div className="hero-ctas">
-              <a href="#locul" className="hero-cta">
+              {/* Duce la povestea completă, nu la o ancoră în pagină —
+                  „descoperă" promite o destinație, nu un scroll. */}
+              <Link href="/despre" className="hero-cta">
                 <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
                   <use href="#star8" />
                 </svg>
@@ -61,7 +77,7 @@ export function Hero() {
                 <svg width="16" height="8" viewBox="0 0 24 12" aria-hidden="true">
                   <use href="#arrow-right" />
                 </svg>
-              </a>
+              </Link>
               <Link href="/shop" className="hero-cta hero-cta--secondary">
                 <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">
                   <use href="#diamond" />

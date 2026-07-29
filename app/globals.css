@@ -566,25 +566,30 @@
   to { transform: scale(1.1) translate(-1.5%, -1%); }
 }
 
-.hero-frame.frame-1 .ken {
-  background: #d9c8b0; /* fallback color; real photo loaded via <Image priority> in JSX */
+.hero-frame.frame-1 .ken,
+.hero-frame.frame-2 .ken {
+  background: #d9c8b0; /* fallback cât timp se încarcă fotografia */
 }
-.hero-frame.frame-1 .ken > img {
+.hero-frame .ken > img {
   object-fit: cover;
   object-position: center;
 }
-.hero-frame.frame-1 .ken::after {
+/*
+  Fotografia cu dealurile e verde-saturată din aparat și iese din paleta
+  earthy a site-ului. O aducem în ton din CSS: scădem saturația, adăugăm
+  o urmă de sepia și un pic de căldură. Reglabil fără a reprocesa fișierul.
+*/
+.hero-frame.frame-1 .ken > img {
+  filter: saturate(0.42) sepia(0.22) contrast(1.04) brightness(1.02);
+}
+.hero-frame.frame-1 .ken::after,
+.hero-frame.frame-2 .ken::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(95deg, rgba(20, 16, 12, 0.32) 0%, rgba(20, 16, 12, 0.1) 45%, rgba(20, 16, 12, 0) 75%);
   pointer-events: none;
   z-index: 1;
-}
-.hero-frame.frame-2 .ken {
-  background:
-    radial-gradient(ellipse at 70% 30%, rgba(255, 230, 180, 0.5) 0%, transparent 40%),
-    linear-gradient(180deg, #5a4a36 0%, #2c2419 80%);
 }
 .hero-frame.frame-3 .ken {
   background:
@@ -593,6 +598,298 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-frame .ken { animation: none !important; }
+}
+
+/* ── Bandă cu sticle, imediat sub hero ───────────────────────────
+   Două sticle, câte una din fiecare gamă, la aceeași scară — diferența
+   dintre game se citește dintr-o privire. Fundal pământiu închis, ca
+   banda să taie pagina, nu să se topească în ea. */
+.bottles-banner {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(90% 160% at 78% 130%, rgba(74, 60, 45, 0.55) 0%, transparent 62%),
+    linear-gradient(104deg, #4a3c2d 0%, #5c4c39 46%, #6b5a44 100%);
+  color: var(--pamant);
+  border-block: 1px solid rgba(26, 26, 26, 0.22);
+}
+[data-theme="dark"] .bottles-banner {
+  background:
+    radial-gradient(90% 160% at 78% 130%, rgba(60, 48, 36, 0.6) 0%, transparent 62%),
+    linear-gradient(104deg, #241d15 0%, #33291e 100%);
+  border-block-color: rgba(203, 190, 174, 0.16);
+}
+/* Linie punctată care traversează banda, sub text — leagă cele două zone. */
+.bb-rule {
+  position: absolute;
+  left: var(--px);
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background-image: linear-gradient(90deg, currentColor 0 4px, transparent 4px 10px);
+  background-size: 10px 1px;
+  opacity: 0.22;
+  pointer-events: none;
+}
+.bb-inner {
+  position: relative;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: clamp(34px, 4.4vw, 56px) var(--px) 0;
+  min-height: clamp(210px, 22vw, 300px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(24px, 5vw, 80px);
+}
+.bb-lede {
+  padding-bottom: clamp(34px, 4.4vw, 56px);
+  max-width: 42ch;
+}
+.bb-star {
+  width: 24px;
+  height: 24px;
+  color: var(--nisip);
+  margin-bottom: 20px;
+}
+.bb-claim {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(24px, 2.9vw, 40px);
+  line-height: 1.16;
+  letter-spacing: -0.005em;
+  color: var(--pamant);
+}
+.bb-cta {
+  margin-top: 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--nisip);
+  border-bottom: 1px solid rgba(203, 190, 174, 0.35);
+  padding-bottom: 5px;
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease), gap 0.3s var(--ease);
+}
+.bb-cta svg { width: 22px; height: 11px; }
+.bb-cta:hover {
+  color: var(--pamant);
+  border-bottom-color: var(--pamant);
+  gap: 20px;
+}
+
+.bb-bottles {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(20px, 4vw, 64px);
+  flex-shrink: 0;
+}
+.bb-bottle {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+/* Halou cald în spatele sticlei — o desprinde de fundalul închis. */
+.bb-bottle-glow {
+  position: absolute;
+  left: 50%;
+  bottom: 26%;
+  width: 190%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(235, 225, 218, 0.16) 0%, transparent 62%);
+  pointer-events: none;
+}
+/* Ambele sticle la aceeași înălțime, indiferent de proporțiile fișierului. */
+.bb-bottle img {
+  position: relative;
+  z-index: 1;
+  width: auto;
+  height: clamp(190px, 21vw, 290px);
+  object-fit: contain;
+  object-position: bottom;
+  filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.42));
+  transition: transform 0.6s var(--ease);
+}
+.bb-bottle:hover img { transform: translateY(-8px); }
+.bb-bottle-meta {
+  position: relative;
+  z-index: 1;
+  margin-top: 16px;
+  padding-bottom: clamp(18px, 2.4vw, 26px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.bb-bottle-gama {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--nisip);
+  opacity: 0.75;
+}
+.bb-bottle-wine {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(15px, 1.5vw, 20px);
+  color: var(--pamant);
+}
+
+@media (max-width: 900px) {
+  .bb-rule { display: none; }
+  .bb-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 44px;
+    gap: 32px;
+  }
+  .bb-lede { padding-bottom: 0; }
+  .bb-star { margin-inline: auto; }
+  .bb-bottles { gap: 28px; }
+  .bb-bottle img { height: clamp(160px, 34vw, 220px); }
+}
+/* ── Seturi pe gamă (înlocuiește grila colecției pe home) ────────── */
+.sets {
+  padding: clamp(72px, 9vw, 130px) var(--px);
+  background: var(--bg-alt);
+}
+.sets-head {
+  max-width: var(--container);
+  margin: 0 auto clamp(40px, 5vw, 72px);
+  text-align: center;
+}
+.sets-head .eyebrow { justify-content: center; }
+.sets-head .lead {
+  max-width: 54ch;
+  margin: 18px auto 0;
+}
+.sets-grid {
+  max-width: var(--container);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(20px, 2.6vw, 40px);
+}
+.set-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+}
+.set-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 48px rgba(74, 60, 45, 0.1);
+}
+.set-visual {
+  position: relative;
+  height: clamp(230px, 26vw, 320px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(4px, 1vw, 14px);
+  padding-top: 28px;
+  background:
+    radial-gradient(90% 120% at 50% 110%, rgba(168, 157, 141, 0.3) 0%, transparent 65%),
+    var(--bg-warm, var(--bg-alt));
+}
+.set-visual img {
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 28px rgba(74, 60, 45, 0.22));
+}
+/* Sticla din mijloc puțin mai înaltă — dă adâncime rândului. */
+.set-bottle--2 { transform: scale(1.08); z-index: 1; }
+.set-body { padding: clamp(24px, 2.6vw, 38px); display: flex; flex-direction: column; flex: 1; }
+.set-title {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.1;
+  margin: 6px 0 12px;
+}
+.set-text {
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-soft);
+  max-width: 44ch;
+}
+.set-list {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 18px 0 0;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 9px;
+}
+.set-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.set-list-code {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--ink-mute);
+}
+.set-pricing {
+  margin-top: auto;
+  padding-top: 24px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.set-price {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(34px, 3.6vw, 46px);
+  line-height: 1;
+}
+.set-price .currency {
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  margin-left: 7px;
+  color: var(--ink-mute);
+}
+.set-was {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  color: var(--ink-mute);
+  text-decoration: line-through;
+}
+.set-badge {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  background: var(--vie);
+  color: var(--pamant);
+  padding: 5px 11px;
+  border-radius: 999px;
+}
+.set-cta { margin-top: 22px; width: 100%; justify-content: center; }
+.set-link {
+  margin-top: 14px;
+  text-align: center;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  transition: color 0.3s;
+}
+.set-link:hover { color: var(--ink); }
+@media (max-width: 860px) {
+  .sets-grid { grid-template-columns: 1fr; max-width: 460px; }
 }
 
 .hero-content {
@@ -3071,6 +3368,448 @@
 /* ----------------------------------------------------------------
    /despre — story page
 ---------------------------------------------------------------- */
+/* ── Pop-up newsletter (−10% la prima comandă) ───────────────────── */
+.nl-pop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(26, 26, 26, 0.45);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: nl-pop-fade 0.4s var(--ease);
+}
+@keyframes nl-pop-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.nl-pop {
+  position: relative;
+  max-width: 860px;
+  width: 100%;
+  background: var(--surface);
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  overflow: hidden;
+  animation: nl-pop-rise 0.5s var(--ease);
+}
+@keyframes nl-pop-rise {
+  from { transform: translateY(18px) scale(0.98); }
+  to { transform: none; }
+}
+.nl-pop-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(250, 249, 246, 0.9);
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.nl-pop-close:hover { background: var(--pamant); }
+.nl-pop-visual {
+  background:
+    radial-gradient(90% 120% at 50% 110%, rgba(168, 157, 141, 0.34) 0%, transparent 65%),
+    var(--bg-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 26px;
+}
+.nl-pop-visual img {
+  width: auto;
+  max-height: 330px;
+  filter: drop-shadow(0 18px 32px rgba(74, 60, 45, 0.26));
+}
+.nl-pop-body { padding: clamp(28px, 4vw, 48px); }
+.nl-pop-badge {
+  display: inline-block;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 42px;
+  line-height: 1;
+  color: var(--vie);
+  margin-bottom: 8px;
+}
+.nl-pop-title {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(26px, 3vw, 38px);
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+.nl-pop-text {
+  font-size: 12.5px;
+  line-height: 1.85;
+  color: var(--ink-soft);
+  max-width: 40ch;
+}
+.nl-pop-form {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.nl-pop-form input {
+  padding: 14px 20px;
+  border: 1px solid var(--line-strong, rgba(74, 60, 45, 0.28));
+  background: var(--field-bg, var(--bg));
+  font-family: var(--font-mono), monospace;
+  font-size: 12.5px;
+  border-radius: 999px;
+  color: var(--ink);
+}
+.nl-pop-form input:focus { outline: none; border-color: var(--vie); }
+.nl-pop-form button {
+  padding: 14px 26px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 999px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s;
+}
+.nl-pop-form button:hover:not(:disabled) { background: var(--vie); border-color: var(--vie); }
+.nl-pop-form button:disabled { opacity: 0.55; cursor: default; }
+.nl-pop-error {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #8a3b2f;
+}
+.nl-pop-fine {
+  margin-top: 14px;
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--ink-mute);
+}
+.nl-pop-decline {
+  margin-top: 16px;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--ink-mute);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.nl-pop-decline:hover { color: var(--ink); }
+@media (max-width: 760px) {
+  .nl-pop { grid-template-columns: 1fr; }
+  .nl-pop-visual { display: none; }
+}
+
+/* ── Social: carusel pe home + galerie pe /social ────────────────── */
+.social {
+  padding: clamp(64px, 8vw, 112px) 0;
+  background: var(--bg);
+  border-block: 1px solid var(--line);
+}
+.social-head {
+  max-width: var(--container);
+  margin: 0 auto clamp(30px, 3.6vw, 48px);
+  padding: 0 var(--px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(20px, 4vw, 64px);
+  flex-wrap: wrap;
+}
+.social-head-side {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(20px, 3vw, 44px);
+  flex-wrap: wrap;
+}
+.social-head .lead { max-width: 42ch; margin: 0; }
+.social-nav { display: flex; gap: 8px; }
+.social-nav button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong, rgba(74, 60, 45, 0.28));
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease), opacity 0.3s;
+}
+.social-nav button:hover:not(:disabled) { background: var(--ink); color: var(--bg); }
+.social-nav button:disabled { opacity: 0.3; cursor: default; }
+
+/* Derulare nativă cu snap — merge la deget, trackpad și tastatură. */
+.social-track {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px var(--px) 20px;
+  scrollbar-width: none;
+}
+.social-track::-webkit-scrollbar { display: none; }
+.social-card {
+  position: relative;
+  flex: 0 0 clamp(220px, 26vw, 300px);
+  aspect-ratio: 4 / 5;
+  scroll-snap-align: start;
+  overflow: hidden;
+  background: var(--bg-alt);
+}
+.social-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s var(--ease);
+}
+.social-card:hover img { transform: scale(1.05); }
+.social-card figcaption {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(26, 26, 26, 0.62);
+  color: var(--pamant);
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+.social-card--cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border: 1px dashed var(--line-strong, rgba(74, 60, 45, 0.28));
+  background: transparent;
+  transition: background 0.4s var(--ease);
+}
+.social-card--cta:hover { background: var(--bg-alt); }
+.social-cta-mark svg { width: 26px; height: 26px; color: var(--vie); }
+.social-cta-text {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.social-ig {
+  display: block;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--px);
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  transition: color 0.3s;
+}
+.social-ig:hover { color: var(--ink); }
+
+.social-page { padding-top: 72px; }
+.social-page-head {
+  padding: clamp(44px, 5.5vw, 76px) var(--px) clamp(32px, 4vw, 52px);
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+}
+.social-page-head-inner { max-width: 720px; margin: 0 auto; }
+.social-page-head .eyebrow { justify-content: center; margin-bottom: 20px; }
+.social-page-head h1 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(34px, 4.4vw, 62px);
+  line-height: 1.06;
+  font-weight: 400;
+  margin-bottom: 18px;
+}
+.social-page-head .lead { margin: 0 auto; max-width: 52ch; }
+.social-page-actions {
+  margin-top: 28px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.social-grid {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: clamp(28px, 3.4vw, 48px) var(--px) clamp(64px, 8vw, 110px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: clamp(180px, 20vw, 260px);
+  gap: clamp(12px, 1.6vw, 22px);
+}
+/* Fiecare a treia poză ocupă două rânduri — peretele nu mai arată ca un tabel. */
+.social-tile {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-alt);
+}
+.social-tile--tall { grid-row: span 2; }
+.social-tile img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s var(--ease); }
+.social-tile:hover img { transform: scale(1.04); }
+.social-tile figcaption {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(26, 26, 26, 0.62);
+  color: var(--pamant);
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+@media (max-width: 1000px) {
+  .social-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .social-grid { grid-template-columns: 1fr; }
+  .social-tile--tall { grid-row: span 1; }
+  .social-card { flex-basis: 78vw; }
+}
+
+/* ── Povestea locului (/despre) — trei capitole ──────────────────── */
+.poveste-page { padding-top: 72px; position: relative; }
+/* Antet compact: o singură linie de titlu, nu un ecran plin. Cititorul
+   ajunge la primul capitol fără să deruleze. */
+.poveste-head {
+  padding: clamp(40px, 5vw, 68px) var(--px) clamp(32px, 4vw, 52px);
+  text-align: center;
+  border-bottom: 1px solid var(--line);
+}
+.poveste-head-inner { max-width: 780px; margin: 0 auto; }
+.poveste-head .eyebrow { justify-content: center; margin-bottom: 20px; }
+.poveste-head h1 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(34px, 4.4vw, 62px);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+.poveste-head .lead { margin: 0 auto; max-width: 54ch; }
+
+/* ── Firul ondulat dintre capitole (desktop) ─────────────────────── */
+.chapter-thread {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+.thread-track,
+.thread-fill {
+  fill: none;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.thread-track { stroke: var(--line); }
+.thread-fill {
+  stroke: var(--vie);
+  opacity: 0.55;
+  transition: stroke-dashoffset 0.15s linear;
+}
+.thread-dot {
+  fill: var(--bg);
+  stroke: var(--line-strong, rgba(74, 60, 45, 0.28));
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  transition: fill 0.4s var(--ease), stroke 0.4s var(--ease);
+}
+.thread-dot.is-on { fill: var(--vie); stroke: var(--vie); }
+.chapter { position: relative; z-index: 1; }
+/* Firul are culoarul lui pe stânga; capitolele se retrag din el ca să nu
+   se suprapună niciodată peste text. */
+@media (min-width: 901px) {
+  .chapter { padding-left: max(var(--px), 120px); }
+}
+@media (max-width: 900px) {
+  .chapter-thread { display: none; }
+}
+
+.poveste-coords {
+  margin-top: 32px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.chapter {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: clamp(64px, 8vw, 120px) var(--px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 5vw, 84px);
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+}
+/* Capitolele alternează stânga/dreapta, ca lectura să nu devină o coloană. */
+.chapter--flip .chapter-media { order: 2; }
+.chapter-media img {
+  width: 100%;
+  height: clamp(320px, 40vw, 520px);
+  object-fit: cover;
+}
+.chapter-num {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(56px, 7vw, 92px);
+  line-height: 1;
+  color: var(--line-strong, rgba(74, 60, 45, 0.28));
+  margin-bottom: 12px;
+}
+.chapter-text .eyebrow { margin-bottom: 18px; }
+.chapter-text .h2 { margin-bottom: 22px; }
+.chapter-text p {
+  font-size: 13.5px;
+  line-height: 1.95;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+.chapter-text p + p { margin-top: 16px; }
+@media (max-width: 900px) {
+  .chapter { grid-template-columns: 1fr; }
+  .chapter--flip .chapter-media { order: 0; }
+}
+
+.poveste-outro {
+  padding: clamp(72px, 9vw, 128px) var(--px);
+  text-align: center;
+}
+.poveste-outro-inner { max-width: 640px; margin: 0 auto; }
+.poveste-outro p {
+  margin: 18px auto 32px;
+  max-width: 46ch;
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: var(--ink-soft);
+}
+
 .despre-page {
   padding-top: 72px; /* header clearance */
 }
