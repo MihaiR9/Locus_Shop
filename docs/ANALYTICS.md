@@ -243,6 +243,64 @@ window.dataLayer.filter(x => Array.isArray(x) && x[0] === 'consent')
 
 ---
 
+## Meta Conversions API — conversii server-side
+
+Pixelul din browser pierde 20–40% din conversii: ad-blockere, Safari/iOS care taie cookie-urile, extensii de confidențialitate. Meta optimizează licitațiile pe conversiile pe care le **vede**, deci ce nu ajunge la ea îți scumpește direct reclama.
+
+De aceea aceeași comandă se trimite de două ori: o dată din browser (pixel prin GTM) și o dată din server, din webhook-ul Stripe — unde nu poate fi blocată.
+
+### ⚠️ Deduplicarea — obligatorie, altfel toate cifrele mint
+
+Cele două evenimente trebuie să aibă **același `event_name` și același `event_id`**, altfel Meta numără fiecare comandă de două ori.
+
+`event_id` e **numărul comenzii** (`LOC-2026-00001`). Serverul îl trimite deja. În browser, el ajunge în dataLayer:
+
+```js
+dataLayer.push({
+  event: "purchase",
+  event_id: "LOC-2026-00001",   // ← cheia de deduplicare
+  ecommerce: { ... }
+});
+```
+
+**Ce trebuie configurat în GTM** (o singură dată):
+
+1. **Variables → New → Data Layer Variable**
+   - Nume: `DLV - event_id`
+   - Data Layer Variable Name: `event_id`
+2. În tag-ul **Meta Pixel — Purchase**, câmpul **Event ID** → `{{DLV - event_id}}`
+
+Fără pasul 2, raportările Meta arată dublul vânzărilor reale, iar algoritmul optimizează pe date false.
+
+### Unde e în cod
+
+| Piesă | Fișier |
+|---|---|
+| Trimiterea evenimentului | `lib/meta/capi.ts` |
+| Colectarea `_fbp` / `_fbc` / IP / user-agent | `lib/meta/attribution.ts` |
+| Salvarea lor pe comandă | `app/(storefront)/checkout/actions.ts` (pasul 5b) |
+| Declanșarea conversiei | `app/api/stripe/webhook/route.ts` → `sendMetaPurchase()` |
+| `event_id` în dataLayer | `lib/analytics/gtm.ts` → `trackPurchase()` |
+
+### Consimțământ
+
+Evenimentul **nu pleacă** dacă utilizatorul n-a acceptat categoria „marketing". Decizia se salvează pe comandă în `orders.marketing_consent` la momentul plasării, ca să rămână auditabilă. Fără consimțământ nu stocăm nici `_fbp`, `_fbc`, IP sau user-agent — rămân `null`.
+
+### Variabile de mediu
+
+Vezi `.env.local.example`. Fără `META_PIXEL_ID` și `META_CAPI_ACCESS_TOKEN`, codul e inactiv și nu produce erori — restul comenzii merge normal.
+
+Pentru testare, setează `META_TEST_EVENT_CODE` și urmărește în **Events Manager → Test Events**. Șterge-l înainte de producție.
+
+### Verificare că funcționează
+
+1. Plasează o comandă de test cu consimțământ de marketing acceptat
+2. În **Events Manager → Test Events** trebuie să apară `Purchase`
+3. În Supabase, `order_events` trebuie să conțină un rând `meta_capi_sent` pentru comanda respectivă (sau `meta_capi_failed`, cu mesajul erorii)
+4. După ce pixelul e activ în GTM, verifică în **Events Manager → Overview** că evenimentul apare ca **Deduplicated** — dacă nu, `event_id` nu e legat corect în tag
+
+---
+
 ## Contact marketing
 
 Când marketing adaugă tag-uri noi în GTM (GA4, Meta Pixel, Ads Conversion) și au nevoie de evenimente custom pe care le nu am — să scrie în GitHub Issues ce vor, adăugăm în `lib/analytics/gtm.ts` și legăm în componente.

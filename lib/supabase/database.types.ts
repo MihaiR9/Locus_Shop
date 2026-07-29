@@ -338,13 +338,18 @@ export type Database = {
         Row: {
           awb_number: string | null
           billing: Json | null
+          client_ip: string | null
+          client_user_agent: string | null
           created_at: string
           customer_id: string | null
           delivered_at: string | null
           discount_cents: number
+          fbc: string | null
+          fbp: string | null
           guest_email: string | null
           id: string
           idempotency_key: string | null
+          marketing_consent: boolean
           notes: string | null
           order_number: string
           paid_at: string | null
@@ -364,13 +369,18 @@ export type Database = {
         Insert: {
           awb_number?: string | null
           billing?: Json | null
+          client_ip?: string | null
+          client_user_agent?: string | null
           created_at?: string
           customer_id?: string | null
           delivered_at?: string | null
           discount_cents?: number
+          fbc?: string | null
+          fbp?: string | null
           guest_email?: string | null
           id?: string
           idempotency_key?: string | null
+          marketing_consent?: boolean
           notes?: string | null
           order_number: string
           paid_at?: string | null
@@ -390,13 +400,18 @@ export type Database = {
         Update: {
           awb_number?: string | null
           billing?: Json | null
+          client_ip?: string | null
+          client_user_agent?: string | null
           created_at?: string
           customer_id?: string | null
           delivered_at?: string | null
           discount_cents?: number
+          fbc?: string | null
+          fbp?: string | null
           guest_email?: string | null
           id?: string
           idempotency_key?: string | null
+          marketing_consent?: boolean
           notes?: string | null
           order_number?: string
           paid_at?: string | null

@@ -4,6 +4,7 @@ import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import type { Json } from "@/lib/supabase/database.types";
 import { getStripe, getSiteUrl } from "@/lib/stripe/server";
+import { collectAttribution } from "@/lib/meta/attribution";
 import type {
   Billing,
   PaymentMethod,
@@ -178,6 +179,29 @@ export async function createOrder(
   }
   const orderId = row.id as string;
   const orderNumber = row.order_number as string;
+
+  // ── 5b. Semnale de atribuire pentru Meta CAPI ───────────────────
+  // Cookie-urile pixelului există doar acum, în request-ul din browser;
+  // evenimentul de conversie pleacă mai târziu din webhook-ul Stripe.
+  // Le salvăm pe comandă ca puntea dintre cele două momente.
+  // Fără consimțământ de marketing rămân null — vezi lib/meta/attribution.ts.
+  const attribution = await collectAttribution();
+  const { error: attrErr } = await supabase
+    .from("orders")
+    .update({
+      marketing_consent: attribution.marketingConsent,
+      fbp: attribution.fbp,
+      fbc: attribution.fbc,
+      client_ip: attribution.clientIp,
+      client_user_agent: attribution.clientUserAgent,
+    })
+    .eq("id", orderId);
+
+  if (attrErr) {
+    // Nu blocăm comanda pentru atribuire — pierdem doar calitatea
+    // potrivirii în Meta, nu vânzarea.
+    console.error("[createOrder] salvare atribuire esuata", orderId, attrErr);
+  }
 
   // ── 6. For card-online: create Stripe Checkout Session ──────────
   // For card-livrare or ramburs: skip; order stays pending_payment until

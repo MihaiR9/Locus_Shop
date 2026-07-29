@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type Stripe from "stripe";
 import { getStripe } from "@/lib/stripe/server";
+import { getSiteUrl } from "@/lib/site";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+import { sendPurchaseEvent } from "@/lib/meta/capi";
 import {
   sendOrderConfirmation,
   sendOrderNotificationToAdmin,
@@ -147,7 +149,93 @@ async function handleSessionPaid(event: Stripe.Event) {
   // ── Send confirmation emails (Pas 6) ──────────────────────────
   await sendOrderEmails(orderId);
 
+  // ── Conversie server-side către Meta ──────────────────────────
+  await sendMetaPurchase(orderId);
+
   // TODO Pas 9: trigger FGO invoice + FanCourier AWB
+}
+
+/**
+ * Trimite conversia `Purchase` către Meta Conversions API.
+ *
+ * Rulează DUPĂ ce comanda e marcată plătită, deci nu poate raporta o
+ * conversie care nu s-a întâmplat. Se deduplică cu evenimentul pixelului
+ * din browser prin `event_id` = numărul comenzii.
+ *
+ * Nu aruncă niciodată: Meta indisponibilă nu are voie să afecteze o
+ * comandă deja încasată. Rezultatul ajunge în `order_events`, ca să se
+ * vadă din admin dacă o conversie n-a plecat.
+ */
+async function sendMetaPurchase(orderId: string) {
+  const supabase = getSupabaseAdminClient();
+
+  const { data: order, error } = await supabase
+    .from("orders")
+    .select(
+      "order_number, total_cents, billing, shipping_address, guest_email, marketing_consent, fbp, fbc, client_ip, client_user_agent",
+    )
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (error || !order) {
+    console.error("[meta-capi] order lookup failed", orderId, error);
+    return;
+  }
+
+  // Poarta GDPR. Fără consimțământ de marketing nu trimitem nimic.
+  if (!order.marketing_consent) {
+    console.info("[meta-capi] sarit, fara consimtamant marketing", orderId);
+    return;
+  }
+
+  const { data: items } = await supabase
+    .from("order_items")
+    .select("code_snapshot, qty, unit_price_cents")
+    .eq("order_id", orderId);
+
+  const billing = order.billing as Record<string, unknown> | null;
+  const shipping = order.shipping_address as Record<string, unknown> | null;
+
+  const pick = (key: string): string | null =>
+    (billing?.[key] as string | undefined) ??
+    (shipping?.[key] as string | undefined) ??
+    null;
+
+  const result = await sendPurchaseEvent({
+    eventId: order.order_number,
+    valueRon: Math.round(order.total_cents / 100),
+    items: (items ?? []).map((it) => ({
+      code: it.code_snapshot,
+      qty: it.qty,
+      unitPriceRon: Math.round(it.unit_price_cents / 100),
+    })),
+    user: {
+      email: pick("email") ?? order.guest_email,
+      phone: pick("phone"),
+      firstName: pick("firstName"),
+      lastName: pick("lastName"),
+      city: pick("city"),
+      zip: pick("zip"),
+      countryCode: "RO",
+      clientIp: order.client_ip,
+      userAgent: order.client_user_agent,
+      fbp: order.fbp,
+      fbc: order.fbc,
+    },
+    sourceUrl: `${getSiteUrl()}/checkout/success`,
+  });
+
+  // „Neconfigurat" nu merită un rând de audit — e starea normală până
+  // când marketing-ul creează tokenul CAPI.
+  if (result.sent === false && result.reason === "not_configured") return;
+
+  await supabase.from("order_events").insert({
+    order_id: orderId,
+    type: result.sent ? "meta_capi_sent" : "meta_capi_failed",
+    payload: result.sent
+      ? { events_received: result.eventsReceived }
+      : { error: result.message },
+  });
 }
 
 /**

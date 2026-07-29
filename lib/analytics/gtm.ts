@@ -176,6 +176,14 @@ export function trackPurchase(params: {
   resetEcommerce();
   pushDataLayer({
     event: "purchase",
+    // Cheia de deduplicare cu Meta Conversions API. Aceeași conversie
+    // pleacă și din webhook-ul Stripe (lib/meta/capi.ts) cu ACELAȘI
+    // event_id; Meta le unește și numără o singură dată.
+    //
+    // ⚠️ În GTM, tag-ul Meta Pixel TREBUIE să aibă câmpul „Event ID"
+    // legat de o variabilă Data Layer care citește `event_id`. Fără asta,
+    // fiecare comandă se numără de două ori.
+    event_id: params.transactionId,
     ecommerce: {
       transaction_id: params.transactionId,
       currency: "RON",
