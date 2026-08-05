@@ -6,11 +6,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ProductBottle } from "@/components/landing/product-bottle";
 import { useCartStore } from "@/lib/cart-store";
 import { useCheckoutStore } from "@/lib/checkout-store";
+import { calculateShippingRon, getShippingMethod } from "@/lib/shipping";
 import { formatRon } from "@/lib/wines";
 import { createOrder } from "@/app/(storefront)/checkout/actions";
-
-const SHIP_FREE_AT = 250;
-const SHIP_FEE = 19;
 // SETCUVINTE / SETSEMNE sunt codurile pe care le prefill-ează cardurile de
 // set de pe home (components/landing/sets-section.tsx). Procentul trebuie
 // să rămână identic cu SET_DISCOUNT_PCT de acolo, altfel prețul afișat pe
@@ -68,11 +66,25 @@ export function OrderSummary() {
     [lines],
   );
 
-  const shippingFee = useMemo(() => {
+  const shippingCalc = useMemo(() => {
     if (!shipping) return null;
-    if (shipping.method === "ridicare") return 0;
-    return subtotal >= SHIP_FREE_AT ? 0 : SHIP_FEE;
+    if (shipping.method === "ridicare") {
+      return { priceRon: 0, freeApplied: false, methodName: "Ridicare Locus" };
+    }
+    const method = getShippingMethod(shipping.serviceId);
+    const c = calculateShippingRon({
+      methodId: shipping.serviceId,
+      county: shipping.county,
+      subtotalRon: subtotal,
+    });
+    return {
+      priceRon: c.priceRon,
+      freeApplied: c.freeApplied,
+      methodName: method?.name ?? "Curier",
+    };
   }, [shipping, subtotal]);
+
+  const shippingFee = shippingCalc?.priceRon ?? null;
 
   const discount = couponPct ? Math.round((subtotal * couponPct) / 100) : 0;
   const total = Math.max(0, subtotal - discount + (shippingFee ?? 0));
@@ -225,10 +237,12 @@ export function OrderSummary() {
               <span>
                 {shipping?.method === "ridicare"
                   ? "gratuit · ridicare"
-                  : "gratuit · peste 250 lei"}
+                  : shippingCalc?.freeApplied
+                    ? "gratuit · peste 250 lei"
+                    : "gratuit"}
               </span>
             ) : (
-              <span>{formatRon(shippingFee)} · curier</span>
+              <span>{formatRon(shippingFee)}</span>
             )}
           </div>
           {couponPct !== null && (

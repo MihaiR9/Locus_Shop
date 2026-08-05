@@ -18,9 +18,17 @@ export type CurrentUser = {
  */
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const supabase = await getSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  /* getUser() throws AuthApiError when the refresh token is missing or
+     invalid (expired session, cleared server-side, cookie mismatch after
+     a Supabase project change). For our purposes any such failure means
+     "not logged in" — swallow and treat as guest. */
+  let user;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    return null;
+  }
   if (!user) return null;
 
   const { data: customer } = await supabase

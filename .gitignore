@@ -28,6 +28,9 @@ tsconfig.tsbuildinfo
 # Scratch debugging utilities (ad-hoc tests, log parsers)
 _scripts/
 
+# Contracte semnate + documentație integrări (PDF-uri cu IBAN, CUI, telefon)
+Integrari/
+
 # Surse originale poze produse (versiuni optimizate sunt în public/photos/products/)
 Assets/
 

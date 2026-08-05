@@ -1,7 +1,9 @@
-import { SHIPPING_METHODS } from "@/lib/shipping";
+import { getShippingMethod, getReferencePrice } from "@/lib/shipping";
 
-const STANDARD = SHIPPING_METHODS.find((m) => m.id === "sameday-standard")!;
-const EASYBOX = SHIPPING_METHODS.find((m) => m.id === "sameday-easybox")!;
+const STANDARD = getShippingMethod("fancourier-standard")!;
+const FANBOX = getShippingMethod("fancourier-fanbox")!;
+const STANDARD_PRICE = getReferencePrice("fancourier-standard");
+const FANBOX_PRICE = getReferencePrice("fancourier-fanbox");
 
 const SCENARIOS = [
   {
@@ -35,8 +37,9 @@ export function CalcCost() {
         <div className="eyebrow">03 — cost transport</div>
         <h2 className="h2">Câteva scenarii reale.</h2>
         <p className="lead">
-          Costul transportului depinde doar de metoda aleasă, nu de greutate
-          (până la 8 kg). Comenzile mari trec automat la transport gratuit.
+          Prețurile de mai jos sunt pentru „restul țării". În București + Ilfov
+          și în județele vecine domeniului, transportul e ceva mai ieftin.
+          Comenzile mari trec automat la transport gratuit.
         </p>
       </div>
 
@@ -45,16 +48,16 @@ export function CalcCost() {
           <span>Comandă</span>
           <span>Greutate aprox.</span>
           <span>Curier la ușă</span>
-          <span>Easybox</span>
+          <span>FANbox</span>
           <span>Ridicare Locus</span>
         </div>
         {SCENARIOS.map((s) => {
           const standardFree =
             STANDARD.freeShippingFromRon !== null &&
             s.subtotalAprox >= STANDARD.freeShippingFromRon;
-          const easyboxFree =
-            EASYBOX.freeShippingFromRon !== null &&
-            s.subtotalAprox >= EASYBOX.freeShippingFromRon;
+          const fanboxFree =
+            FANBOX.freeShippingFromRon !== null &&
+            s.subtotalAprox >= FANBOX.freeShippingFromRon;
           return (
             <div key={s.bottles} className="livrare-calc-row">
               <span className="livrare-calc-label">
@@ -63,10 +66,10 @@ export function CalcCost() {
               </span>
               <span>{s.weight}</span>
               <span className={standardFree ? "is-free" : ""}>
-                {standardFree ? "gratuit" : format(STANDARD.basePriceRon)}
+                {standardFree ? "gratuit" : format(STANDARD_PRICE)}
               </span>
-              <span className={easyboxFree ? "is-free" : ""}>
-                {easyboxFree ? "gratuit" : format(EASYBOX.basePriceRon)}
+              <span className={fanboxFree ? "is-free" : ""}>
+                {fanboxFree ? "gratuit" : format(FANBOX_PRICE)}
               </span>
               <span className="is-free">gratuit</span>
             </div>
@@ -80,8 +83,8 @@ export function CalcCost() {
           {STANDARD.freeShippingFromRon} lei subtotal.
         </li>
         <li>
-          <strong>Easybox</strong> devine <strong>gratuit</strong> peste{" "}
-          {EASYBOX.freeShippingFromRon} lei subtotal.
+          <strong>FANbox</strong> devine <strong>gratuit</strong> peste{" "}
+          {FANBOX.freeShippingFromRon} lei subtotal.
         </li>
         <li>
           <strong>Ridicarea de la sediu</strong> este întotdeauna gratuită,

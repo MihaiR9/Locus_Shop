@@ -68,20 +68,27 @@ export async function proxy(req: NextRequest) {
   }
 
   // ─── 2 + 3) SUPABASE SESSION + ADMIN GATE ────────────────────
-  // Restul aplicației (storefront, /cont) nu are nevoie de auth în
-  // middleware — server components apelează `getCurrentUser()` direct.
-  // Doar /admin/* trebuie protejat aici + reînnoire tokens per request.
-  if (!pathname.startsWith("/admin")) return NextResponse.next();
-  if (pathname === "/admin/login") return NextResponse.next();
-  if (pathname.startsWith("/admin/auth/callback")) return NextResponse.next();
+  // Sărim complet peste refresh pe rutele de auth callback — acolo
+  // schimbăm codul PKCE pe sesiune, iar cookie-urile de code_verifier
+  // (`sb-...-auth-token-code-verifier`) NU trebuie atinse între request-ul
+  // de login și click-ul pe magic link. Dacă proxy-ul apelează getUser()
+  // aici și eșuează, șterge cookie-urile PKCE → login pierdut → user
+  // rămâne pe pagina de login.
+  const isAuthCallback =
+    pathname === "/auth/callback" ||
+    pathname.startsWith("/admin/auth/callback");
+  if (isAuthCallback) return NextResponse.next();
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
   if (!url || !anonKey) {
-    // Env-uri lipsă → nu putem verifica, redirect la login.
-    const loginUrl = req.nextUrl.clone();
-    loginUrl.pathname = "/admin/login";
-    return NextResponse.redirect(loginUrl);
+    if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+      const loginUrl = req.nextUrl.clone();
+      loginUrl.pathname = "/admin/login";
+      return NextResponse.redirect(loginUrl);
+    }
+    return NextResponse.next();
   }
 
   const res = NextResponse.next();
@@ -98,17 +105,38 @@ export async function proxy(req: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user: Awaited<ReturnType<typeof supabase.auth.getUser>>["data"]["user"] =
+    null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    /* Refresh token invalid / expirat / cookie stricat. Curățăm DOAR
+       cookie-urile de sesiune (`sb-...-auth-token[.N]`), NU și cele de
+       PKCE (`code-verifier`) — pentru că user-ul poate fi în mijlocul
+       unui login (email trimis, urmează click pe link). Ștergerea lor
+       aici ar rupe fluxul PKCE. */
+    for (const c of req.cookies.getAll()) {
+      if (c.name.startsWith("sb-") && !c.name.includes("code-verifier")) {
+        res.cookies.delete(c.name);
+      }
+    }
+  }
 
-  const role = (user?.app_metadata as { role?: string } | undefined)?.role;
+  // Admin gate — doar pentru /admin/* (fără login/callback).
+  const isAdminRoute =
+    pathname.startsWith("/admin") &&
+    pathname !== "/admin/login" &&
+    !pathname.startsWith("/admin/auth/callback");
 
-  if (!user || role !== "admin") {
-    const loginUrl = req.nextUrl.clone();
-    loginUrl.pathname = "/admin/login";
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+  if (isAdminRoute) {
+    const role = (user?.app_metadata as { role?: string } | undefined)?.role;
+    if (!user || role !== "admin") {
+      const loginUrl = req.nextUrl.clone();
+      loginUrl.pathname = "/admin/login";
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   return res;

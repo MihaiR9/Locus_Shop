@@ -138,7 +138,13 @@ export type OrderDetail = {
   stripeSessionId: string | null;
   stripePaymentIntent: string | null;
   awbNumber: string | null;
+  awbCreatedAt: string | null;
   smartbillInvoiceId: string | null;
+
+  courierService: string | null;
+  pickupPointId: string | null;
+  pickupPointName: string | null;
+  pickupPointAddress: string | null;
 
   createdAt: string;
   paidAt: string | null;
@@ -234,7 +240,12 @@ export async function getOrderDetail(
     stripeSessionId: order.stripe_session_id ?? null,
     stripePaymentIntent: order.stripe_payment_intent ?? null,
     awbNumber: order.awb_number ?? null,
+    awbCreatedAt: order.awb_created_at ?? null,
     smartbillInvoiceId: order.smartbill_invoice_id ?? null,
+    courierService: order.courier_service ?? null,
+    pickupPointId: order.pickup_point_id ?? null,
+    pickupPointName: order.pickup_point_name ?? null,
+    pickupPointAddress: order.pickup_point_address ?? null,
     createdAt: order.created_at,
     paidAt: order.paid_at ?? null,
     shippedAt: order.shipped_at ?? null,

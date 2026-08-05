@@ -5,6 +5,10 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import type { Json } from "@/lib/supabase/database.types";
 import { getStripe, getSiteUrl } from "@/lib/stripe/server";
 import { collectAttribution } from "@/lib/meta/attribution";
+import {
+  calculateShippingRon,
+  getShippingMethod,
+} from "@/lib/shipping";
 import type {
   Billing,
   PaymentMethod,
@@ -33,8 +37,6 @@ export type CreateOrderResult =
     }
   | { ok: false; error: string };
 
-const SHIP_FREE_AT_CENTS = 25000; // 250 lei
-const SHIP_FEE_CENTS = 1900; //  19 lei
 
 /**
  * Place an order: validates inputs, re-prices server-side from the live
@@ -98,11 +100,36 @@ export async function createOrder(
     subtotalCents += p.price_cents * it.qty;
   }
 
-  // Shipping
+  // Shipping — recalc server-side pe baza subtotal + județ + serviciu ales.
+  // Client-side calc e doar pentru afișare; sursa de adevăr e aici.
   const shipMethod = input.shipping.method;
   let shippingCents = 0;
-  if (shipMethod === "curier") {
-    shippingCents = subtotalCents >= SHIP_FREE_AT_CENTS ? 0 : SHIP_FEE_CENTS;
+  let courierService: string | null = null;
+  let pickupPointId: string | null = null;
+  let pickupPointName: string | null = null;
+  let pickupPointAddress: string | null = null;
+
+  if (input.shipping.method === "curier") {
+    const method = getShippingMethod(input.shipping.serviceId);
+    if (!method) {
+      return { ok: false, error: "Metodă de livrare invalidă." };
+    }
+    if (method.requiresPickupPoint && !input.shipping.pickupPointId) {
+      return {
+        ok: false,
+        error: "Pentru serviciul ales trebuie să selectezi un punct de ridicare.",
+      };
+    }
+    const calc = calculateShippingRon({
+      methodId: input.shipping.serviceId,
+      county: input.shipping.county,
+      subtotalRon: subtotalCents / 100,
+    });
+    shippingCents = Math.round(calc.priceRon * 100);
+    courierService = method.fanCourierService;
+    pickupPointId = input.shipping.pickupPointId ?? null;
+    pickupPointName = input.shipping.pickupPointName ?? null;
+    pickupPointAddress = input.shipping.pickupPointAddress ?? null;
   }
 
   // Coupon
@@ -180,11 +207,14 @@ export async function createOrder(
   const orderId = row.id as string;
   const orderNumber = row.order_number as string;
 
-  // ── 5b. Semnale de atribuire pentru Meta CAPI ───────────────────
+  // ── 5b. Semnale de atribuire pentru Meta CAPI + snapshot FanCourier ───
   // Cookie-urile pixelului există doar acum, în request-ul din browser;
   // evenimentul de conversie pleacă mai târziu din webhook-ul Stripe.
   // Le salvăm pe comandă ca puntea dintre cele două momente.
   // Fără consimțământ de marketing rămân null — vezi lib/meta/attribution.ts.
+  //
+  // Simultan salvăm serviciul FanCourier ales + punctul PUDO (dacă e cazul),
+  // ca să le știm la generarea AWB-ului din admin.
   const attribution = await collectAttribution();
   const { error: attrErr } = await supabase
     .from("orders")
@@ -194,6 +224,10 @@ export async function createOrder(
       fbc: attribution.fbc,
       client_ip: attribution.clientIp,
       client_user_agent: attribution.clientUserAgent,
+      courier_service: courierService,
+      pickup_point_id: pickupPointId,
+      pickup_point_name: pickupPointName,
+      pickup_point_address: pickupPointAddress,
     })
     .eq("id", orderId);
 

@@ -5898,6 +5898,64 @@
   color: var(--ink);
 }
 
+/* ── Ship methods radio grid ── */
+.ship-methods {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+@media (min-width: 720px) {
+  .ship-methods { grid-template-columns: 1fr 1fr; }
+}
+.ship-method-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(74, 60, 45, 0.32);
+  cursor: pointer;
+  transition: border-color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
+}
+.ship-method-card:hover { border-color: var(--ink); }
+.ship-method-card.is-active {
+  border-color: var(--ink);
+  background: color-mix(in oklab, var(--ink) 4%, transparent);
+}
+.ship-method-card input[type="radio"] {
+  margin-top: 4px;
+  accent-color: var(--vie);
+}
+.ship-method-body { flex: 1; min-width: 0; }
+.ship-method-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+.ship-method-name {
+  font-family: var(--font-serif), serif;
+  font-size: 15px;
+  color: var(--ink);
+}
+.ship-method-duration {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  white-space: nowrap;
+}
+.ship-method-desc {
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
 /* ── Form fields ── */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
 .grid-3 { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }

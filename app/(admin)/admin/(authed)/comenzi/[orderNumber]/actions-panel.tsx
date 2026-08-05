@@ -93,19 +93,21 @@ export function ActionsPanel({
 
         {canShip && (
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-zinc-700">
-              Număr AWB (FanCourier)
-            </label>
+            <p className="text-[11px] text-zinc-500">
+              AWB-ul se emite din panelul FanCourier de mai sus. Marchează
+              expediată doar dacă folosești curier manual (fără API).
+            </p>
             <input
               type="text"
               value={awb}
               onChange={(e) => setAwb(e.target.value)}
               disabled={isPending}
-              placeholder="ex: FC12345678"
+              placeholder="AWB manual (opțional)"
               className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-sm placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
             />
             <Button
               type="button"
+              variant="outline"
               disabled={isPending}
               onClick={() => run(() => markShipped(orderNumber, awb || null))}
             >
@@ -294,13 +296,6 @@ export function ActionsPanel({
           <div className="flex flex-col gap-2">
             <Button variant="outline" disabled title="Vine cu integrarea FGO">
               Generează factură FGO
-            </Button>
-            <Button
-              variant="outline"
-              disabled
-              title="Vine cu integrarea FanCourier API"
-            >
-              Generează AWB FanCourier
             </Button>
           </div>
         </div>

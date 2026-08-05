@@ -336,10 +336,12 @@ export type Database = {
       }
       orders: {
         Row: {
+          awb_created_at: string | null
           awb_number: string | null
           billing: Json | null
           client_ip: string | null
           client_user_agent: string | null
+          courier_service: string | null
           created_at: string
           customer_id: string | null
           delivered_at: string | null
@@ -355,6 +357,9 @@ export type Database = {
           paid_at: string | null
           payment_method: Database["public"]["Enums"]["pay_method_t"]
           payment_status: Database["public"]["Enums"]["pay_status_t"]
+          pickup_point_address: string | null
+          pickup_point_id: string | null
+          pickup_point_name: string | null
           shipped_at: string | null
           shipping_address: Json | null
           shipping_cents: number
@@ -367,10 +372,12 @@ export type Database = {
           total_cents: number
         }
         Insert: {
+          awb_created_at?: string | null
           awb_number?: string | null
           billing?: Json | null
           client_ip?: string | null
           client_user_agent?: string | null
+          courier_service?: string | null
           created_at?: string
           customer_id?: string | null
           delivered_at?: string | null
@@ -386,6 +393,9 @@ export type Database = {
           paid_at?: string | null
           payment_method: Database["public"]["Enums"]["pay_method_t"]
           payment_status?: Database["public"]["Enums"]["pay_status_t"]
+          pickup_point_address?: string | null
+          pickup_point_id?: string | null
+          pickup_point_name?: string | null
           shipped_at?: string | null
           shipping_address?: Json | null
           shipping_cents?: number
@@ -398,10 +408,12 @@ export type Database = {
           total_cents: number
         }
         Update: {
+          awb_created_at?: string | null
           awb_number?: string | null
           billing?: Json | null
           client_ip?: string | null
           client_user_agent?: string | null
+          courier_service?: string | null
           created_at?: string
           customer_id?: string | null
           delivered_at?: string | null
@@ -417,6 +429,9 @@ export type Database = {
           paid_at?: string | null
           payment_method?: Database["public"]["Enums"]["pay_method_t"]
           payment_status?: Database["public"]["Enums"]["pay_status_t"]
+          pickup_point_address?: string | null
+          pickup_point_id?: string | null
+          pickup_point_name?: string | null
           shipped_at?: string | null
           shipping_address?: Json | null
           shipping_cents?: number

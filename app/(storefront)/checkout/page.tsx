@@ -8,9 +8,9 @@ import { OrderSummary } from "@/components/checkout/order-summary";
 import { CheckoutTracker } from "@/components/checkout/checkout-tracker";
 
 export const metadata: Metadata = {
-  title: "Checkout · Domeniul Locus",
+  title: "Detalii comandă · Domeniul Locus",
   description:
-    "Finalizează comanda — livrare prin curier sau ridicare personală, plată card online sau la livrare.",
+    "Finalizează comanda — livrare prin curier sau FANbox, plată card online sau la livrare.",
 };
 
 export default function CheckoutPage() {
@@ -21,7 +21,7 @@ export default function CheckoutPage() {
         <header className="checkout-head">
           <div className="eyebrow">Finalizare comandă · pas cu pas</div>
           <div className="checkout-title-row">
-            <h1>checkout.</h1>
+            <h1>detalii comandă.</h1>
             <StepRail />
           </div>
         </header>

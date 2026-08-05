@@ -9,6 +9,7 @@ import {
 } from "../../../_components/payment-fulfillment-badges";
 import { formatRelDate } from "../../../_components/rel-date";
 import { ActionsPanel } from "./actions-panel";
+import { AwbPanel } from "./awb-panel";
 
 const RO_DATETIME = new Intl.DateTimeFormat("ro-RO", {
   day: "numeric",
@@ -277,6 +278,17 @@ export default async function AdminOrderDetailPage({
               )}
             </div>
           </section>
+
+          <AwbPanel
+            orderNumber={order.orderNumber}
+            orderStatus={order.status}
+            shippingMethod={order.shippingMethod}
+            awbNumber={order.awbNumber}
+            awbCreatedAt={order.awbCreatedAt}
+            courierService={order.courierService}
+            pickupPointName={order.pickupPointName}
+            pickupPointAddress={order.pickupPointAddress}
+          />
 
           <ActionsPanel
             orderNumber={order.orderNumber}

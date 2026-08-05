@@ -19,9 +19,13 @@ export type CurrentAdmin = {
 export const getCurrentAdmin = cache(
   async (): Promise<CurrentAdmin | null> => {
     const supabase = await getSupabaseServerClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    let user;
+    try {
+      const { data } = await supabase.auth.getUser();
+      user = data.user;
+    } catch {
+      return null;
+    }
     if (!user) return null;
 
     const role = (user.app_metadata as { role?: string } | undefined)?.role;

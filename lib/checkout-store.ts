@@ -1,20 +1,31 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
+import type { ShippingMethodId } from "@/lib/shipping";
 
 // ─── Types ──────────────────────────────────────────────────────────
 export type ShipMethod = "curier" | "ridicare";
 
 export type ShippingCurier = {
   method: "curier";
+  /** Serviciul FanCourier ales. PayPoint și Sediu FAN nu sunt încă în contract. */
+  serviceId: Extract<
+    ShippingMethodId,
+    "fancourier-standard" | "fancourier-fanbox"
+  >;
   firstName: string;
   lastName: string;
   phone: string;
   email: string;
+  /** La FANbox/PayPoint/Office adresa e a punctului fix. Standard = adresa reală. */
   address: string;
   city: string;
   county: string;
   zip: string;
   note: string;
+  /** ID FC pentru locker/PayPoint/office — obligatoriu pt cele 3 servicii. */
+  pickupPointId?: string;
+  pickupPointName?: string;
+  pickupPointAddress?: string;
 };
 export type ShippingRidicare = {
   method: "ridicare";
