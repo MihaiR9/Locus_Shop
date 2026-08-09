@@ -58,19 +58,21 @@
 - mereu: avertisment "consum responsabil / sulfiți"
 
 **Game produs (denumiri proprii):**
-- **cuvinte** — gama de bază (LC01, LC02, LC04)
-- **semne** — gama premium (LS01, LS02, LS04)
+- **cuvinte** (LC01, LC02, LC04) — gama mai scumpă
+- **semne** (LS01, LS02, LS04) — gama mai ieftină
 - **pauze** — viitor (rezerve / ediții limitate)
 
-**Catalog actual (mock — vezi `Landing_V1.html` linia ~2233):**
+⚠️ Regulă de brand: NU se folosesc etichetele „premium" / „gama de bază" / „basic" / „reserve" în copy sau UI. Prețul diferă → nu e nevoie de qualifier. Fiecare gamă e referită doar prin nume.
+
+**Catalog actual (după corecția din 2026-08-08 — ierarhia de preț a fost inversată față de mock-ul inițial):**
 | Cod | Nume | Gamă | Tip | Preț |
 |-----|------|------|-----|------|
-| LC01 | Fetească Regală | cuvinte | Alb · Demisec · 13.5% | 79 lei |
-| LC02 | Fetească Neagră | cuvinte | Roșu · Demisec · 14.9% | 89 lei |
-| LC04 | Riesling Italian | cuvinte | Alb · Sec · 13% | 79 lei |
-| LS01 | Fetească Regală | semne | Alb · Demisec · 13.5% | 109 lei |
-| LS02 | Fetească Neagră | semne | Roșu · Demisec · 14.9% | 119 lei |
-| LS04 | Riesling Italian | semne | Alb · Sec · 13% | 109 lei |
+| LC01 | Fetească Regală | cuvinte | Alb · Demisec · 13.5% | 109 lei |
+| LC02 | Fetească Neagră | cuvinte | Roșu · Demisec · 14.9% | 119 lei |
+| LC04 | Riesling Italian | cuvinte | Alb · Sec · 13% | 109 lei |
+| LS01 | Fetească Regală | semne | Alb · Demisec · 13.5% | 79 lei |
+| LS02 | Fetească Neagră | semne | Roșu · Demisec · 14.9% | 89 lei |
+| LS04 | Riesling Italian | semne | Alb · Sec · 13% | 79 lei |
 
 ---
 

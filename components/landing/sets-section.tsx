@@ -25,16 +25,16 @@ const SETS: {
   {
     gama: "cuvinte",
     coupon: "SETCUVINTE",
-    eyebrow: "gama de bază",
+    eyebrow: "trei sticle · cuvinte",
     title: "Setul Cuvinte",
-    body: "Cele trei vinuri ale gamei, într-un singur colet. Pentru mese obișnuite care merită totuși un vin cu origine.",
+    body: "Cele trei vinuri ale gamei, într-un singur colet. Pentru mese lungi și cadouri care nu au nevoie de explicații.",
   },
   {
     gama: "semne",
     coupon: "SETSEMNE",
-    eyebrow: "gama premium",
+    eyebrow: "trei sticle · semne",
     title: "Setul Semne",
-    body: "Aceleași trei soiuri, în registrul mare. Pentru mesele lungi și pentru cadouri care nu au nevoie de explicații.",
+    body: "Aceleași trei soiuri, altă mână la sticlă. Pentru mese obișnuite care merită totuși un vin cu origine.",
   },
 ];
 

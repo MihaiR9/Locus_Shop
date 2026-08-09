@@ -178,21 +178,73 @@ export async function createInternalAwb(
   shipment: FanCourierShipment,
 ): Promise<{ awbNumber: string; raw: unknown }> {
   const body = { clientId: getClientId(), shipments: [shipment] };
-  const res = await request<{
-    status: string;
-    data: Array<{ awbNumber?: string; awb?: string; message?: string }>;
-  }>("/intern-awb", { method: "POST", jsonBody: body });
+  const res = await request<unknown>("/intern-awb", {
+    method: "POST",
+    jsonBody: body,
+  });
 
-  const first = Array.isArray(res.data) ? res.data[0] : null;
-  const awb = first?.awbNumber ?? first?.awb;
+  /* API-ul FC returnează AWB-ul cu naming diferit față de versiunea din
+     PDF. Am văzut în practică: `data[0].awbNumber`, `data[0].awb`,
+     `data.awbNumber` (nu în array), sau chiar `data` = string direct.
+     Extragem defensiv toate variantele + log complet la eșec. */
+  const extractAwb = (obj: unknown): string | null => {
+    if (!obj) return null;
+    if (typeof obj === "string") return obj;
+    if (typeof obj === "number") return String(obj);
+    if (typeof obj !== "object") return null;
+    const rec = obj as Record<string, unknown>;
+    const candidates = [
+      rec.awbNumber,
+      rec.awb,
+      rec.number,
+      rec.awb_number,
+      rec.awbNo,
+      rec.awb_no,
+    ];
+    for (const c of candidates) {
+      if (typeof c === "string" && c.trim()) return c.trim();
+      if (typeof c === "number") return String(c);
+    }
+    return null;
+  };
+
+  /* Response format actual (nu cel din PDF v2.0):
+     { "response": [ { "awbNumber": 7000...657, "tariff": ..., ... } ] }
+     Verificăm both `response` și `data` (retro-compat cu vechiul format). */
+  const root = res as {
+    response?: unknown;
+    data?: unknown;
+    message?: string;
+    status?: string;
+  };
+  const data = root?.response ?? root?.data;
+
+  let awb: string | null = null;
+  if (Array.isArray(data)) {
+    for (const it of data) {
+      awb = extractAwb(it);
+      if (awb) break;
+    }
+  } else {
+    awb = extractAwb(data);
+  }
+
   if (!awb) {
+    console.error("[FanCourier] AWB response fără număr identificabil:", JSON.stringify(res));
+    const msg =
+      (Array.isArray(data) && data[0] && typeof data[0] === "object"
+        ? (data[0] as { message?: string; error?: string }).message ??
+          (data[0] as { message?: string; error?: string }).error
+        : null) ??
+      root.message ??
+      "răspuns neașteptat (verifică log-urile serverului pentru raw body)";
     throw new FanCourierError(
-      `AWB creat fără număr — ${first?.message ?? "răspuns neașteptat"}`,
+      `AWB creat fără număr — ${msg}`,
       500,
       res,
     );
   }
-  return { awbNumber: String(awb), raw: res };
+  return { awbNumber: awb, raw: res };
 }
 
 /** Șterge un AWB din borderou. Merge doar dacă nu a plecat curierul cu el. */

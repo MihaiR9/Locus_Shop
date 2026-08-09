@@ -40,7 +40,12 @@ export type BillingFizica = {
   type: "fizica";
   firstName: string;
   lastName: string;
-  cnp: string;
+  /** Adresa fiscală (line1) — obligatoriu pentru factura ANAF. */
+  address: string;
+  city: string;
+  county: string;
+  zip?: string;
+  cnp?: string;
   email: string;
   sameAsShipping: boolean;
 };
@@ -57,11 +62,21 @@ export type Billing = BillingFizica | BillingJuridica;
 
 export type PaymentMethod = "card-online" | "card-livrare";
 
+export type VoucherState = {
+  /** Codul introdus (uppercase). Null = fără voucher aplicat. */
+  code: string | null;
+  /** Procent reducere (5-100). Null dacă voucherul e fixed_off. */
+  percentOff: number | null;
+  /** Reducere fixă în bani (RON). Null dacă e percent. */
+  fixedOffRon: number | null;
+};
+
 type CheckoutState = {
   shipping: Shipping | null;
   billing: Billing | null;
   payment: PaymentMethod;
   termsAccepted: boolean;
+  voucher: VoucherState | null;
 };
 
 type CheckoutActions = {
@@ -69,6 +84,8 @@ type CheckoutActions = {
   saveBilling: (b: Billing) => void;
   setPayment: (p: PaymentMethod) => void;
   setTerms: (v: boolean) => void;
+  applyVoucher: (v: VoucherState) => void;
+  clearVoucher: () => void;
   reset: () => void;
 };
 
@@ -79,6 +96,7 @@ const initial: CheckoutState = {
   billing: null,
   payment: "card-online",
   termsAccepted: false,
+  voucher: null,
 };
 
 export const useCheckoutStore = create<Store>()(
@@ -90,6 +108,8 @@ export const useCheckoutStore = create<Store>()(
       saveBilling: (b) => set({ billing: b }),
       setPayment: (p) => set({ payment: p }),
       setTerms: (v) => set({ termsAccepted: v }),
+      applyVoucher: (v) => set({ voucher: v }),
+      clearVoucher: () => set({ voucher: null }),
       reset: () => set(initial),
     }),
     {
@@ -100,6 +120,7 @@ export const useCheckoutStore = create<Store>()(
         shipping: s.shipping,
         billing: s.billing,
         payment: s.payment,
+        voucher: s.voucher,
       }),
     },
   ),

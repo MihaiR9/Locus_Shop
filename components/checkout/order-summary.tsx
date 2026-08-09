@@ -1,296 +1,267 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { ProductBottle } from "@/components/landing/product-bottle";
+import { useMemo, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useCartStore } from "@/lib/cart-store";
 import { useCheckoutStore } from "@/lib/checkout-store";
 import { calculateShippingRon, getShippingMethod } from "@/lib/shipping";
+import { calculateSgrRon, countBottles, SGR_PER_BOTTLE_RON } from "@/lib/sgr";
 import { formatRon } from "@/lib/wines";
 import { createOrder } from "@/app/(storefront)/checkout/actions";
-// SETCUVINTE / SETSEMNE sunt codurile pe care le prefill-ează cardurile de
-// set de pe home (components/landing/sets-section.tsx). Procentul trebuie
-// să rămână identic cu SET_DISCOUNT_PCT de acolo, altfel prețul afișat pe
-// card nu corespunde cu sumarul comenzii.
-//
-// ⚠️ Lista e hardcodată client-side: oricine o poate citi din bundle și
-// aplica un cod fără verificare de expirare sau număr de utilizări.
-// `lib/coupons.ts` are deja `validateCoupon` pe baza de date — de mutat
-// validarea acolo înainte de lansare.
-const COUPONS: Record<string, number> = {
-  LOCUS10: 10,
-  PARTENER15: 15,
-  SETCUVINTE: 15,
-  SETSEMNE: 15,
-};
+import { applyVoucherAction } from "@/app/(storefront)/cos/actions";
+
+/**
+ * OrderSummary — aside sticky din partea dreaptă a /checkout.
+ * Rutare: „← înapoi la coș" pentru edit rapid al items, apoi listă
+ * produse compactă, sum-rows (subtotal / voucher / SGR / transport),
+ * voucher input, total mare Cormorant, CTA „Plasează comanda".
+ */
+
+function formatMoneyRo(n: number): { whole: string; cents: string } {
+  const whole = Math.floor(n);
+  const cents = Math.round((n - whole) * 100)
+    .toString()
+    .padStart(2, "0");
+  return {
+    whole: whole.toLocaleString("ro-RO"),
+    cents,
+  };
+}
 
 export function OrderSummary() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  // Stable primitives only — same pattern as CartDrawer.
   const items = useCartStore((s) => s.items);
   const clearCart = useCartStore((s) => s.clear);
   const shipping = useCheckoutStore((s) => s.shipping);
   const billing = useCheckoutStore((s) => s.billing);
-  const termsAccepted = useCheckoutStore((s) => s.termsAccepted);
-  const reset = useCheckoutStore((s) => s.reset);
+  const terms = useCheckoutStore((s) => s.termsAccepted);
+  const voucher = useCheckoutStore((s) => s.voucher);
+  const applyVoucher = useCheckoutStore((s) => s.applyVoucher);
+  const clearVoucher = useCheckoutStore((s) => s.clearVoucher);
+  const resetCheckout = useCheckoutStore((s) => s.reset);
 
-  const [coupon, setCoupon] = useState("");
-  const [couponPct, setCouponPct] = useState<number | null>(null);
-  const [couponErr, setCouponErr] = useState(false);
+  const [voucherInput, setVoucherInput] = useState(voucher?.code ?? "");
+  const [voucherMsg, setVoucherMsg] = useState<{ text: string; kind: "ok" | "err" } | null>(
+    voucher ? { text: `Aplicat (${voucher.code})`, kind: "ok" } : null,
+  );
+  const [voucherPending, startVoucherTransition] = useTransition();
+
   const [placeError, setPlaceError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-  // Idempotency key — generated once per OrderSummary mount. If user
-  // double-clicks the submit button or the network retries, the server
-  // returns the SAME order instead of inserting twice.
-  const idempotencyKeyRef = useRef<string>(
+  const [placing, startPlacingTransition] = useTransition();
+  const idemRef = useRef<string>(
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
       : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
   );
 
-  // CartLine snapshots already carry name/price/gama/bottleColor —
-  // no DB join needed. Pricing at place-order time will be re-validated
-  // server-side against products.price_cents (Pas 4).
   const lines = useMemo(() => Object.values(items), [items]);
-
-  const subtotal = useMemo(
+  const subtotalRon = useMemo(
     () => lines.reduce((s, l) => s + l.priceRon * l.qty, 0),
     [lines],
   );
-
-  const totalQty = useMemo(
-    () => lines.reduce((s, l) => s + l.qty, 0),
-    [lines],
-  );
+  const totalBottles = countBottles(lines);
+  const sgrRon = calculateSgrRon(totalBottles);
 
   const shippingCalc = useMemo(() => {
     if (!shipping) return null;
-    if (shipping.method === "ridicare") {
+    if (shipping.method === "ridicare")
       return { priceRon: 0, freeApplied: false, methodName: "Ridicare Locus" };
-    }
-    const method = getShippingMethod(shipping.serviceId);
+    const m = getShippingMethod(shipping.serviceId);
     const c = calculateShippingRon({
       methodId: shipping.serviceId,
       county: shipping.county,
-      subtotalRon: subtotal,
+      subtotalRon,
     });
-    return {
-      priceRon: c.priceRon,
-      freeApplied: c.freeApplied,
-      methodName: method?.name ?? "Curier",
-    };
-  }, [shipping, subtotal]);
+    return { priceRon: c.priceRon, freeApplied: c.freeApplied, methodName: m?.name ?? "Curier" };
+  }, [shipping, subtotalRon]);
 
-  const shippingFee = shippingCalc?.priceRon ?? null;
+  const shippingRon = shippingCalc?.priceRon ?? null;
 
-  const discount = couponPct ? Math.round((subtotal * couponPct) / 100) : 0;
-  const total = Math.max(0, subtotal - discount + (shippingFee ?? 0));
+  const discountRon = useMemo(() => {
+    if (!voucher) return 0;
+    if (voucher.percentOff) return Math.round(subtotalRon * voucher.percentOff) / 100;
+    return Math.min(voucher.fixedOffRon ?? 0, subtotalRon);
+  }, [voucher, subtotalRon]);
+
+  const totalRon =
+    Math.max(0, subtotalRon - discountRon) + sgrRon + (shippingRon ?? 0);
+  const totalMoney = formatMoneyRo(totalRon);
 
   const canPlace =
-    lines.length > 0 && shipping !== null && billing !== null && termsAccepted;
+    lines.length > 0 && shipping !== null && billing !== null && terms;
 
-  function applyCoupon() {
-    const code = coupon.trim().toUpperCase();
-    if (!code) return;
-    if (COUPONS[code]) {
-      setCouponPct(COUPONS[code]);
-      setCouponErr(false);
-    } else {
-      setCouponPct(null);
-      setCouponErr(true);
+  function submitVoucher() {
+    const code = voucherInput.trim().toUpperCase();
+    setVoucherMsg(null);
+    if (!code) {
+      clearVoucher();
+      setVoucherMsg({ text: "Introdu un cod.", kind: "err" });
+      return;
     }
+    startVoucherTransition(async () => {
+      const res = await applyVoucherAction(code, Math.round(subtotalRon * 100));
+      if (!res.ok) {
+        clearVoucher();
+        setVoucherMsg({ text: res.error, kind: "err" });
+        return;
+      }
+      applyVoucher({
+        code: res.code,
+        percentOff: null,
+        fixedOffRon: res.discountCents / 100,
+      });
+      setVoucherMsg({
+        text: `Voucher aplicat: −${formatRon(res.discountCents / 100)}`,
+        kind: "ok",
+      });
+    });
   }
-
-  // Cupon venit prin URL (`/checkout?cupon=SETCUVINTE`) — cardurile de set
-  // de pe home trimit aici. Se aplică o singură dată, la montare, ca
-  // prețul din sumar să corespundă cu cel promis pe card.
-  const prefillRef = useRef(false);
-  useEffect(() => {
-    if (prefillRef.current) return;
-    const raw = searchParams.get("cupon");
-    if (!raw) return;
-    prefillRef.current = true;
-
-    const code = raw.trim().toUpperCase();
-    setCoupon(code);
-    if (COUPONS[code]) {
-      setCouponPct(COUPONS[code]);
-      setCouponErr(false);
-    }
-  }, [searchParams]);
 
   function placeOrder() {
     if (!canPlace || !shipping || !billing) return;
     setPlaceError(null);
-
-    startTransition(async () => {
+    startPlacingTransition(async () => {
       const result = await createOrder({
-        idempotencyKey: idempotencyKeyRef.current,
+        idempotencyKey: idemRef.current,
         items: lines.map((l) => ({ code: l.code, qty: l.qty })),
         shipping,
         billing,
         payment: useCheckoutStore.getState().payment,
-        couponCode: couponPct !== null ? coupon.trim().toUpperCase() : null,
+        couponCode: voucher?.code ?? null,
       });
-
       if (!result.ok) {
         setPlaceError(result.error);
         return;
       }
-
       sessionStorage.setItem("locus-last-order", result.orderNumber);
       clearCart();
-      reset();
-
-      // For card-online, the action created a Stripe Checkout Session
-      // and returned its hosted URL. Redirect there; Stripe will redirect
-      // back to /checkout/success?id=...&session_id=... after payment.
+      resetCheckout();
       if (result.stripeSessionUrl) {
         window.location.href = result.stripeSessionUrl;
         return;
       }
-
-      // Otherwise (card-livrare / ramburs): straight to confirmation.
-      router.push(
-        "/checkout/success?id=" + encodeURIComponent(result.orderNumber),
-      );
+      router.push("/checkout/success?id=" + encodeURIComponent(result.orderNumber));
     });
   }
 
   return (
-    <aside className="summary" aria-label="Sumar comandă">
-      {/* LEFT: items + coupon */}
-      <div className="summary-items-block">
-        <div className="summary-head">
-          <h2>comanda ta.</h2>
-          <span className="count">
-            {totalQty} {totalQty === 1 ? "sticlă" : "sticle"}
+    <aside className="co-summary" aria-label="Sumar comandă">
+      <Link href="/cos" className="co-summary-back">
+        <span className="arrow">→</span> înapoi la coș
+      </Link>
+      <div className="co-summary-title">Sumar comandă</div>
+
+      <div className="co-sum-rows">
+        <div className="co-srow">
+          <span className="label">
+            Subtotal ({totalBottles} {totalBottles === 1 ? "sticlă" : "sticle"})
           </span>
+          <span className="value">{formatRon(subtotalRon)}</span>
         </div>
 
-        <div className="sum-items">
-          {lines.length === 0 ? (
-            <div className="sum-empty">
-              Coșul este gol.
-              <br />
-              <Link href="/shop">Alege un vin</Link>
-            </div>
-          ) : (
-            lines.map((line) => (
-              <div key={line.code} className="sum-item">
-                <div className="sum-img">
-                  <ProductBottle
-                    code={line.code}
-                    name={line.name}
-                    gama={line.gama}
-                    color={line.bottleColor}
-                    size={100}
-                  />
-                  <span className="qty">{line.qty}</span>
-                </div>
-                <div className="sum-body">
-                  <div className="sum-name">{line.name}</div>
-                  <div className="sum-meta">
-                    {line.code} · {line.gama}
-                  </div>
-                </div>
-                <div className="sum-price">
-                  {formatRon(line.priceRon * line.qty)}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        <div className="sum-coupon">
-          <input
-            className="input"
-            placeholder="Cod voucher"
-            value={coupon}
-            onChange={(e) => {
-              setCoupon(e.target.value);
-              setCouponErr(false);
-            }}
-            style={couponErr ? { borderColor: "#a23" } : undefined}
-          />
-          <button type="button" onClick={applyCoupon}>
-            aplică
-          </button>
-        </div>
-      </div>
-
-      {/* RIGHT: totals + submit */}
-      <div className="summary-total-block">
-        <div className="sum-rows">
-          <div className="sum-row">
-            <span>Subtotal</span>
-            <span>{formatRon(subtotal)}</span>
+        {voucher && discountRon > 0 && (
+          <div className="co-srow discount">
+            <span className="label">Voucher ({voucher.code})</span>
+            <span className="value">−{formatRon(discountRon)}</span>
           </div>
-          <div className="sum-row">
-            <span>Transport</span>
-            {shippingFee === null ? (
-              <span className="muted">se calculează la pasul 1</span>
-            ) : shippingFee === 0 ? (
-              <span>
-                {shipping?.method === "ridicare"
+        )}
+
+        <div className="co-srow">
+          <span className="label">
+            Garanție SGR
+            <span
+              className="hint"
+              title={`${SGR_PER_BOTTLE_RON} lei/sticlă — obligatorie prin lege, returnabilă la orice punct RetuRO.`}
+            >
+              i
+            </span>
+          </span>
+          <span className="value">{formatRon(sgrRon)}</span>
+        </div>
+
+        <div className={`co-srow ${shippingRon === null ? "muted" : ""}`}>
+          <span className="label">Transport</span>
+          <span className="value">
+            {shippingRon === null
+              ? "alege metoda la pas 1"
+              : shippingRon === 0
+                ? shipping?.method === "ridicare"
                   ? "gratuit · ridicare"
                   : shippingCalc?.freeApplied
                     ? "gratuit · peste 250 lei"
-                    : "gratuit"}
-              </span>
-            ) : (
-              <span>{formatRon(shippingFee)}</span>
-            )}
-          </div>
-          {couponPct !== null && (
-            <div className="sum-row">
-              <span>Voucher ({couponPct}%)</span>
-              <span>−{formatRon(discount)}</span>
-            </div>
+                    : "gratuit"
+                : formatRon(shippingRon)}
+          </span>
+        </div>
+
+        <div className="co-voucher">
+          <input
+            type="text"
+            placeholder="cod voucher"
+            value={voucherInput}
+            onChange={(e) => setVoucherInput(e.target.value)}
+            disabled={voucherPending}
+          />
+          {voucher ? (
+            <button
+              type="button"
+              disabled={voucherPending}
+              onClick={() => {
+                setVoucherInput("");
+                clearVoucher();
+                setVoucherMsg(null);
+              }}
+            >
+              Scoate
+            </button>
+          ) : (
+            <button type="button" onClick={submitVoucher} disabled={voucherPending}>
+              {voucherPending ? "…" : "Aplică"}
+            </button>
           )}
         </div>
-
-        <div className="sum-total">
-          <div className="label">Total</div>
-          <div className="val">
-            {formatRon(total).replace(" lei", "")}
-            <span className="currency">lei</span>
-          </div>
-        </div>
-
-        {placeError && (
-          <p
-            role="alert"
-            style={{
-              marginTop: 12,
-              fontSize: 12,
-              color: "#a23",
-              fontFamily: "var(--font-mono), monospace",
-            }}
-          >
-            {placeError}
-          </p>
+        {voucherMsg && (
+          <div className={`co-voucher-msg ${voucherMsg.kind}`}>{voucherMsg.text}</div>
         )}
+      </div>
 
-        <button
-          type="button"
-          className="btn btn-solid place-order"
-          disabled={!canPlace || isPending}
-          onClick={placeOrder}
-        >
-          {isPending ? "Se procesează…" : "Plasează comanda"}
-          <svg className="arrow" viewBox="0 0 24 12" aria-hidden="true">
-            <use href="#arrow-right" />
-          </svg>
-        </button>
+      <div className="co-sum-total">
+        <span className="label">Total</span>
+        <span className="value">
+          {totalMoney.whole}
+          <span className="suffix">,{totalMoney.cents} lei</span>
+        </span>
+      </div>
 
-        <p className="sum-foot-note">
-          Livrare 2–4 zile · gratis peste 250 lei. Conține sulfiți.
-          Consumul excesiv de alcool dăunează sănătății.
+      {placeError && (
+        <div style={{
+          padding: "0 20px 12px",
+          fontFamily: "var(--font-mono), monospace",
+          fontSize: 11,
+          color: "#8C3B2E",
+        }}>
+          {placeError}
+        </div>
+      )}
+
+      <button
+        type="button"
+        className="co-cta"
+        disabled={!canPlace || placing}
+        onClick={placeOrder}
+      >
+        {placing ? "Se procesează…" : "Plasează comanda"}
+      </button>
+
+      <div className="co-summary-legal">
+        <p>
+          <strong>Garanție SGR</strong> — {SGR_PER_BOTTLE_RON} lei/sticlă, inclusă
+          în total. Se recuperează la returnarea ambalajului la orice punct de
+          colectare RetuRO.
         </p>
+        <p>Conține sulfiți. Consumul excesiv de alcool dăunează sănătății.</p>
       </div>
     </aside>
   );

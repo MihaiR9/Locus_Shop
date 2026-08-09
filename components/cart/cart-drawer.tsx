@@ -179,8 +179,8 @@ export function CartDrawer() {
               <span>Total</span>
               <span>{formatRon(subtotal)}</span>
             </div>
-            <Link href="/checkout" className="cart-checkout" onClick={close}>
-              Către checkout
+            <Link href="/cos" className="cart-checkout" onClick={close}>
+              Vezi coșul
               <svg className="arrow-svg" viewBox="0 0 24 12" aria-hidden="true">
                 <use href="#arrow-right" />
               </svg>

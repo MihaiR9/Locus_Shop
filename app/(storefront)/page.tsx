@@ -22,7 +22,10 @@ import { Footer } from "@/components/landing/footer";
 export default function HomePage() {
   return (
     <>
-      <main id="top">
+      {/* landing-display: schimbă temporar --font-serif → Libre Caslon
+          Display doar pentru pagina asta, ca să vedem cum arată noul font
+          fără să afecteze /shop, PDP-uri, admin etc. Vezi globals.css. */}
+      <main id="top" className="landing-display">
         <Hero />
         <BottlesBanner />
         <Manifesto />

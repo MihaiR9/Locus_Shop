@@ -10,6 +10,7 @@ import {
 import { formatRelDate } from "../../../_components/rel-date";
 import { ActionsPanel } from "./actions-panel";
 import { AwbPanel } from "./awb-panel";
+import { InvoicePanel } from "./invoice-panel";
 
 const RO_DATETIME = new Intl.DateTimeFormat("ro-RO", {
   day: "numeric",
@@ -288,6 +289,19 @@ export default async function AdminOrderDetailPage({
             courierService={order.courierService}
             pickupPointName={order.pickupPointName}
             pickupPointAddress={order.pickupPointAddress}
+          />
+
+          <InvoicePanel
+            orderNumber={order.orderNumber}
+            orderStatus={order.status}
+            invoiceNumber={order.fgoInvoiceNumber}
+            invoiceSeries={order.fgoInvoiceSeries}
+            invoiceLink={order.fgoInvoiceLink}
+            invoiceCreatedAt={order.fgoInvoiceCreatedAt}
+            invoiceStatus={order.fgoInvoiceStatus}
+            hasBilling={
+              !!order.billing && Object.keys(order.billing).length > 0
+            }
           />
 
           <ActionsPanel

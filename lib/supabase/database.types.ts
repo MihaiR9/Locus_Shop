@@ -121,33 +121,42 @@ export type Database = {
         Row: {
           cnp: string | null
           company: string | null
+          created_at: string
           cui: string | null
           customer_id: string
           hq_address: string | null
           iban: string | null
           id: string
+          is_default: boolean
+          label: string | null
           reg_no: string | null
           type: Database["public"]["Enums"]["bill_type_t"]
         }
         Insert: {
           cnp?: string | null
           company?: string | null
+          created_at?: string
           cui?: string | null
           customer_id: string
           hq_address?: string | null
           iban?: string | null
           id?: string
+          is_default?: boolean
+          label?: string | null
           reg_no?: string | null
           type: Database["public"]["Enums"]["bill_type_t"]
         }
         Update: {
           cnp?: string | null
           company?: string | null
+          created_at?: string
           cui?: string | null
           customer_id?: string
           hq_address?: string | null
           iban?: string | null
           id?: string
+          is_default?: boolean
+          label?: string | null
           reg_no?: string | null
           type?: Database["public"]["Enums"]["bill_type_t"]
         }
@@ -204,6 +213,9 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          favorite_pickup_point_address: string | null
+          favorite_pickup_point_id: string | null
+          favorite_pickup_point_name: string | null
           id: string
           marketing_opt_in: boolean
           name: string | null
@@ -213,6 +225,9 @@ export type Database = {
         Insert: {
           created_at?: string
           email: string
+          favorite_pickup_point_address?: string | null
+          favorite_pickup_point_id?: string | null
+          favorite_pickup_point_name?: string | null
           id?: string
           marketing_opt_in?: boolean
           name?: string | null
@@ -222,6 +237,9 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string
+          favorite_pickup_point_address?: string | null
+          favorite_pickup_point_id?: string | null
+          favorite_pickup_point_name?: string | null
           id?: string
           marketing_opt_in?: boolean
           name?: string | null
@@ -346,7 +364,13 @@ export type Database = {
           customer_id: string | null
           delivered_at: string | null
           discount_cents: number
+          excise_cents: number
           fbc: string | null
+          fgo_invoice_created_at: string | null
+          fgo_invoice_link: string | null
+          fgo_invoice_number: string | null
+          fgo_invoice_series: string | null
+          fgo_invoice_status: string | null
           fbp: string | null
           guest_email: string | null
           id: string
@@ -360,6 +384,7 @@ export type Database = {
           pickup_point_address: string | null
           pickup_point_id: string | null
           pickup_point_name: string | null
+          sgr_cents: number
           shipped_at: string | null
           shipping_address: Json | null
           shipping_cents: number
@@ -382,7 +407,13 @@ export type Database = {
           customer_id?: string | null
           delivered_at?: string | null
           discount_cents?: number
+          excise_cents?: number
           fbc?: string | null
+          fgo_invoice_created_at?: string | null
+          fgo_invoice_link?: string | null
+          fgo_invoice_number?: string | null
+          fgo_invoice_series?: string | null
+          fgo_invoice_status?: string | null
           fbp?: string | null
           guest_email?: string | null
           id?: string
@@ -396,6 +427,7 @@ export type Database = {
           pickup_point_address?: string | null
           pickup_point_id?: string | null
           pickup_point_name?: string | null
+          sgr_cents?: number
           shipped_at?: string | null
           shipping_address?: Json | null
           shipping_cents?: number
@@ -418,7 +450,13 @@ export type Database = {
           customer_id?: string | null
           delivered_at?: string | null
           discount_cents?: number
+          excise_cents?: number
           fbc?: string | null
+          fgo_invoice_created_at?: string | null
+          fgo_invoice_link?: string | null
+          fgo_invoice_number?: string | null
+          fgo_invoice_series?: string | null
+          fgo_invoice_status?: string | null
           fbp?: string | null
           guest_email?: string | null
           id?: string
@@ -432,6 +470,7 @@ export type Database = {
           pickup_point_address?: string | null
           pickup_point_id?: string | null
           pickup_point_name?: string | null
+          sgr_cents?: number
           shipped_at?: string | null
           shipping_address?: Json | null
           shipping_cents?: number

@@ -288,17 +288,6 @@ export function ActionsPanel({
           </p>
         )}
 
-        {/* Integrări viitoare */}
-        <div className="border-t border-zinc-100 pt-4">
-          <div className="mb-2 text-[11px] font-medium uppercase tracking-[0.08em] text-zinc-500">
-            Integrări viitoare
-          </div>
-          <div className="flex flex-col gap-2">
-            <Button variant="outline" disabled title="Vine cu integrarea FGO">
-              Generează factură FGO
-            </Button>
-          </div>
-        </div>
 
         {/* Zonă de pericol */}
         {canDelete && (

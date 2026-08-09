@@ -9,6 +9,9 @@ import {
   calculateShippingRon,
   getShippingMethod,
 } from "@/lib/shipping";
+import { SGR_PER_BOTTLE_RON, countBottles } from "@/lib/sgr";
+import { calculateExciseCents } from "@/lib/excise";
+import { saveAccountFromOrder } from "@/lib/account/defaults";
 import type {
   Billing,
   PaymentMethod,
@@ -166,7 +169,20 @@ export async function createOrder(
     }
   }
 
-  const totalCents = Math.max(0, subtotalCents - discountCents + shippingCents);
+  // SGR — garanție returnare 0.5 lei/sticlă. NU intră în discount, NU are
+  // TVA. Se adaugă peste (subtotal - discount + shipping).
+  const bottleCount = countBottles(input.items);
+  const sgrCents = Math.round(bottleCount * SGR_PER_BOTTLE_RON * 100);
+
+  // Accize (11 lei/hL vin liniștit). INCLUSE în prețul afișat — nu se
+  // adaugă la total. Le calculăm pentru a le salva pe comandă și a le
+  // defalca pe factura fiscală.
+  const exciseCents = calculateExciseCents(bottleCount);
+
+  const totalCents = Math.max(
+    0,
+    subtotalCents - discountCents + shippingCents + sgrCents,
+  );
 
   // ── 4. Extract guest email from billing/shipping (or use logged-in)
   const currentUser = await getCurrentUser();
@@ -228,6 +244,8 @@ export async function createOrder(
       pickup_point_id: pickupPointId,
       pickup_point_name: pickupPointName,
       pickup_point_address: pickupPointAddress,
+      sgr_cents: sgrCents,
+      excise_cents: exciseCents,
     })
     .eq("id", orderId);
 
@@ -235,6 +253,21 @@ export async function createOrder(
     // Nu blocăm comanda pentru atribuire — pierdem doar calitatea
     // potrivirii în Meta, nu vânzarea.
     console.error("[createOrder] salvare atribuire esuata", orderId, attrErr);
+  }
+
+  // ── 5c. Salvez pe cont datele pentru pre-fill la comenzile viitoare ──
+  // Doar pentru user logat. Guest checkout → nu avem unde. Nu blocăm
+  // comanda dacă eșuează.
+  if (currentUser?.customerId) {
+    try {
+      await saveAccountFromOrder({
+        customerId: currentUser.customerId,
+        shipping: input.shipping,
+        billing: input.billing,
+      });
+    } catch (err) {
+      console.error("[createOrder] saveAccountFromOrder failed", err);
+    }
   }
 
   // ── 6. For card-online: create Stripe Checkout Session ──────────
@@ -272,6 +305,21 @@ export async function createOrder(
             product_data: {
               name: "Transport curier",
               metadata: { code: "SHIPPING" },
+            },
+          },
+        });
+      }
+
+      // SGR — garanție returnare, obligatoriu legal, linie separată.
+      if (sgrCents > 0) {
+        lineItems.push({
+          quantity: 1,
+          price_data: {
+            currency: "ron",
+            unit_amount: sgrCents,
+            product_data: {
+              name: `Garanție SGR (${bottleCount} sticle × 0.5 lei)`,
+              metadata: { code: `SGR-${bottleCount}` },
             },
           },
         });

@@ -1,12 +1,26 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useCheckoutStore,
   type ShippingCurier,
 } from "@/lib/checkout-store";
-import { SHIPPING_METHODS, type ShippingMethodId } from "@/lib/shipping";
+import { type ShippingMethodId } from "@/lib/shipping";
+import type { AccountDefaults } from "@/lib/account/defaults";
 import { PickupPointSelect } from "./pickup-point-select";
+
+/**
+ * StepShipping — pasul 1 „Livrare".
+ *
+ * Tabs mereu vizibile: „Livrare prin curier" | „Ridicare personală (FANbox)".
+ * Sub tab-ul curent, 3 stări:
+ *   - saved  → card cu date preluate din cont (dacă există) + „alege alta"
+ *   - picker → listă radio cu adrese/FANbox-uri salvate + „adaugă"
+ *   - form   → form gol (guest sau user care adaugă nou)
+ *
+ * Salvarea se face în checkoutStore, snapshot pentru order + auto-save
+ * pe cont la finalizare (vezi lib/account/defaults saveAccountFromOrder).
+ */
 
 const COUNTIES = [
   "Alba", "Arad", "Argeș", "Bacău", "Bihor", "Bistrița-Năsăud", "Botoșani",
@@ -18,86 +32,166 @@ const COUNTIES = [
   "Vrancea",
 ];
 
-type FcServiceId = ShippingCurier["serviceId"];
+type TabId = "curier" | "fanbox";
+type Mode = "saved" | "picker" | "form";
 
-/** Mapare de la id-ul metodei → tipul PUDO cerut de API-ul FC. */
-const PICKUP_TYPE_MAP: Record<FcServiceId, "fanbox" | null> = {
-  "fancourier-standard": null,
-  "fancourier-fanbox": "fanbox",
+const TAB_TO_SERVICE: Record<TabId, ShippingMethodId> = {
+  curier: "fancourier-standard",
+  fanbox: "fancourier-fanbox",
 };
 
-export function StepShipping() {
+type Props = {
+  defaults: AccountDefaults | null;
+};
+
+function splitName(full: string | null): { firstName: string; lastName: string } {
+  if (!full) return { firstName: "", lastName: "" };
+  const parts = full.trim().split(/\s+/);
+  if (parts.length === 1) return { firstName: parts[0], lastName: "" };
+  return { firstName: parts[0], lastName: parts.slice(1).join(" ") };
+}
+
+type FormState = Omit<ShippingCurier, "method" | "serviceId">;
+
+const EMPTY_FORM: FormState = {
+  firstName: "",
+  lastName: "",
+  phone: "",
+  email: "",
+  address: "",
+  city: "",
+  county: "",
+  zip: "",
+  note: "",
+};
+
+export function StepShipping({ defaults }: Props) {
   const saved = useCheckoutStore((s) => s.shipping);
   const saveShipping = useCheckoutStore((s) => s.saveShipping);
 
-  const [methodId, setMethodId] = useState<ShippingMethodId>(
-    saved?.method === "curier" ? saved.serviceId : "fancourier-standard",
+  const [tab, setTab] = useState<TabId>(
+    saved?.method === "curier" && saved.serviceId === "fancourier-fanbox"
+      ? "fanbox"
+      : "curier",
   );
+  const serviceId = TAB_TO_SERVICE[tab];
 
-  const fcServiceId = methodId as FcServiceId;
-  const pickupType = PICKUP_TYPE_MAP[fcServiceId];
+  const hasSavedForCurier = !!defaults && defaults.addresses.length > 0;
+  const hasSavedForFanbox = !!defaults && !!defaults.favoritePickupPoint;
+  const hasSavedForTab = tab === "curier" ? hasSavedForCurier : hasSavedForFanbox;
 
-  // Form curier (singurul rămas — livrare la ușă sau FANbox)
-  const [c, setC] = useState<Omit<ShippingCurier, "method" | "serviceId">>(() =>
-    saved?.method === "curier"
-      ? {
-          firstName: saved.firstName,
-          lastName: saved.lastName,
-          phone: saved.phone,
-          email: saved.email,
-          address: saved.address,
-          city: saved.city,
-          county: saved.county,
-          zip: saved.zip,
-          note: saved.note,
-          pickupPointId: saved.pickupPointId,
-          pickupPointName: saved.pickupPointName,
-          pickupPointAddress: saved.pickupPointAddress,
-        }
-      : {
-          firstName: "",
-          lastName: "",
-          phone: "",
-          email: "",
-          address: "",
-          city: "",
-          county: "",
-          zip: "",
-          note: "",
-        },
+  /* Semnal „am date pentru tab-ul curent" — fie din Zustand (user a
+     salvat manual), fie din cont (defaults). */
+  const zSavedMatchesTab =
+    saved !== null &&
+    saved.method === "curier" &&
+    (tab === "curier"
+      ? saved.serviceId === "fancourier-standard"
+      : saved.serviceId === "fancourier-fanbox");
+
+  // Mode per tab
+  const [mode, setMode] = useState<Mode>(
+    zSavedMatchesTab || hasSavedForTab ? "saved" : "form",
+  );
+  useEffect(() => {
+    setMode(zSavedMatchesTab || hasSavedForTab ? "saved" : "form");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  // Preselect din defaults
+  const initialForm: FormState = (() => {
+    if (saved?.method === "curier") {
+      return {
+        firstName: saved.firstName,
+        lastName: saved.lastName,
+        phone: saved.phone,
+        email: saved.email,
+        address: saved.address,
+        city: saved.city,
+        county: saved.county,
+        zip: saved.zip,
+        note: saved.note,
+        pickupPointId: saved.pickupPointId,
+        pickupPointName: saved.pickupPointName,
+        pickupPointAddress: saved.pickupPointAddress,
+      };
+    }
+    const { firstName, lastName } = splitName(defaults?.customerName ?? null);
+    return {
+      ...EMPTY_FORM,
+      firstName,
+      lastName,
+      phone: defaults?.customerPhone ?? "",
+      email: defaults?.customerEmail ?? "",
+    };
+  })();
+
+  const [form, setForm] = useState<FormState>(initialForm);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
+    defaults?.addresses.find((a) => a.isDefault)?.id ??
+      defaults?.addresses[0]?.id ??
+      null,
   );
 
   const [error, setError] = useState<string | null>(null);
 
-  // Re-sync când vine saved din altă rută
+  // Efectiv: adresa curentă din saved-view (curier) sau pickup favorit (fanbox)
+  const savedAddress =
+    tab === "curier"
+      ? defaults?.addresses.find((a) => a.id === selectedAddressId) ??
+        defaults?.addresses.find((a) => a.isDefault) ??
+        defaults?.addresses[0] ??
+        null
+      : null;
+  const savedPickup = tab === "fanbox" ? defaults?.favoritePickupPoint ?? null : null;
+
+  // Persist când mode==='saved' — automat cu adresa selectată
   useEffect(() => {
-    if (!saved || saved.method !== "curier") return;
-    setMethodId(saved.serviceId);
-    setC({
-      firstName: saved.firstName,
-      lastName: saved.lastName,
-      phone: saved.phone,
-      email: saved.email,
-      address: saved.address,
-      city: saved.city,
-      county: saved.county,
-      zip: saved.zip,
-      note: saved.note,
-      pickupPointId: saved.pickupPointId,
-      pickupPointName: saved.pickupPointName,
-      pickupPointAddress: saved.pickupPointAddress,
-    });
-  }, [saved]);
+    if (mode !== "saved") return;
+    if (tab === "curier" && savedAddress && defaults) {
+      const { firstName, lastName } = splitName(defaults.customerName);
+      const s: ShippingCurier = {
+        method: "curier",
+        serviceId,
+        firstName,
+        lastName,
+        phone: defaults.customerPhone ?? "",
+        email: defaults.customerEmail,
+        address: savedAddress.line1,
+        city: savedAddress.city,
+        county: savedAddress.county,
+        zip: savedAddress.zip ?? "",
+        note: form.note,
+      };
+      saveShipping(s);
+      setForm({ ...form, ...s });
+    } else if (tab === "fanbox" && savedPickup && defaults) {
+      const { firstName, lastName } = splitName(defaults.customerName);
+      const s: ShippingCurier = {
+        method: "curier",
+        serviceId,
+        firstName,
+        lastName,
+        phone: defaults.customerPhone ?? "",
+        email: defaults.customerEmail,
+        address: "",
+        city: "",
+        county: "",
+        zip: "",
+        note: form.note,
+        pickupPointId: savedPickup.id,
+        pickupPointName: savedPickup.name,
+        pickupPointAddress: savedPickup.address,
+      };
+      saveShipping(s);
+      setForm({ ...form, ...s });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, tab, selectedAddressId]);
 
-  const selectedMethod = useMemo(
-    () => SHIPPING_METHODS.find((m) => m.id === methodId),
-    [methodId],
-  );
-
-  function handleSave() {
+  function handleSaveForm() {
     setError(null);
-    // Curier
-    const commonRequired: Array<keyof typeof c> = [
+    const commonReq: Array<keyof FormState> = [
       "firstName",
       "lastName",
       "phone",
@@ -105,203 +199,394 @@ export function StepShipping() {
       "city",
       "county",
     ];
-    const missing = commonRequired.find((k) => !String(c[k] ?? "").trim());
-    if (missing) {
-      setError("Completează câmpurile marcate.");
-      return;
+    for (const k of commonReq) {
+      if (!String(form[k] ?? "").trim()) {
+        setError("Completează câmpurile marcate.");
+        return;
+      }
     }
-    if (!/^\S+@\S+\.\S+$/.test(c.email)) {
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) {
       setError("Email invalid.");
       return;
     }
-    // Adresa e obligatorie doar la Standard (livrare la ușă).
-    if (fcServiceId === "fancourier-standard" && !c.address.trim()) {
+    if (tab === "curier" && !form.address.trim()) {
       setError("Adresa e obligatorie pentru livrare la ușă.");
       return;
     }
-    // Punct fix obligatoriu la FANbox/PayPoint/Office
-    if (selectedMethod?.requiresPickupPoint && !c.pickupPointId) {
-      setError("Alege un punct de ridicare.");
+    if (tab === "fanbox" && !form.pickupPointId) {
+      setError("Alege un locker FANbox.");
       return;
     }
     saveShipping({
       method: "curier",
-      serviceId: fcServiceId,
-      ...c,
+      serviceId,
+      ...form,
     });
+    /* După orice save reușit, treci la vederea colapsată — chiar dacă
+       nu avem încă un profil pe cont, avem date în Zustand → afișăm card. */
+    setMode("saved");
   }
 
-  const isSaved = saved !== null;
+  const isSaved = saved !== null && saved.method === "curier";
 
   return (
-    <section className={`step-card ${isSaved ? "is-saved" : ""}`} id="step-1">
-      <header className="step-head">
-        <div className="step-head-title">
-          <span className="checkout-step-num" aria-hidden="true">1</span>
-          <h2 className="h3">Cum primești sticlele.</h2>
-        </div>
-        <span className="step-status">{isSaved ? "salvat" : "incomplet"}</span>
+    <section className="co-step" aria-labelledby="co-step-1">
+      <header className="co-step-head">
+        <div className="co-badge">01</div>
+        <h2 className="co-step-title" id="co-step-1">Livrare</h2>
+        {isSaved && mode === "saved" && (
+          <span className="co-status">salvat</span>
+        )}
       </header>
 
-      {/* Radio grid cu metodele FanCourier active */}
-      <div className="ship-methods" role="radiogroup" aria-label="Mod livrare">
-        {SHIPPING_METHODS.map((m) => (
-          <label
-            key={m.id}
-            className={`ship-method-card ${methodId === m.id ? "is-active" : ""}`}
-          >
-            <input
-              type="radio"
-              name="ship-method"
-              value={m.id}
-              checked={methodId === m.id}
-              onChange={() => setMethodId(m.id)}
-            />
-            <div className="ship-method-body">
-              <div className="ship-method-head">
-                <span className="ship-method-name">{m.name}</span>
-                <span className="ship-method-duration">{m.duration}</span>
-              </div>
-              <p className="ship-method-desc">{m.description}</p>
-            </div>
-          </label>
-        ))}
+      <div className="co-tabs" role="tablist" aria-label="Metodă livrare">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "curier"}
+          className={`co-tab ${tab === "curier" ? "is-active" : ""}`}
+          onClick={() => setTab("curier")}
+        >
+          Livrare prin curier
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "fanbox"}
+          className={`co-tab ${tab === "fanbox" ? "is-active" : ""}`}
+          onClick={() => setTab("fanbox")}
+        >
+          Ridicare personală (FANbox)
+        </button>
       </div>
 
-      <form noValidate onSubmit={(e) => e.preventDefault()}>
-          <div className="grid-2">
-            <div className="field">
-              <label htmlFor="ship-first">Prenume <span className="req">*</span></label>
-              <input
-                className="input" id="ship-first" autoComplete="given-name"
-                value={c.firstName}
-                onChange={(e) => setC({ ...c, firstName: e.target.value })}
-              />
+      {/* SAVED VIEW curier — construit din form (Zustand cel mai recent) */}
+      {mode === "saved" && tab === "curier" && (form.address || savedAddress) && (
+        <div className="co-saved">
+          <span className="co-saved-icon" aria-hidden="true">📍</span>
+          <div className="co-saved-main">
+            <div className="co-saved-name">
+              {`${form.firstName} ${form.lastName}`.trim() || "Adresă salvată"}
             </div>
-            <div className="field">
-              <label htmlFor="ship-last">Nume <span className="req">*</span></label>
-              <input
-                className="input" id="ship-last" autoComplete="family-name"
-                value={c.lastName}
-                onChange={(e) => setC({ ...c, lastName: e.target.value })}
-              />
+            <div className="co-saved-line">{form.phone || "—"}</div>
+            <div className="co-saved-line">{form.address}</div>
+            <div className="co-saved-line muted">
+              {form.city}
+              {form.county ? `, ${form.county}` : ""}
+              {form.zip ? ` · ${form.zip}` : ""}
             </div>
           </div>
-          <div className="grid-2">
-            <div className="field">
-              <label htmlFor="ship-phone">Telefon <span className="req">*</span></label>
-              <input
-                className="input" id="ship-phone" type="tel" autoComplete="tel"
-                placeholder="07xx xxx xxx"
-                value={c.phone}
-                onChange={(e) => setC({ ...c, phone: e.target.value })}
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="ship-email">Email <span className="req">*</span></label>
-              <input
-                className="input" id="ship-email" type="email" autoComplete="email"
-                placeholder="nume@exemplu.ro"
-                value={c.email}
-                onChange={(e) => setC({ ...c, email: e.target.value })}
-              />
-            </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <button
+              type="button"
+              className="co-chip"
+              onClick={() => setMode("form")}
+            >
+              Modifică
+            </button>
+            {hasSavedForCurier && (
+              <button
+                type="button"
+                className="co-chip ghost"
+                onClick={() => setMode("picker")}
+              >
+                Alege altă adresă
+              </button>
+            )}
           </div>
+        </div>
+      )}
 
-          <div className="grid-2">
-            <div className="field">
-              <label htmlFor="ship-county">Județ <span className="req">*</span></label>
+      {mode === "saved" && tab === "fanbox" && (form.pickupPointId || savedPickup) && (
+        <div className="co-saved">
+          <span className="co-saved-icon" aria-hidden="true">❤</span>
+          <div className="co-saved-main">
+            <div className="co-saved-name">
+              {form.pickupPointName || savedPickup?.name || "Punct FANbox"}
+            </div>
+            <div className="co-saved-line">
+              {form.pickupPointAddress || savedPickup?.address || ""}
+            </div>
+            <div className="co-saved-line muted">
+              {`${form.firstName} ${form.lastName}`.trim()}
+              {form.phone ? ` · ${form.phone}` : ""}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="co-chip"
+            onClick={() => setMode("form")}
+          >
+            Alege alt punct
+          </button>
+        </div>
+      )}
+
+      {/* PICKER (curier) */}
+      {mode === "picker" && tab === "curier" && defaults && (
+        <div className="co-picker">
+          {defaults.addresses.map((a) => {
+            const isSel = a.id === selectedAddressId;
+            return (
+              <button
+                type="button"
+                key={a.id}
+                className="co-picker-item"
+                onClick={() => setSelectedAddressId(a.id)}
+              >
+                <input
+                  type="radio"
+                  name="co-addr-pick"
+                  checked={isSel}
+                  readOnly
+                
+              suppressHydrationWarning
+            />
+                <div>
+                  <div className="co-picker-name">
+                    {defaults.customerName ?? "Adresă"}
+                    {a.isDefault ? " — preferată" : ""}
+                  </div>
+                  <div className="co-picker-line">
+                    {a.line1}, {a.city}, {a.county}
+                    {a.zip ? ` · ${a.zip}` : ""}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            className="co-picker-add"
+            onClick={() => {
+              setForm({
+                ...form,
+                address: "",
+                city: "",
+                county: "",
+                zip: "",
+              });
+              setMode("form");
+            }}
+          >
+            <span className="plus">+</span> adaugă adresă nouă
+          </button>
+          <div className="co-picker-footer">
+            <button
+              type="button"
+              className="co-chip ghost"
+              onClick={() => setMode("saved")}
+            >
+              Anulează
+            </button>
+            <button
+              type="button"
+              className="co-chip"
+              onClick={() => setMode("saved")}
+            >
+              Folosește adresa
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* FORM */}
+      {mode === "form" && (
+        <div>
+          <form
+            className={tab === "fanbox" ? "co-form" : "co-form"}
+            onSubmit={(e) => e.preventDefault()}
+            noValidate
+          >
+            <div className="co-field">
+              <label htmlFor="co-first">
+                Prenume<span className="req">*</span>
+              </label>
+              <input
+                id="co-first"
+                type="text"
+                autoComplete="given-name"
+                value={form.firstName}
+                onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                placeholder="Mihai"
+              />
+            </div>
+            <div className="co-field">
+              <label htmlFor="co-last">
+                Nume<span className="req">*</span>
+              </label>
+              <input
+                id="co-last"
+                type="text"
+                autoComplete="family-name"
+                value={form.lastName}
+                onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                placeholder="Roscăneanu"
+              />
+            </div>
+            <div className="co-field">
+              <label htmlFor="co-phone">
+                Telefon<span className="req">*</span>
+              </label>
+              <input
+                id="co-phone"
+                type="tel"
+                autoComplete="tel"
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                placeholder="07xx xxx xxx"
+              />
+            </div>
+            <div className="co-field">
+              <label htmlFor="co-email">
+                Email<span className="req">*</span>
+              </label>
+              <input
+                id="co-email"
+                type="email"
+                autoComplete="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                placeholder="tu@exemplu.ro"
+              />
+            </div>
+            <div className="co-field">
+              <label htmlFor="co-county">
+                Județ<span className="req">*</span>
+              </label>
               <select
-                className="select" id="ship-county" autoComplete="address-level1"
-                value={c.county}
-                onChange={(e) => setC({ ...c, county: e.target.value, pickupPointId: undefined, pickupPointName: undefined, pickupPointAddress: undefined })}
+                id="co-county"
+                autoComplete="address-level1"
+                value={form.county}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    county: e.target.value,
+                    pickupPointId: undefined,
+                    pickupPointName: undefined,
+                    pickupPointAddress: undefined,
+                  })
+                }
               >
                 <option value="">Alege județul</option>
-                {COUNTIES.map((co) => (
-                  <option key={co} value={co}>{co}</option>
+                {COUNTIES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
                 ))}
               </select>
             </div>
-            <div className="field">
-              <label htmlFor="ship-city">Localitate <span className="req">*</span></label>
+            <div className="co-field">
+              <label htmlFor="co-city">
+                Localitate<span className="req">*</span>
+              </label>
               <input
-                className="input" id="ship-city" autoComplete="address-level2"
-                value={c.city}
-                onChange={(e) => setC({ ...c, city: e.target.value, pickupPointId: undefined, pickupPointName: undefined, pickupPointAddress: undefined })}
+                id="co-city"
+                type="text"
+                autoComplete="address-level2"
+                value={form.city}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    city: e.target.value,
+                    pickupPointId: undefined,
+                    pickupPointName: undefined,
+                    pickupPointAddress: undefined,
+                  })
+                }
+                placeholder="București"
               />
             </div>
-          </div>
 
-          {fcServiceId === "fancourier-standard" ? (
-            <>
-              <div className="field">
-                <label htmlFor="ship-address">
-                  Adresă (stradă, număr, bloc, scară, ap.) <span className="req">*</span>
-                </label>
-                <input
-                  className="input" id="ship-address" autoComplete="street-address"
-                  value={c.address}
-                  onChange={(e) => setC({ ...c, address: e.target.value })}
-                />
-              </div>
-              <div className="grid-2">
-                <div className="field">
-                  <label htmlFor="ship-zip">Cod poștal</label>
+            {tab === "curier" ? (
+              <>
+                <div className="co-field span-2">
+                  <label htmlFor="co-address">
+                    Adresă<span className="req">*</span>
+                  </label>
                   <input
-                    className="input" id="ship-zip" autoComplete="postal-code"
-                    value={c.zip}
-                    onChange={(e) => setC({ ...c, zip: e.target.value })}
+                    id="co-address"
+                    type="text"
+                    autoComplete="street-address"
+                    value={form.address}
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
+                    placeholder="Stradă, număr, bloc, apartament"
                   />
                 </div>
+                <div className="co-field">
+                  <label htmlFor="co-zip">
+                    Cod poștal <span className="opt">(opțional)</span>
+                  </label>
+                  <input
+                    id="co-zip"
+                    type="text"
+                    autoComplete="postal-code"
+                    value={form.zip}
+                    onChange={(e) => setForm({ ...form, zip: e.target.value })}
+                    placeholder="020956"
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="co-field span-2">
+                <PickupPointSelect
+                  type="fanbox"
+                  county={form.county}
+                  locality={form.city}
+                  value={
+                    form.pickupPointId
+                      ? {
+                          id: form.pickupPointId,
+                          name: form.pickupPointName ?? "",
+                          address: form.pickupPointAddress ?? "",
+                        }
+                      : null
+                  }
+                  onChange={(p) =>
+                    setForm({
+                      ...form,
+                      pickupPointId: p?.id,
+                      pickupPointName: p?.name,
+                      pickupPointAddress: p?.address,
+                    })
+                  }
+                />
               </div>
-            </>
-          ) : pickupType ? (
-            <PickupPointSelect
-              type={pickupType}
-              county={c.county}
-              locality={c.city}
-              value={
-                c.pickupPointId
-                  ? {
-                      id: c.pickupPointId,
-                      name: c.pickupPointName ?? "",
-                      address: c.pickupPointAddress ?? "",
-                    }
-                  : null
-              }
-              onChange={(p) =>
-                setC({
-                  ...c,
-                  pickupPointId: p?.id,
-                  pickupPointName: p?.name,
-                  pickupPointAddress: p?.address,
-                })
-              }
-            />
-          ) : null}
+            )}
 
-          <div className="field">
-            <label htmlFor="ship-note">Observații pentru curier (opțional)</label>
-            <textarea
-              className="textarea" id="ship-note"
-              placeholder="Ex: vă rog sunați înainte de a urca; după ora 17:00."
-              value={c.note}
-              onChange={(e) => setC({ ...c, note: e.target.value })}
-            />
-          </div>
-        </form>
+            <div className="co-field span-2">
+              <label htmlFor="co-note">
+                Observații <span className="opt">(opțional)</span>
+              </label>
+              <textarea
+                id="co-note"
+                value={form.note}
+                onChange={(e) => setForm({ ...form, note: e.target.value })}
+                placeholder="Interfon, program, alte detalii utile curierului"
+              />
+            </div>
 
-      {error && <p className="step-error">{error}</p>}
+            {error && <p className="co-error">{error}</p>}
 
-      <div className="step-actions">
-        <span className="save-note">Datele rămân pe acest dispozitiv. Nu trimitem nimic încă.</span>
-        <button type="button" className="btn btn-solid" onClick={handleSave}>
-          {isSaved ? "Actualizează" : "Salvează și continuă"}
-          <svg className="arrow" viewBox="0 0 24 12" aria-hidden="true">
-            <use href="#arrow-right" />
-          </svg>
-        </button>
-      </div>
+            <div className="co-form-actions">
+              {(hasSavedForTab || isSaved) && (
+                <button
+                  type="button"
+                  className="co-chip ghost"
+                  onClick={() => setMode(hasSavedForTab ? "saved" : "form")}
+                >
+                  Anulează
+                </button>
+              )}
+              <button
+                type="button"
+                className="co-chip"
+                onClick={handleSaveForm}
+              >
+                Salvează adresa
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </section>
   );
 }

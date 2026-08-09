@@ -140,6 +140,11 @@ export type OrderDetail = {
   awbNumber: string | null;
   awbCreatedAt: string | null;
   smartbillInvoiceId: string | null;
+  fgoInvoiceNumber: string | null;
+  fgoInvoiceSeries: string | null;
+  fgoInvoiceLink: string | null;
+  fgoInvoiceCreatedAt: string | null;
+  fgoInvoiceStatus: string | null;
 
   courierService: string | null;
   pickupPointId: string | null;
@@ -242,6 +247,11 @@ export async function getOrderDetail(
     awbNumber: order.awb_number ?? null,
     awbCreatedAt: order.awb_created_at ?? null,
     smartbillInvoiceId: order.smartbill_invoice_id ?? null,
+    fgoInvoiceNumber: order.fgo_invoice_number ?? null,
+    fgoInvoiceSeries: order.fgo_invoice_series ?? null,
+    fgoInvoiceLink: order.fgo_invoice_link ?? null,
+    fgoInvoiceCreatedAt: order.fgo_invoice_created_at ?? null,
+    fgoInvoiceStatus: order.fgo_invoice_status ?? null,
     courierService: order.courier_service ?? null,
     pickupPointId: order.pickup_point_id ?? null,
     pickupPointName: order.pickup_point_name ?? null,
