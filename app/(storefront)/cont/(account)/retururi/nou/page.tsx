@@ -65,7 +65,7 @@ export default async function NewReturnPage({
       >
         Termenul legal de retragere e 14 zile calendaristice de la primirea
         coletului (OUG 34/2014, art. 9). Pentru sticle nedeschise costul de
-        retur îl suporți tu, în rest îl preluăm noi prin AWB Sameday.
+        retur îl suporți tu, în rest îl preluăm noi prin AWB FanCourier.
       </p>
     </>
   );

@@ -188,7 +188,7 @@ export default async function CheckoutSuccessPage({
   const shippingLabel = isPickup
     ? "ridicare personală"
     : isFanbox
-      ? "livrare la easybox"
+      ? "livrare la locker FANbox"
       : "livrare prin curier";
 
   const gtmItems: GtmItem[] =

@@ -5,7 +5,7 @@ import { Footer } from "@/components/landing/footer";
 export const metadata: Metadata = {
   title: "Cum cumperi · Domeniul Locus",
   description:
-    "Pași simpli pentru a comanda vin de la Domeniul Locus. Plată online sau la livrare, factură electronică, livrare prin Sameday. Răspundem la întrebările tale.",
+    "Pași simpli pentru a comanda vin de la Domeniul Locus. Plată online sau la livrare, factură electronică, livrare prin FanCourier. Răspundem la întrebările tale.",
 };
 
 const STEPS = [
@@ -22,7 +22,7 @@ const STEPS = [
   {
     n: "03",
     title: "Completează datele.",
-    body: "La checkout intri trei detalii: cum vrei să primești sticlele (curier sau ridicare), pe ce nume emitem factura (persoană fizică sau juridică) și cum plătești.",
+    body: "La checkout intri trei detalii: cum vrei să primești sticlele (curier la ușă sau locker FANbox), pe ce nume emitem factura (persoană fizică sau juridică) și cum plătești.",
   },
   {
     n: "04",
@@ -32,7 +32,7 @@ const STEPS = [
   {
     n: "05",
     title: "Primești vinul.",
-    body: "1–3 zile lucrătoare prin Sameday, sau gratuit la sediul Buciumeni dacă alegi ridicarea personală. Email cu tracking + factură electronică pe drum.",
+    body: "1–3 zile lucrătoare prin FanCourier, la ușă sau într-un locker FANbox. Transport gratuit peste 250 lei. Email cu tracking + factură electronică pe drum.",
   },
 ];
 
@@ -43,7 +43,7 @@ const FAQ = [
   },
   {
     q: "Cum schimb cantitatea după ce am plătit?",
-    a: "Anulăm comanda inițială, refundăm și plasezi una nouă. E mai sigur decât să modificăm AWB-ul — Sameday nu garantează schimbările pe ruta deja începută.",
+    a: "Anulăm comanda inițială, refundăm și plasezi una nouă. E mai sigur decât să modificăm AWB-ul — FanCourier nu garantează schimbările pe ruta deja începută.",
   },
   {
     q: "Trebuie cont ca să comand?",
@@ -55,7 +55,7 @@ const FAQ = [
   },
   {
     q: "Plătesc cu cardul la livrare?",
-    a: "Da. Curierul Sameday are POS mobil, accepți cardul (Visa, Mastercard) sau cash. Numerar maxim 5.000 lei conform legii.",
+    a: "Da. Curierul FanCourier are POS mobil, accepți cardul (Visa, Mastercard) sau cash. Numerar maxim 5.000 lei conform legii.",
   },
   {
     q: "Pot cumpăra cu factură pentru firmă?",

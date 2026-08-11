@@ -9,7 +9,7 @@ import { LivrareFAQ } from "@/components/livrare/livrare-faq";
 export const metadata: Metadata = {
   title: "Livrare · Domeniul Locus",
   description:
-    "Livrare prin Sameday în toată România · curier la ușă sau Easybox · gratuit peste 250 lei. Ridicare personală gratuită la sediul Buciumeni.",
+    "Livrare prin FanCourier în toată România · curier la ușă sau locker FANbox · gratuit peste 250 lei.",
 };
 
 export default function LivrarePage() {
@@ -21,10 +21,10 @@ export default function LivrarePage() {
             <div className="eyebrow">Livrare · Domeniul Locus</div>
             <h1 className="livrare-hero-title">Vinul, până la ușa ta.</h1>
             <p className="livrare-hero-lead">
-              Toate comenzile pleacă din Buciumeni prin <strong>Sameday</strong>,
-              partenerul nostru de curierat. Costuri fixe, durate predictibile,
-              ramburs disponibil. Sau vii tu la cramă — pe noi ne găsești între
-              Panciu și Nicorești.
+              Toate comenzile pleacă din Buciumeni prin{" "}
+              <strong>FanCourier</strong>, partenerul nostru de curierat. Costuri
+              fixe, durate predictibile. Alegi între livrare la ușă și un locker
+              FANbox, disponibil non-stop.
             </p>
           </div>
         </header>

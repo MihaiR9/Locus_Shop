@@ -76,7 +76,7 @@ export default function PrivacyPage() {
 
       <h2>4. Cui transmitem datele</h2>
       <ul>
-        <li><strong>Curier</strong> (Sameday) — pentru livrare</li>
+        <li><strong>Curier</strong> (FanCourier) — pentru livrare</li>
         <li><strong>Procesator plăți</strong> (Stripe) — pentru încasare</li>
         <li><strong>Furnizor facturare</strong> (Smartbill) — pentru factură + e-Factura ANAF</li>
         <li><strong>Furnizor email</strong> (Resend) — pentru notificări tranzacționale</li>

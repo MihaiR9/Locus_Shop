@@ -6,7 +6,7 @@ import { breadcrumbSchema, itemListSchema } from "@/lib/seo/schema";
 import { getAllWines } from "@/lib/wines-queries";
 
 const DESCRIPTION =
-  "Cumpără vinurile Domeniului Locus — gamele cuvinte, semne și pauze. Livrare în România prin curier sau ridicare personală la cramă.";
+  "Cumpără vinurile Domeniului Locus — gamele cuvinte, semne și pauze. Livrare în toată România prin curier, gratuit peste 250 lei.";
 
 export const metadata: Metadata = {
   title: "Shop · Domeniul Locus",

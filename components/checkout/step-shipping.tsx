@@ -12,7 +12,11 @@ import { PickupPointSelect } from "./pickup-point-select";
 /**
  * StepShipping — pasul 1 „Livrare".
  *
- * Tabs mereu vizibile: „Livrare prin curier" | „Ridicare personală (FANbox)".
+ * Tabs mereu vizibile: „Livrare prin curier" | „Locker FANbox".
+ *
+ * Nu oferim ridicare de la cramă. Eticheta veche spunea „Ridicare
+ * personală (FANbox)", ceea ce suna a ridicare de la sediu — dar FANbox e
+ * un locker FanCourier, deci tot livrare e, doar că într-un alt punct.
  * Sub tab-ul curent, 3 stări:
  *   - saved  → card cu date preluate din cont (dacă există) + „alege alta"
  *   - picker → listă radio cu adrese/FANbox-uri salvate + „adaugă"
@@ -256,7 +260,7 @@ export function StepShipping({ defaults }: Props) {
           className={`co-tab ${tab === "fanbox" ? "is-active" : ""}`}
           onClick={() => setTab("fanbox")}
         >
-          Ridicare personală (FANbox)
+          Locker FANbox
         </button>
       </div>
 

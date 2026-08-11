@@ -5,7 +5,7 @@ const FAQ = [
   },
   {
     q: "Pot urmări coletul?",
-    a: "Da. Imediat ce Sameday generează AWB-ul, primești email și SMS cu link de tracking direct de la Sameday.",
+    a: "Da. Imediat ce FanCourier generează AWB-ul, primești email și SMS cu link de tracking direct de la FanCourier.",
   },
   {
     q: "Ce se întâmplă dacă nu sunt acasă când vine curierul?",
