@@ -7,8 +7,13 @@ import { ProductBottle } from "@/components/landing/product-bottle";
 import { useCartStore } from "@/lib/cart-store";
 import { useCheckoutStore } from "@/lib/checkout-store";
 import { formatRon, type Wine } from "@/lib/wines";
-import { FREE_SHIPPING_THRESHOLD_RON } from "@/lib/shipping";
+import {
+  FREE_SHIPPING_THRESHOLD_RON,
+  getReferencePrice,
+  getShippingMethods,
+} from "@/lib/shipping";
 import { SGR_PER_BOTTLE_RON, calculateSgrRon, countBottles } from "@/lib/sgr";
+import { calculateSetDiscountCents, SET_DISCOUNT_PCT } from "@/lib/sets";
 import { applyVoucherAction } from "./actions";
 
 type Props = {
@@ -39,13 +44,29 @@ export function CartPage({ catalog }: Props) {
   const totalBottles = countBottles(lines);
   const sgrRon = calculateSgrRon(totalBottles);
 
-  const discountRon = useMemo(() => {
+  // Reducerea de set, calculată cu aceeași funcție ca pe server —
+  // coșul, checkout-ul și suma încasată de Stripe trebuie să spună toate
+  // același lucru.
+  const setDiscount = useMemo(() => {
+    const priceByCode = new Map(
+      lines.map((l) => [l.code, Math.round(l.priceRon * 100)]),
+    );
+    const res = calculateSetDiscountCents(
+      lines.map((l) => ({ code: l.code, qty: l.qty })),
+      priceByCode,
+    );
+    return { ron: res.discountCents / 100, matches: res.matches };
+  }, [lines]);
+
+  const voucherRon = useMemo(() => {
     if (!voucher) return 0;
     if (voucher.percentOff) {
       return Math.round(subtotal * voucher.percentOff) / 100;
     }
     return Math.min(voucher.fixedOffRon ?? 0, subtotal);
   }, [voucher, subtotal]);
+
+  const discountRon = Math.min(setDiscount.ron + voucherRon, subtotal);
 
   const remainingForFreeShipping = Math.max(
     0,
@@ -56,7 +77,27 @@ export function CartPage({ catalog }: Props) {
     ? 100
     : Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD_RON) * 100);
 
-  const total = Math.max(0, subtotal - discountRon) + sgrRon;
+  /**
+   * Transportul nu e încă decis în coș — metoda și județul se aleg la
+   * pasul următor. Afișăm totuși o valoare, pentru că un coș care ascunde
+   * costul livrării până la ultimul pas e exact felul în care se pierd
+   * comenzile.
+   *
+   * „De la" înseamnă cea mai IEFTINĂ opțiune, nu cea mai scumpă. Prima
+   * versiune arăta tariful de curier la ușă (32 lei), deci speria omul cu
+   * maximul deși putea plăti 18 cu FANbox.
+   */
+  const shippingOptions = useMemo(
+    () =>
+      getShippingMethods()
+        .map((m) => ({ name: m.name, priceRon: getReferencePrice(m.id) }))
+        .sort((a, b) => a.priceRon - b.priceRon),
+    [],
+  );
+  const shippingEstimateRon = shippingOptions[0]?.priceRon ?? 0;
+  const shippingRon = shippingIsFree ? 0 : shippingEstimateRon;
+
+  const total = Math.max(0, subtotal - discountRon) + sgrRon + shippingRon;
 
   // Sugerăm vinuri NU sunt în coș, ordonate după preț (max 3 recomandări).
   const suggestions = useMemo(() => {
@@ -127,6 +168,29 @@ export function CartPage({ catalog }: Props) {
                 {totalBottles} {totalBottles === 1 ? "sticlă" : "sticle"}
               </span>
             </header>
+
+            {/* Setul nu e un produs separat — e o stare a coșului. Când
+                toate cele trei vinuri ale unei game sunt prezente, o
+                spunem explicit, ca reducerea din sumar să aibă un motiv
+                vizibil. */}
+            {setDiscount.matches.map((m) => (
+              <div className="cart-set-flag" key={m.def.key}>
+                <span className="cart-set-mark" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <use href="#star8" />
+                  </svg>
+                </span>
+                <span className="cart-set-text">
+                  <strong>
+                    {m.def.label}
+                    {m.count > 1 ? ` ×${m.count}` : ""}
+                  </strong>
+                  <span>
+                    {m.def.note} · {SET_DISCOUNT_PCT}% aplicat automat
+                  </span>
+                </span>
+              </div>
+            ))}
             <ul className="cart-page-list">
               {lines.map((line) => (
                 <li key={line.code} className="cart-page-item">
@@ -308,10 +372,19 @@ export function CartPage({ catalog }: Props) {
                 <dt>Subtotal</dt>
                 <dd>{formatRon(subtotal)}</dd>
               </div>
-              {discountRon > 0 && (
+              {setDiscount.matches.map((m) => (
+                <div key={m.def.key}>
+                  <dt>
+                    {m.def.label}
+                    {m.count > 1 ? ` ×${m.count}` : ""} · −{SET_DISCOUNT_PCT}%
+                  </dt>
+                  <dd>−{formatRon(m.discountCents / 100)}</dd>
+                </div>
+              ))}
+              {voucherRon > 0 && (
                 <div>
                   <dt>Reducere{voucher ? ` (${voucher.code})` : ""}</dt>
-                  <dd>−{formatRon(discountRon)}</dd>
+                  <dd>−{formatRon(voucherRon)}</dd>
                 </div>
               )}
               <div>
@@ -323,12 +396,21 @@ export function CartPage({ catalog }: Props) {
                 </dt>
                 <dd>+{formatRon(sgrRon)}</dd>
               </div>
+              <div>
+                <dt>Transport</dt>
+                <dd>
+                  {shippingIsFree ? "gratuit" : `de la ${formatRon(shippingEstimateRon)}`}
+                </dd>
+              </div>
               <div className="cart-page-totals-note">
-                Transportul se calculează la pasul următor, în funcție de
-                metoda aleasă.
+                {shippingIsFree
+                  ? "Transport gratuit — indiferent de metoda aleasă la pasul următor."
+                  : `${shippingOptions
+                      .map((o) => `${o.name.replace(/\s*\(.*\)/, "")} ${o.priceRon} lei`)
+                      .join(" · ")}. Alegi metoda la pasul următor.`}
               </div>
               <div className="cart-page-totals-grand">
-                <dt>Subtotal + SGR</dt>
+                <dt>{shippingIsFree ? "Total" : "Total estimat"}</dt>
                 <dd>{formatRon(total)}</dd>
               </div>
             </dl>
