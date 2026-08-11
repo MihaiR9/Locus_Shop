@@ -4,6 +4,9 @@ import { Reveal } from "@/components/reveal";
 import { AddSetButton } from "@/components/landing/add-set-button";
 import { getWinesByGama } from "@/lib/wines-queries";
 import { productPhoto, type Gama, type Wine } from "@/lib/wines";
+// Procentul vine din singura sursă — aceeași folosită de server la
+// calculul reducerii. Dacă se schimbă, se schimbă în ambele locuri odată.
+import { SET_DISCOUNT_PCT } from "@/lib/sets";
 
 /**
  * Secțiunea de vânzare de pe home: două seturi, câte unul de gamă.
@@ -13,25 +16,20 @@ import { productPhoto, type Gama, type Wine } from "@/lib/wines";
  * să aleagă sticlă cu sticlă merge în shop.
  */
 
-const SET_DISCOUNT_PCT = 15;
-
 const SETS: {
   gama: Extract<Gama, "cuvinte" | "semne">;
-  coupon: string;
   eyebrow: string;
   title: string;
   body: string;
 }[] = [
   {
     gama: "cuvinte",
-    coupon: "SETCUVINTE",
     eyebrow: "trei sticle · cuvinte",
     title: "Setul Cuvinte",
     body: "Cele trei vinuri ale gamei, într-un singur colet. Pentru mese lungi și cadouri care nu au nevoie de explicații.",
   },
   {
     gama: "semne",
-    coupon: "SETSEMNE",
     eyebrow: "trei sticle · semne",
     title: "Setul Semne",
     body: "Aceleași trei soiuri, altă mână la sticlă. Pentru mese obișnuite care merită totuși un vin cu origine.",
@@ -93,7 +91,7 @@ async function SetCard({ config }: { config: (typeof SETS)[number] }) {
           <span className="set-badge">−{SET_DISCOUNT_PCT}%</span>
         </div>
 
-        <AddSetButton wines={wines} couponCode={config.coupon} />
+        <AddSetButton wines={wines} />
         <Link href={`/${config.gama}`} className="set-link">
           Vezi sticlele separat
         </Link>

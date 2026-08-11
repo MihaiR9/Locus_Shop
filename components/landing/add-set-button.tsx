@@ -8,22 +8,20 @@ import type { Wine } from "@/lib/wines";
 /**
  * Adaugă în coș toate sticlele unui set, dintr-un singur click.
  *
- * Reducerea nu e „magică": setul e pur și simplu cele trei vinuri ale
- * gamei, iar discountul se aplică prin cupon la checkout. De asta butonul
- * duce direct la checkout cu codul prefiltrat — altfel prețul afișat pe
- * card n-ar corespunde cu ce vede clientul în sumar, ceea ce ar fi
- * inducere în eroare.
+ * Nu trimite niciun cod de voucher: reducerea se acordă automat pentru că
+ * setul e recunoscut din compoziția coșului, iar calculul îl face serverul
+ * din prețurile din bază (vezi `lib/sets.ts`). Clientul rămâne în flux —
+ * se deschide coșul, unde vede gruparea și prețul redus.
  */
 export function AddSetButton({
   wines,
-  couponCode,
   label = "Adaugă setul în coș",
 }: {
   wines: Wine[];
-  couponCode: string;
   label?: string;
 }) {
   const addItem = useCartStore((s) => s.addItem);
+  const openCart = useCartStore((s) => s.open);
   const [busy, setBusy] = useState(false);
 
   function handleClick() {
@@ -43,7 +41,8 @@ export function AddSetButton({
       })),
     );
 
-    window.location.href = `/checkout?cupon=${encodeURIComponent(couponCode)}`;
+    openCart();
+    window.setTimeout(() => setBusy(false), 600);
   }
 
   return (

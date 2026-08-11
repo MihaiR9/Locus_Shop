@@ -10,6 +10,7 @@ import {
   getShippingMethod,
 } from "@/lib/shipping";
 import { SGR_PER_BOTTLE_RON, countBottles } from "@/lib/sgr";
+import { calculateSetDiscountCents } from "@/lib/sets";
 import { calculateExciseCents } from "@/lib/excise";
 import { saveAccountFromOrder } from "@/lib/account/defaults";
 import type {
@@ -135,8 +136,20 @@ export async function createOrder(
     pickupPointAddress = input.shipping.pickupPointAddress ?? null;
   }
 
+  // Reducere de set — se acordă automat când coșul conține toate cele
+  // trei vinuri ale unei game. Calculată aici, din prețurile din bază,
+  // NU din ce trimite clientul: altfel oricine putea cere orice preț.
+  //
+  // Se cumulează cu un voucher: setul reduce pachetul, voucherul e o
+  // reducere comercială separată. Dacă vrei să fie exclusive, mută
+  // `discountCents` de mai jos într-o alegere de tip max().
+  const priceByCode = new Map(
+    (products ?? []).map((p) => [p.code, p.price_cents]),
+  );
+  const setResult = calculateSetDiscountCents(input.items, priceByCode);
+  let discountCents = setResult.discountCents;
+
   // Coupon
-  let discountCents = 0;
   if (input.couponCode && input.couponCode.trim().length > 0) {
     const code = input.couponCode.trim().toUpperCase();
     const { data: coupon } = await supabase
@@ -163,11 +176,15 @@ export async function createOrder(
     }
 
     if (coupon.percent_off) {
-      discountCents = Math.round((subtotalCents * coupon.percent_off) / 100);
+      discountCents += Math.round((subtotalCents * coupon.percent_off) / 100);
     } else if (coupon.fixed_off_cents) {
-      discountCents = Math.min(coupon.fixed_off_cents, subtotalCents);
+      discountCents += coupon.fixed_off_cents;
     }
   }
+
+  // Plasa de siguranță: reducerea cumulată nu poate depăși subtotalul,
+  // altfel totalul ar ieși negativ și Stripe ar refuza sesiunea.
+  discountCents = Math.min(discountCents, subtotalCents);
 
   // SGR — garanție returnare 0.5 lei/sticlă. NU intră în discount, NU are
   // TVA. Se adaugă peste (subtotal - discount + shipping).
@@ -342,8 +359,14 @@ export async function createOrder(
                   amount_off: discountCents,
                   currency: "ron",
                   duration: "once",
+                  // Eticheta de pe bonul Stripe. Reflectă ce a produs
+                  // reducerea, ca să nu apară „voucher" acolo unde de fapt
+                  // clientul a beneficiat de prețul de set.
                   name:
-                    input.couponCode?.toUpperCase() ?? "Voucher Domeniul Locus",
+                    input.couponCode?.toUpperCase() ??
+                    (setResult.matches.length > 0
+                      ? setResult.matches.map((m) => m.def.label).join(" + ")
+                      : "Reducere Domeniul Locus"),
                 })
               ).id,
             },

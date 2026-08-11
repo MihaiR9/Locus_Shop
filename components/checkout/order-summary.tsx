@@ -7,6 +7,7 @@ import { useCartStore } from "@/lib/cart-store";
 import { useCheckoutStore } from "@/lib/checkout-store";
 import { calculateShippingRon, getShippingMethod } from "@/lib/shipping";
 import { calculateSgrRon, countBottles, SGR_PER_BOTTLE_RON } from "@/lib/sgr";
+import { calculateSetDiscountCents, SET_DISCOUNT_PCT } from "@/lib/sets";
 import { formatRon } from "@/lib/wines";
 import { createOrder } from "@/app/(storefront)/checkout/actions";
 import { applyVoucherAction } from "@/app/(storefront)/cos/actions";
@@ -79,11 +80,26 @@ export function OrderSummary() {
 
   const shippingRon = shippingCalc?.priceRon ?? null;
 
-  const discountRon = useMemo(() => {
+  // Reducerea de set — aceeași funcție pe care o folosește serverul în
+  // `createOrder`, ca sumarul să nu promită alt total decât cel încasat.
+  const setDiscount = useMemo(() => {
+    const priceByCode = new Map(
+      lines.map((l) => [l.code, Math.round(l.priceRon * 100)]),
+    );
+    const res = calculateSetDiscountCents(
+      lines.map((l) => ({ code: l.code, qty: l.qty })),
+      priceByCode,
+    );
+    return { ron: res.discountCents / 100, matches: res.matches };
+  }, [lines]);
+
+  const voucherRon = useMemo(() => {
     if (!voucher) return 0;
     if (voucher.percentOff) return Math.round(subtotalRon * voucher.percentOff) / 100;
     return Math.min(voucher.fixedOffRon ?? 0, subtotalRon);
   }, [voucher, subtotalRon]);
+
+  const discountRon = Math.min(setDiscount.ron + voucherRon, subtotalRon);
 
   const totalRon =
     Math.max(0, subtotalRon - discountRon) + sgrRon + (shippingRon ?? 0);
@@ -161,10 +177,20 @@ export function OrderSummary() {
           <span className="value">{formatRon(subtotalRon)}</span>
         </div>
 
-        {voucher && discountRon > 0 && (
+        {setDiscount.matches.map((m) => (
+          <div className="co-srow discount" key={m.def.key}>
+            <span className="label">
+              {m.def.label}
+              {m.count > 1 ? ` ×${m.count}` : ""} · −{SET_DISCOUNT_PCT}%
+            </span>
+            <span className="value">−{formatRon(m.discountCents / 100)}</span>
+          </div>
+        ))}
+
+        {voucher && voucherRon > 0 && (
           <div className="co-srow discount">
             <span className="label">Voucher ({voucher.code})</span>
-            <span className="value">−{formatRon(discountRon)}</span>
+            <span className="value">−{formatRon(voucherRon)}</span>
           </div>
         )}
 
