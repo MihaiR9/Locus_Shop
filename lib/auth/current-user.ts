@@ -54,10 +54,24 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
 
   const fullName = (customer.name ?? "").trim();
   const [first, ...rest] = fullName.split(/\s+/);
+
+  /* Adresa autoritară e cea din `auth.users` — aia e identitatea cu care
+     omul s-a autentificat. `customers.email` e date de profil și poate
+     rămâne în urmă: dacă cineva își schimbă emailul din Supabase Auth,
+     sau dacă fișa de client a fost legată greșit, cele două diverg și
+     contul afișa adresa greșită. */
+  const authEmail = user.email ?? "";
+  if (authEmail && customer.email && authEmail.toLowerCase() !== customer.email.toLowerCase()) {
+    console.warn(
+      "[current-user] email divergent intre auth si customers",
+      { authId: user.id, customerId: customer.id, authEmail, customerEmail: customer.email },
+    );
+  }
+
   return {
     authId: user.id,
     customerId: customer.id,
-    email: customer.email,
+    email: authEmail || customer.email,
     firstName: first ?? "",
     lastName: rest.join(" "),
     fullName,
