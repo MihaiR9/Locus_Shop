@@ -20,16 +20,39 @@ Fișierele de aici **nu se încarcă automat**. Se copiază manual:
 Le ținem în repo ca să existe o singură versiune de adevăr și ca
 modificările să se vadă în istoric — dashboard-ul nu are versionare.
 
+## Fișiere și unde se pun
+
+| Fișier | Șablonul din dashboard | Subiect propus |
+|---|---|---|
+| `magic-link.html` | Magic Link | `Autentificare · Domeniul Locus` |
+| `confirm-signup.html` | Confirm signup | `Confirmă-ți adresa · Domeniul Locus` |
+| `reset-password.html` | Reset password | `Resetare parolă · Domeniul Locus` |
+| `change-email.html` | Change email address | `Confirmă adresa nouă · Domeniul Locus` |
+| `invite-user.html` | Invite user | `Ai un cont pregătit · Domeniul Locus` |
+
 ## Variabile disponibile
 
 Supabase folosește templating Go. Cele utile:
 
 | Variabilă | Ce conține |
 |---|---|
-| `{{ .ConfirmationURL }}` | linkul de autentificare, complet |
-| `{{ .Email }}` | adresa destinatarului |
+| `{{ .ConfirmationURL }}` | linkul de acțiune, complet |
+| `{{ .Email }}` | adresa destinatarului (la *change email*: adresa **veche**) |
+| `{{ .NewEmail }}` | adresa **nouă** — există doar la *Change email address* |
 | `{{ .Token }}` | codul de 6 cifre, dacă preferi OTP în loc de link |
 | `{{ .SiteURL }}` | URL-ul configurat în proiect |
+
+`{{ .NewEmail }}` e singura variabilă care nu e disponibilă peste tot. Dacă
+o folosești din greșeală în alt șablon, iese gol — fără eroare, doar un
+rând care nu spune nimic.
+
+## Despre resetarea parolei
+
+Autentificarea clienților e pe **magic link, fără parolă**, deci șablonul
+de reset nu se declanșează în fluxul normal. Îl ținem completat pentru
+cazul în care se activează parolele, și pentru conturile de admin dacă
+vor fi vreodată create cu parolă. Un email urât trimis rar e tot un email
+urât.
 
 ## ⚠️ Logo-ul
 
