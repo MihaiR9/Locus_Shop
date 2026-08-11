@@ -34,15 +34,39 @@ export async function adminLoginWithEmail(email: string): Promise<Result> {
   });
 
   if (error) {
+    /* Mesajul de dinainte spunea „Nu există cont cu această adresă" pentru
+       trei situații distincte, așa că un cont existent dar neconfirmat sau
+       o limită de trimitere atinsă arătau identic cu o adresă greșită. Le
+       separăm — altfel diagnosticarea e ghicit. */
     const msg = error.message.toLowerCase();
+
+    if (msg.includes("rate limit") || msg.includes("too many")) {
+      return {
+        ok: false,
+        error:
+          "Prea multe cereri într-un interval scurt. Așteaptă câteva minute și încearcă din nou.",
+      };
+    }
+
     if (
       msg.includes("signups not allowed") ||
       msg.includes("user not found") ||
       error.code === "otp_disabled"
     ) {
-      return { ok: false, error: "Nu există cont cu această adresă." };
+      return {
+        ok: false,
+        error:
+          "Nu există cont activ cu această adresă, sau contul nu are emailul confirmat. Verifică în Supabase → Authentication → Users.",
+      };
     }
-    return { ok: false, error: error.message };
+
+    // Restul: mesajul brut de la Supabase, plus codul, ca să se poată căuta.
+    console.error("[admin-login] signInWithOtp a esuat", {
+      email: clean,
+      code: error.code,
+      message: error.message,
+    });
+    return { ok: false, error: `${error.message}${error.code ? ` (${error.code})` : ""}` };
   }
   return { ok: true };
 }
