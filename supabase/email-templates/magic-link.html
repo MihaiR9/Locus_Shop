@@ -5,89 +5,137 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Autentificare · Domeniul Locus</title>
 </head>
-<body style="margin:0;padding:0;background:#EBE1DA;font-family:'IBM Plex Mono','Courier New',Courier,monospace;color:#1A1A1A;">
+<body style="margin:0;padding:0;background:#f0ede7;font-family:'IBM Plex Mono','Courier New',Courier,monospace;color:#1a1a1a;">
 
   <div style="display:none;visibility:hidden;opacity:0;height:0;width:0;overflow:hidden;">Linkul tău de autentificare, valabil o oră.</div>
 
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#EBE1DA;padding:32px 16px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f0ede7;padding:40px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#EBE1DA;">
 
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#faf9f6;border:1px solid rgba(74,60,45,0.14);">
+
+          <!-- ── Titlu ─────────────────────────────────────────────
+               Imagine, nu text: Italiana e font web, iar Gmail și
+               Outlook nu încarcă @font-face. Singura cale ca titlul să
+               apară în fontul de brand la toată lumea. Randat la 2x
+               (1024px) și afișat la 512, ca să fie curat pe retina.
+               Dacă imaginile sunt blocate, rămâne textul din `alt`. -->
           <tr>
-            <td style="padding:0 0 24px 0;text-align:center;">
+            <td align="center" style="padding:52px 44px 0 44px;">
               <img
-                src="https://www.domeniul-locus.ro/brand/logo-locus.png"
-                width="132"
-                alt="Domeniul Locus"
-                style="display:block;margin:0 auto 10px auto;width:132px;max-width:60%;height:auto;border:0;"
+                src="https://www.domeniul-locus.ro/brand/email/bine-ai-revenit.png"
+                width="512"
+                alt="Bine ai revenit"
+                style="display:block;margin:0 auto;width:100%;max-width:512px;height:auto;border:0;"
               />
-              <div style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:#6E5E4B;">un loc · un timp · un vin</div>
             </td>
           </tr>
 
+          <!-- ── Fotografie ────────────────────────────────────────── -->
           <tr>
-            <td style="background:#F2EAE2;border:1px solid rgba(74,60,45,0.18);padding:36px 32px;">
+            <td style="padding:30px 44px 0 44px;">
+              <img
+                src="https://www.domeniul-locus.ro/photos/hero/cuvinte-rosu.jpg"
+                width="512"
+                alt="Fetească Neagră, gama Cuvinte"
+                style="display:block;width:100%;max-width:512px;height:auto;border:0;"
+              />
+            </td>
+          </tr>
 
-              <div style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#6E5E4B;margin-bottom:14px;">
-                Autentificare
-              </div>
-
-              <div style="font-family:Italiana,Georgia,'Times New Roman',serif;font-size:36px;line-height:1.15;color:#1A1A1A;letter-spacing:-0.015em;">
-                Intră în cont.
-              </div>
-
-              <p style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:14px;line-height:1.85;color:#4A3C2D;margin:22px 0 0 0;">
+          <!-- ── Mesaj, centrat ────────────────────────────────────── -->
+          <tr>
+            <td style="padding:38px 56px 0 56px;text-align:center;">
+              <div style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:11px;line-height:2;letter-spacing:0.16em;text-transform:uppercase;color:#4a3c2d;">
                 Ai cerut un link de autentificare pentru
-                <strong style="color:#1A1A1A;">{{ .Email }}</strong>. Apasă
-                butonul de mai jos — nu ai nevoie de parolă.
-              </p>
+              </div>
+              <div style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:11.5px;line-height:2;letter-spacing:0.08em;color:#1a1a1a;padding-top:4px;">
+                {{ .Email }}
+              </div>
+              <div style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:11px;line-height:2;letter-spacing:0.16em;text-transform:uppercase;color:#4a3c2d;padding-top:18px;">
+                Nu ai nevoie de parolă.<br />
+                Un singur pas, și ești în cont.
+              </div>
+            </td>
+          </tr>
 
-              <!-- Buton „bulletproof": tabel, nu <a> stilizat, ca să arate
-                   corect și în Outlook, care ignoră padding pe linkuri. -->
-              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:32px 0 0 0;">
+          <!-- ── Buton (tabel, pentru Outlook) ─────────────────────── -->
+          <tr>
+            <td align="center" style="padding:34px 44px 0 44px;">
+              <table role="presentation" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td align="center" bgcolor="#3E4336" style="background:#3E4336;">
+                  <td align="center" bgcolor="#1a1a1a" style="background:#1a1a1a;">
                     <a
                       href="{{ .ConfirmationURL }}"
-                      style="display:inline-block;padding:16px 34px;font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#EBE1DA;text-decoration:none;"
+                      style="display:inline-block;padding:17px 42px;font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:#faf9f6;text-decoration:none;"
                     >Autentifică-mă</a>
                   </td>
                 </tr>
               </table>
-
-              <p style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:12px;line-height:1.8;color:#6E5E4B;margin:28px 0 0 0;">
-                Linkul e valabil <strong style="color:#4A3C2D;">o oră</strong> și
-                poate fi folosit o singură dată.
-              </p>
-
-              <p style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:12px;line-height:1.8;color:#6E5E4B;margin:20px 0 0 0;border-top:1px solid rgba(74,60,45,0.18);padding-top:22px;">
-                Dacă butonul nu funcționează, copiază adresa asta în browser:
-                <br />
-                <a href="{{ .ConfirmationURL }}" style="color:#4A3C2D;word-break:break-all;">{{ .ConfirmationURL }}</a>
-              </p>
-
-              <p style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:12px;line-height:1.8;color:#6E5E4B;margin:20px 0 0 0;">
-                Nu tu ai cerut linkul? Ignoră mesajul — fără o apăsare pe buton,
-                nu se întâmplă nimic.
-              </p>
-
+              <div style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:#6e5e4b;padding-top:16px;">
+                Valabil o oră · o singură folosire
+              </div>
             </td>
           </tr>
 
+          <!-- ── Logo ──────────────────────────────────────────────── -->
           <tr>
-            <td style="padding:24px 0 0 0;text-align:center;font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:11px;color:#6E5E4B;line-height:1.6;">
-              SC ROMVINTEC SRL · Buciumeni, jud. Galați<br />
-              <a href="mailto:contact@domeniul-locus.ro" style="color:#4A3C2D;text-decoration:none;">contact@domeniul-locus.ro</a>
-              · <a href="tel:+40752232912" style="color:#4A3C2D;text-decoration:none;">0752 232 912</a>
-              <br /><br />
-              <span style="color:#6E5E4B;font-size:10px;">
-                18+ · Conține sulfiți · Consumul excesiv de alcool dăunează sănătății.
-              </span>
+            <td align="center" style="padding:46px 44px 0 44px;">
+              <img
+                src="https://www.domeniul-locus.ro/brand/logo-locus.png"
+                width="104"
+                alt="Domeniul Locus"
+                style="display:block;margin:0 auto;width:104px;height:auto;border:0;"
+              />
+              <div style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:#8b7841;padding-top:10px;">
+                un loc · un timp · un vin
+              </div>
+            </td>
+          </tr>
+
+          <!-- ── Bară de contact ───────────────────────────────────── -->
+          <tr>
+            <td style="padding:40px 44px 0 44px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid rgba(74,60,45,0.14);">
+                <tr>
+                  <td style="padding:18px 0 0 0;font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#6e5e4b;">
+                    Buciumeni, Galați
+                  </td>
+                  <td align="center" style="padding:18px 0 0 0;font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#6e5e4b;">
+                    <a href="mailto:contact@domeniul-locus.ro" style="color:#6e5e4b;text-decoration:none;">contact@domeniul-locus.ro</a>
+                  </td>
+                  <td align="right" style="padding:18px 0 0 0;font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.12em;color:#6e5e4b;">
+                    <a href="tel:+40752232912" style="color:#6e5e4b;text-decoration:none;">0752 232 912</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ── Link de rezervă + notă ────────────────────────────── -->
+          <tr>
+            <td style="padding:24px 44px 44px 44px;">
+              <div style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:9.5px;line-height:1.7;color:#6e5e4b;">
+                Nu funcționează butonul?
+                <a href="{{ .ConfirmationURL }}" style="color:#8b7841;">Deschide linkul direct</a>.
+                Nu tu ai cerut autentificarea? Ignoră mesajul — fără o apăsare, nu se întâmplă nimic.
+              </div>
             </td>
           </tr>
 
         </table>
+
+        <!-- ── Sub card: mențiuni legale ─────────────────────────── -->
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+          <tr>
+            <td align="center" style="padding:22px 20px 0 20px;font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:9px;line-height:1.8;letter-spacing:0.08em;color:#8a7c68;">
+              SC ROMVINTEC SRL · 18+ · Conține sulfiți<br />
+              Consumul excesiv de alcool dăunează sănătății.
+            </td>
+          </tr>
+        </table>
+
       </td>
     </tr>
   </table>

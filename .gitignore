@@ -41,3 +41,7 @@ Assets/
 
 # Fable 5 (subagent) își salvează memoria în .claude/ oriunde ajunge — excludem.
 **/.claude/agent-memory/
+
+# Preview-uri generate pentru emailuri — se regenerează din
+# supabase/email-templates/, nu au ce căuta în build-ul public.
+public/_preview/
