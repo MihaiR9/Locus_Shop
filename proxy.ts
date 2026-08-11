@@ -5,6 +5,48 @@ const PREVIEW_COOKIE = "locus-preview";
 const PREVIEW_MAX_AGE = 60 * 60 * 24 * 30; // 30 zile
 
 /**
+ * Hostul pe care trăiește panoul de administrare, ex. `admin.domeniul-locus.ro`.
+ *
+ * Gol → rutarea pe host e dezactivată și totul merge ca înainte (dev local,
+ * unde nu ai subdomenii). Setat → cele două lumi se despart:
+ *
+ *   admin.domeniul-locus.ro  → doar /admin
+ *   domeniul-locus.ro        → doar magazinul; /admin devine 404
+ *
+ * DE CE: cookie-urile de sesiune Supabase se scopează pe host (nu au
+ * atribut Domain). Cu hosturi diferite, sesiunea de admin și cea de client
+ * încetează să se calce — poți fi logat ca administrator într-o parte și ca
+ * simplu client în cealaltă, simultan. Înainte, o sesiune de admin deschisă
+ * te făcea să apari drept acel utilizator și în contul de pe magazin.
+ */
+const ADMIN_HOST = process.env.ADMIN_HOST?.trim().toLowerCase() ?? "";
+
+/**
+ * Construiește un URL absolut pe hostul DIN CARE a venit cererea.
+ *
+ * `req.nextUrl` poate purta hostul intern în spatele unui proxy. Pentru
+ * redirectările din panou asta ar fi grav: ar arunca administratorul de pe
+ * `admin.` înapoi pe apex, unde `/admin` răspunde 404 — buclă de login.
+ */
+function sameHostUrl(req: NextRequest, pathWithQuery: string): string {
+  const proto =
+    req.headers.get("x-forwarded-proto") ??
+    (req.nextUrl.protocol.replace(":", "") || "https");
+  const host = req.headers.get("host") ?? req.nextUrl.host;
+  return `${proto}://${host}${pathWithQuery}`;
+}
+
+/** Rute care trebuie să funcționeze pe ORICE host. */
+function isHostAgnostic(pathname: string): boolean {
+  return (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api/") ||
+    pathname === "/favicon.ico" ||
+    pathname === "/icon.svg"
+  );
+}
+
+/**
  * Proxy (fost `middleware.ts` în Next 15). Trei responsabilități:
  *
  * 1. **Coming-soon gate** — când `COMING_SOON=true`, orice request e
@@ -22,8 +64,48 @@ const PREVIEW_MAX_AGE = 60 * 60 * 24 * 30; // 30 zile
 export async function proxy(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
 
+  // ─── 0) RUTARE PE HOST — admin separat de magazin ────────────
+  const host = req.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
+  const onAdminHost = ADMIN_HOST !== "" && host === ADMIN_HOST;
+
+  if (ADMIN_HOST !== "" && !isHostAgnostic(pathname)) {
+    if (onAdminHost) {
+      // Pe hostul de admin, rădăcina duce direct în panou.
+      //
+      // URL-ul se construiește din antetul `host` primit, nu din
+      // `req.nextUrl`: în spatele unui proxy, hostul din `nextUrl` poate fi
+      // cel intern, iar redirectul ar arunca omul de pe subdomeniu înapoi
+      // pe apex. (Un `Location` relativ ar fi fost mai simplu, dar Next
+      // cere URL absolut în middleware — altfel „Invalid URL".)
+      if (pathname === "/") {
+        return NextResponse.redirect(sameHostUrl(req, "/admin"));
+      }
+      if (!pathname.startsWith("/admin")) {
+        // Spre magazin, folosind domeniul canonic din config — nu ghicim
+        // tăind prefixul „admin.", pentru că subdomeniul poate avea
+        // oricând altă formă.
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+        if (siteUrl) {
+          return NextResponse.redirect(new URL(pathname + req.nextUrl.search, siteUrl));
+        }
+        const url = req.nextUrl.clone();
+        url.pathname = "/admin";
+        return NextResponse.redirect(url);
+      }
+    } else if (pathname.startsWith("/admin")) {
+      // Pe magazin, /admin nu există. Răspundem 404 sec, NU redirect spre
+      // hostul de admin — nu anunțăm unde e panoul cui îl caută.
+      return new NextResponse("Not found", {
+        status: 404,
+        headers: { "content-type": "text/plain; charset=utf-8" },
+      });
+    }
+  }
+
   // ─── 1) COMING-SOON GATE ─────────────────────────────────────
-  if (process.env.COMING_SOON === "true") {
+  // Hostul de admin nu e gate-uit: e deja protejat de verificarea de rol,
+  // iar „în curând" n-are niciun sens într-un panou de administrare.
+  if (process.env.COMING_SOON === "true" && !onAdminHost) {
     const isWhitelisted =
       pathname === "/coming-soon" ||
       pathname.startsWith("/admin") ||
@@ -84,9 +166,7 @@ export async function proxy(req: NextRequest) {
 
   if (!url || !anonKey) {
     if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
-      const loginUrl = req.nextUrl.clone();
-      loginUrl.pathname = "/admin/login";
-      return NextResponse.redirect(loginUrl);
+      return NextResponse.redirect(sameHostUrl(req, "/admin/login"));
     }
     return NextResponse.next();
   }
@@ -132,10 +212,9 @@ export async function proxy(req: NextRequest) {
   if (isAdminRoute) {
     const role = (user?.app_metadata as { role?: string } | undefined)?.role;
     if (!user || role !== "admin") {
-      const loginUrl = req.nextUrl.clone();
-      loginUrl.pathname = "/admin/login";
-      loginUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(loginUrl);
+      // Rămânem pe hostul curent — vezi `sameHostUrl`.
+      const target = `/admin/login?redirect=${encodeURIComponent(pathname)}`;
+      return NextResponse.redirect(sameHostUrl(req, target));
     }
   }
 
