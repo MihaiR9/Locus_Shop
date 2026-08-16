@@ -33,10 +33,10 @@ export default function TermsPage() {
         <li><strong>Denumire:</strong> SC ROMVINTEC SRL</li>
         <li><strong>Sediu social:</strong> str. Portului nr. 20, tronson 1, camera 211, mun. Galați, jud. Galați</li>
         <li><strong>Punct de lucru:</strong> Centrul de Vinificație Buciumeni, com. Buciumeni, jud. Galați</li>
-        <li><strong>CUI:</strong> [TODO]</li>
-        <li><strong>Reg. Com.:</strong> [TODO]</li>
+        <li><strong>CUI:</strong> RO19027937</li>
+        <li><strong>Reg. Com.:</strong> J2006001485178</li>
         <li><strong>Telefon:</strong> 0752 232 912</li>
-        <li><strong>Email:</strong> contact@domeniul-locus.ro</li>
+        <li><strong>Email:</strong> office@domeniul-locus.ro</li>
       </ul>
 
       <h2>2. Plasarea comenzii</h2>
@@ -112,7 +112,7 @@ export default function TermsPage() {
 
       <h2>9. Soluționarea disputelor</h2>
       <p>
-        Reclamațiile se trimit la <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>.
+        Reclamațiile se trimit la <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>.
         Dacă nu ajungem la un acord, te poți adresa:
       </p>
       <ul>

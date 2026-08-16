@@ -25,9 +25,23 @@ export default function PrivacyPage() {
       <ul>
         <li><strong>Denumire:</strong> SC ROMVINTEC SRL</li>
         <li><strong>Sediu:</strong> str. Portului nr. 20, mun. Galați, jud. Galați</li>
-        <li><strong>Email:</strong> <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a></li>
-        <li><strong>DPO:</strong> [TODO — desemnează responsabil cu protecția datelor]</li>
+        <li><strong>CUI:</strong> RO19027937</li>
+        <li><strong>Reg. Com.:</strong> J2006001485178</li>
+        <li><strong>Telefon:</strong> 0752 232 912</li>
+        <li><strong>Email:</strong> <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a></li>
       </ul>
+
+      <p>
+        <strong>Responsabil cu protecția datelor (DPO).</strong> Conform art. 37
+        din Regulamentul (UE) 2016/679 (GDPR), desemnarea unui DPO nu este
+        obligatorie pentru operatorii care nu efectuează prelucrări la scară
+        largă sau prelucrări sistematice ale unor categorii speciale de date.
+        Domeniul Locus se încadrează în această categorie. Cererile privind
+        protecția datelor (acces, rectificare, ștergere, portabilitate,
+        opoziție) se adresează direct la{" "}
+        <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>{" "}
+        și primesc răspuns în termen de 30 de zile calendaristice.
+      </p>
 
       <h2>2. Ce date colectăm</h2>
       <h3>Date de contact și livrare</h3>
@@ -108,7 +122,7 @@ export default function PrivacyPage() {
       </ul>
       <p>
         Pentru a-ți exercita orice drept, scrie la{" "}
-        <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>.
+        <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>.
         Răspundem în maxim 30 de zile.
       </p>
 

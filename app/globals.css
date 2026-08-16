@@ -8802,3 +8802,17 @@
 }
 .cs-empty-p { color: var(--ink-soft); line-height: 1.7; margin-bottom: 28px; }
 .cs-empty .cs-cta { margin-inline: auto; }
+
+/* Sold out state for wine-add button */
+.wine-add.is-sold-out,
+.wine-add:disabled {
+  background: transparent;
+  color: var(--ink-mute);
+  border-color: var(--line);
+  cursor: not-allowed;
+}
+.wine-add.is-sold-out:hover {
+  background: transparent;
+  color: var(--ink-mute);
+  border-color: var(--line);
+}

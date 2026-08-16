@@ -34,7 +34,7 @@ export default function ReturnsPage() {
       <ol>
         <li>
           Trimite o notificare la{" "}
-          <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>{" "}
+          <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>{" "}
           cu numărul comenzii și produsele pe care vrei să le returnezi.
         </li>
         <li>
@@ -87,7 +87,7 @@ export default function ReturnsPage() {
         Dacă primești un colet vizibil deteriorat, refuză-l direct la curier
         sau, dacă ai semnat deja, fotografiază starea coletului și a produselor
         înainte de a deschide complet și trimite-ne fotografiile la{" "}
-        <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>{" "}
+        <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>{" "}
         în maxim 24 de ore. Procesăm înlocuirea sau rambursarea fără cost
         suplimentar pentru tine.
       </p>
@@ -99,7 +99,7 @@ export default function ReturnsPage() {
       </p>
       <div className="callout">
         Către <strong>SC ROMVINTEC SRL</strong>,{" "}
-        <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>:
+        <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>:
         <br />
         <br />
         Vă notific prin prezenta că mă retrag din contractul de vânzare
@@ -114,7 +114,7 @@ export default function ReturnsPage() {
       <h2>6. Întrebări</h2>
       <p>
         Pentru orice întrebare despre retururi sau probleme cu o comandă, scrie
-        la <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>{" "}
+        la <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>{" "}
         sau sună la <a href="tel:+40752232912">0752 232 912</a>.
       </p>
       <p>

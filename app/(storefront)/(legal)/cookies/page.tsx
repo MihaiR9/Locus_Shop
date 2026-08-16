@@ -99,7 +99,7 @@ export default function CookiesPage() {
       <h2>Întrebări</h2>
       <p>
         Pentru orice întrebare despre cookie-uri sau date personale, scrie la{" "}
-        <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>.
+        <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>.
         Vezi și{" "}
         <Link href="/confidentialitate">Politica de confidențialitate</Link>.
       </p>
