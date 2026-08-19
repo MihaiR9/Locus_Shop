@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { FanCourierPickupPoint, FanCourierPickupType } from "@/lib/fancourier/types";
+import { usePickupPoints } from "./use-pickup-points";
 
 type SelectedPoint = {
   id: string;
@@ -20,17 +21,13 @@ type Props = {
   disabled?: boolean;
 };
 
-type ApiResponse =
-  | { ok: true; configured: true; points: FanCourierPickupPoint[] }
-  | { ok: true; configured: false; points: []; message: string }
-  | { ok: false; error: string };
-
 /**
  * Selector puncte PUDO (FANbox / PayPoint / sediu FAN).
  *
- * Fetch-ul pornește când user-ul are județ ales — nu vrem 5000 de puncte
- * încărcate pe blank. Dacă API-ul e neconfigurat local (dev fără .env
- * complet), oferim un fallback: input text pentru id-ul punctului.
+ * Lista vine din `usePickupPoints`, partajată cu dropdown-ul de localitate
+ * din pasul de livrare — un singur request pentru amândouă. Dacă API-ul e
+ * neconfigurat (dev fără .env complet), oferim un fallback: input text
+ * pentru id-ul punctului.
  */
 export function PickupPointSelect({
   type,
@@ -40,51 +37,15 @@ export function PickupPointSelect({
   onChange,
   disabled,
 }: Props) {
-  const [points, setPoints] = useState<FanCourierPickupPoint[]>([]);
-  const [state, setState] = useState<"idle" | "loading" | "ok" | "unconfigured" | "error">(
-    "idle",
-  );
-  const [errMsg, setErrMsg] = useState<string | null>(null);
   const [manualId, setManualId] = useState(value?.id ?? "");
   const [query, setQuery] = useState("");
 
-  // Fetch pe mount pentru fiecare tip nou — luăm TOATE punctele (~5k pt
-  // FANbox). Filtrarea pe județ/localitate se face client-side ca să nu
-  // refetch-uim la fiecare tastă în input-uri.
-  const abortRef = useRef<AbortController | null>(null);
-  useEffect(() => {
-    abortRef.current?.abort();
-    const ctrl = new AbortController();
-    abortRef.current = ctrl;
-    setState("loading");
-
-    fetch(`/api/fancourier/pickup-points?type=${encodeURIComponent(type)}`, {
-      signal: ctrl.signal,
-    })
-      .then((r) => r.json() as Promise<ApiResponse>)
-      .then((json) => {
-        if (!json.ok) {
-          setState("error");
-          setErrMsg(json.error);
-          return;
-        }
-        if (!json.configured) {
-          setState("unconfigured");
-          setErrMsg(json.message);
-          return;
-        }
-        setPoints(json.points);
-        setState("ok");
-        setErrMsg(null);
-      })
-      .catch((err) => {
-        if (err.name === "AbortError") return;
-        setState("error");
-        setErrMsg(String(err));
-      });
-
-    return () => ctrl.abort();
-  }, [type]);
+  /* Luăm TOATE punctele tipului (~5k pentru FANbox) și filtrăm client-side,
+     ca să nu refetch-uim la fiecare tastă în căutare. */
+  const fetched = usePickupPoints(type);
+  const points = fetched.points;
+  const state = fetched.status;
+  const errMsg = "message" in fetched ? fetched.message : null;
 
   const norm = (s: string) => s.toLowerCase();
 

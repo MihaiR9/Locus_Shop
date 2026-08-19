@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   useCheckoutStore,
   type ShippingCurier,
@@ -8,6 +8,7 @@ import {
 import { type ShippingMethodId } from "@/lib/shipping";
 import type { AccountDefaults } from "@/lib/account/defaults";
 import { PickupPointSelect } from "./pickup-point-select";
+import { localitiesInCounty, usePickupPoints } from "./use-pickup-points";
 
 /**
  * StepShipping — pasul 1 „Livrare".
@@ -80,6 +81,12 @@ export function StepShipping({ defaults }: Props) {
   );
   const serviceId = TAB_TO_SERVICE[tab];
 
+  /* Pe tab-ul FANbox, localitatea o alegi dintr-o listă construită din
+     chiar punctele FanCourier: un oraș fără locker n-are ce căuta acolo.
+     Pe livrarea la ușă rămâne text liber — acolo se livrează oriunde, iar
+     lista completă de localități ar veni din alt endpoint. */
+  const pickupPoints = usePickupPoints("fanbox", tab === "fanbox");
+
   const hasSavedForCurier = !!defaults && defaults.addresses.length > 0;
   const hasSavedForFanbox = !!defaults && !!defaults.favoritePickupPoint;
   const hasSavedForTab = tab === "curier" ? hasSavedForCurier : hasSavedForFanbox;
@@ -131,6 +138,11 @@ export function StepShipping({ defaults }: Props) {
   })();
 
   const [form, setForm] = useState<FormState>(initialForm);
+
+  const fanboxLocalities = useMemo(
+    () => localitiesInCounty(pickupPoints.points, form.county),
+    [pickupPoints.points, form.county],
+  );
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
     defaults?.addresses.find((a) => a.isDefault)?.id ??
       defaults?.addresses[0]?.id ??
@@ -482,22 +494,60 @@ export function StepShipping({ defaults }: Props) {
               <label htmlFor="co-city">
                 Localitate<span className="req">*</span>
               </label>
-              <input
-                id="co-city"
-                type="text"
-                autoComplete="address-level2"
-                value={form.city}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    city: e.target.value,
-                    pickupPointId: undefined,
-                    pickupPointName: undefined,
-                    pickupPointAddress: undefined,
-                  })
-                }
-                placeholder="București"
-              />
+              {fanboxLocalities.length > 0 ? (
+                <select
+                  id="co-city"
+                  autoComplete="address-level2"
+                  value={
+                    /* Dacă localitatea rămasă din tab-ul de curier nu are
+                       locker, nu o afișăm ca selectată — ar arăta ales ceva
+                       ce nu e în listă. */
+                    fanboxLocalities.includes(form.city) ? form.city : ""
+                  }
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      city: e.target.value,
+                      pickupPointId: undefined,
+                      pickupPointName: undefined,
+                      pickupPointAddress: undefined,
+                    })
+                  }
+                >
+                  <option value="">Alege localitatea</option>
+                  {fanboxLocalities.map((l) => (
+                    <option key={l} value={l}>{l}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  id="co-city"
+                  type="text"
+                  autoComplete="address-level2"
+                  value={form.city}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      city: e.target.value,
+                      pickupPointId: undefined,
+                      pickupPointName: undefined,
+                      pickupPointAddress: undefined,
+                    })
+                  }
+                  placeholder="București"
+                />
+              )}
+              {tab === "fanbox" && (
+                <p className="step-note" style={{ marginTop: 6 }}>
+                  {pickupPoints.status === "loading"
+                    ? "Se încarcă localitățile cu lockere FANbox…"
+                    : pickupPoints.status === "ok" && !form.county
+                      ? "Alege întâi județul, ca să-ți arătăm doar localitățile cu lockere."
+                      : pickupPoints.status === "ok" && fanboxLocalities.length === 0
+                        ? "Nu există lockere FANbox în județul ales. Comută pe livrare prin curier."
+                        : null}
+                </p>
+              )}
             </div>
 
             {tab === "curier" ? (
