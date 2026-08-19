@@ -429,7 +429,6 @@ export function StepShipping({ defaults }: Props) {
                 autoComplete="given-name"
                 value={form.firstName}
                 onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                placeholder="Mihai"
               />
             </div>
             <div className="co-field">
@@ -442,7 +441,6 @@ export function StepShipping({ defaults }: Props) {
                 autoComplete="family-name"
                 value={form.lastName}
                 onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                placeholder="Roscăneanu"
               />
             </div>
             <div className="co-field">
@@ -468,7 +466,6 @@ export function StepShipping({ defaults }: Props) {
                 autoComplete="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="tu@exemplu.ro"
               />
             </div>
             <div className="co-field">
@@ -539,7 +536,6 @@ export function StepShipping({ defaults }: Props) {
                       pickupPointAddress: undefined,
                     })
                   }
-                  placeholder="București"
                 />
               )}
               {tab === "fanbox" && (
@@ -580,7 +576,6 @@ export function StepShipping({ defaults }: Props) {
                     autoComplete="postal-code"
                     value={form.zip}
                     onChange={(e) => setForm({ ...form, zip: e.target.value })}
-                    placeholder="020956"
                   />
                 </div>
               </>

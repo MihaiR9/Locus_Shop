@@ -481,7 +481,6 @@ export function StepBilling({ defaults }: Props) {
               type="text"
               value={f.firstName}
               onChange={(e) => setF({ ...f, firstName: e.target.value })}
-              placeholder="Mihai"
             />
           </div>
           <div className="co-field">
@@ -493,7 +492,6 @@ export function StepBilling({ defaults }: Props) {
               type="text"
               value={f.lastName}
               onChange={(e) => setF({ ...f, lastName: e.target.value })}
-              placeholder="Roscăneanu"
             />
           </div>
           <div className="co-field span-2">
@@ -505,7 +503,6 @@ export function StepBilling({ defaults }: Props) {
               type="email"
               value={f.email}
               onChange={(e) => setF({ ...f, email: e.target.value })}
-              placeholder="tu@exemplu.ro"
               suppressHydrationWarning
             />
           </div>
@@ -547,7 +544,6 @@ export function StepBilling({ defaults }: Props) {
                   autoComplete="address-level2"
                   value={f.city}
                   onChange={(e) => setF({ ...f, city: e.target.value })}
-                  placeholder="București"
                   suppressHydrationWarning
                 />
               </div>
@@ -561,7 +557,6 @@ export function StepBilling({ defaults }: Props) {
                   autoComplete="address-level1"
                   value={f.county}
                   onChange={(e) => setF({ ...f, county: e.target.value })}
-                  placeholder="Ilfov"
                   suppressHydrationWarning
                 />
               </div>
@@ -575,7 +570,6 @@ export function StepBilling({ defaults }: Props) {
                   autoComplete="postal-code"
                   value={f.zip}
                   onChange={(e) => setF({ ...f, zip: e.target.value })}
-                  placeholder="020956"
                   suppressHydrationWarning
                 />
               </div>
@@ -612,7 +606,6 @@ export function StepBilling({ defaults }: Props) {
               type="text"
               value={j.company}
               onChange={(e) => setJ({ ...j, company: e.target.value })}
-              placeholder="Domeniul Locus SRL"
               autoComplete="organization"
             />
           </div>
@@ -661,7 +654,6 @@ export function StepBilling({ defaults }: Props) {
               type="email"
               value={j.email}
               onChange={(e) => setJ({ ...j, email: e.target.value })}
-              placeholder="contabilitate@firma.ro"
             />
           </div>
           <div className="co-field span-2">
@@ -687,7 +679,6 @@ export function StepBilling({ defaults }: Props) {
               autoComplete="address-level2"
               value={j.hqCity}
               onChange={(e) => setJ({ ...j, hqCity: e.target.value })}
-              placeholder="București"
             />
           </div>
           <div className="co-field">
@@ -700,7 +691,6 @@ export function StepBilling({ defaults }: Props) {
               autoComplete="address-level1"
               value={j.hqCounty}
               onChange={(e) => setJ({ ...j, hqCounty: e.target.value })}
-              placeholder="Ilfov"
             />
           </div>
 
