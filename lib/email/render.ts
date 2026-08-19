@@ -133,10 +133,13 @@ export function renderReturnStatus(
   return renderWith("return_status", enrichedCtx, assembleReturnStatus);
 }
 
-export function renderNewsletterWelcome(): Promise<Rendered> {
-  return renderWith("newsletter_welcome", {}, () =>
-    assembleNewsletterWelcome({}, {}),
-  );
+export function renderNewsletterWelcome(
+  vars: { couponCode?: string } = {},
+): Promise<Rendered> {
+  /* Lambda-ul de dinainte ignora argumentele si chema assemble cu `{}`,
+     asa ca blocurile incarcate din DB se pierdeau si emailul pleca gol —
+     doar chenarul, fara text. Pasam functia direct. */
+  return renderWith("newsletter_welcome", vars, assembleNewsletterWelcome);
 }
 
 // ─── Preview (folosit din admin) ─────────────────────────────────
@@ -185,7 +188,9 @@ export function previewTemplate(
       ));
       break;
     case "newsletter_welcome":
-      ({ content, preheader } = assembleNewsletterWelcome(blocks, {}));
+      // `vars` conține sampleVariables (couponCode) — fără ele, preview-ul
+      // din admin ar arăta emailul fără cod, adică altfel decât pleacă.
+      ({ content, preheader } = assembleNewsletterWelcome(blocks, vars));
       break;
     default:
       throw new Error(`No preview handler for template ${key}`);

@@ -80,8 +80,11 @@ export async function sendOrderNotificationToAdmin(
 /**
  * Newsletter welcome — fires when someone submits the footer signup.
  */
-export async function sendNewsletterWelcome(to: string): Promise<SendResult> {
-  const rendered = await renderNewsletterWelcome();
+export async function sendNewsletterWelcome(
+  to: string,
+  couponCode?: string,
+): Promise<SendResult> {
+  const rendered = await renderNewsletterWelcome({ couponCode });
   return sendRendered(to, rendered, "newsletter welcome");
 }
 

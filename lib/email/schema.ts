@@ -471,9 +471,9 @@ export const RETURN_STATUS: EmailTemplateDef = {
 export const NEWSLETTER_WELCOME: EmailTemplateDef = {
   key: "newsletter_welcome",
   name: "Bun venit newsletter",
-  description: "Trimis la signup din footer.",
+  description: "Trimis la signup din footer sau din pop-up.",
   destination: "client",
-  variables: [],
+  variables: ["couponCode"],
   subject: "Bun venit la Domeniul Locus",
   blocks: [
     {
@@ -487,6 +487,22 @@ export const NEWSLETTER_WELCOME: EmailTemplateDef = {
       label: "Titlu mare",
       kind: "input",
       defaultValue: "Locul, în cuvinte.",
+    },
+    /* Pop-up-ul de pe site promite „−10% la prima comandă", așa că emailul
+       trebuie să livreze codul. Blocurile de mai jos apar doar când
+       {{couponCode}} are valoare — dacă nu există cupon activ, emailul
+       pleacă fără promisiune neonorată. */
+    {
+      key: "coupon_label",
+      label: "Etichetă cod reducere",
+      kind: "input",
+      defaultValue: "codul tău de reducere",
+    },
+    {
+      key: "coupon_note",
+      label: "Explicație sub cod",
+      kind: "input",
+      defaultValue: "−10% la prima comandă. Îl introduci în coș, la finalizare.",
     },
     {
       key: "para_1",
@@ -507,10 +523,10 @@ export const NEWSLETTER_WELCOME: EmailTemplateDef = {
       label: "Paragraf 3 (cu link către shop)",
       kind: "textarea",
       defaultValue:
-        "Între timp, vinurile sunt aici: https://domeniul-locus.ro/shop",
+        "Între timp, vinurile sunt aici: https://www.domeniul-locus.ro/shop",
     },
   ],
-  sampleVariables: {},
+  sampleVariables: { couponCode: "LOCUS10" },
 };
 
 // ─── Registry ────────────────────────────────────────────────────

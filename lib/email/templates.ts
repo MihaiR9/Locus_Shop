@@ -437,11 +437,34 @@ export function assembleNewsletterWelcome(
   blocks: Record<string, string>,
   vars: Record<string, string | number | undefined>,
 ): Assembled {
+  /* Codul apare doar dacă expeditorul a găsit un cupon activ. Un cod pe
+     care checkout-ul l-ar refuza e mai rău decât niciun cod. */
+  const code = String(vars.couponCode ?? "").trim();
+  const couponBlock = code
+    ? `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 0 0;">
+      <tr>
+        <td align="center" style="border:1px solid ${LINE};background:${PAMANT};padding:22px 16px;">
+          <div style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};">
+            ${escapeHtml(b(blocks, "coupon_label", vars))}
+          </div>
+          <div style="font-family:${MONO};font-size:26px;letter-spacing:0.18em;color:${INK};margin-top:12px;font-weight:600;">
+            ${escapeHtml(code)}
+          </div>
+          <div style="font-family:${MONO};font-size:11px;line-height:1.7;color:${INK_SOFT};margin-top:12px;">
+            ${escapeHtml(b(blocks, "coupon_note", vars))}
+          </div>
+        </td>
+      </tr>
+    </table>`
+    : "";
+
   const content = `
     <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:14px;">
       ${escapeHtml(b(blocks, "eyebrow", vars))}
     </div>
     <span style="font-family:${SERIF};font-size:36px;color:${INK};letter-spacing:-0.015em;">${escapeHtml(b(blocks, "greeting", vars))}</span>
+    ${couponBlock}
     <p style="font-family:${MONO};font-size:14px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
       ${textToHtml(b(blocks, "para_1", vars))}
     </p>
