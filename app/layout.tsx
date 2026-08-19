@@ -40,8 +40,9 @@ gtag('set', 'ads_data_redaction', true);
 gtag('set', 'url_passthrough', true);
 `;
 
-/** Fost display font principal. Italiana n-are diacritice complete (ș/ț
- *  cu virgulă sub) — o păstrăm doar pentru pagini legacy dacă ai nevoie. */
+/** Fontul din logo. N-are diacritice complete (ș/ț cu virgulă sub), deci
+ *  îl folosim doar unde textul e fix și fără ele — momentan titlul hero
+ *  de pe pagina principală (`.hero-title`). Restul stă pe Cormorant. */
 const italiana = Italiana({
   variable: "--font-italiana",
   subsets: ["latin"],

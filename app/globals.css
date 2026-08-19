@@ -911,7 +911,11 @@
 }
 .hero-title {
   color: var(--pamant);
-  font-family: var(--font-serif), Georgia, serif;
+  /* Italiana, ca în logo. Restul site-ului rămâne pe Cormorant fiindcă
+     Italiana n-are ș/ț cu virgulă — aici textul e „un loc. un timp. un
+     vin.", fără diacritice, deci limitarea nu se vede. Dacă textul
+     hero-ului se schimbă vreodată în ceva cu diacritice, mută-l înapoi. */
+  font-family: var(--font-italiana), Georgia, serif;
   font-size: clamp(64px, 12vw, 192px);
   line-height: 0.88;
   letter-spacing: -0.025em;
