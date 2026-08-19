@@ -15,7 +15,7 @@ export default async function BillingPage() {
   const supabase = await getSupabaseServerClient();
   const { data } = await supabase
     .from("billing_profiles")
-    .select("id, company, cui, reg_no, iban, hq_address, type")
+    .select("id, company, cui, reg_no, iban, hq_address, hq_city, hq_county, type")
     .eq("customer_id", user.customerId)
     .eq("type", "juridica")
     .order("id", { ascending: true });

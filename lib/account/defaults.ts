@@ -33,6 +33,8 @@ export type SavedBilling = {
   regNo: string | null;
   iban: string | null;
   hqAddress: string | null;
+  hqCity: string | null;
+  hqCounty: string | null;
   isDefault: boolean;
 };
 
@@ -77,7 +79,7 @@ export async function getAccountDefaults(
   const { data: billingProfiles } = await supabase
     .from("billing_profiles")
     .select(
-      "id, type, label, cnp, company, cui, reg_no, iban, hq_address, is_default",
+      "id, type, label, cnp, company, cui, reg_no, iban, hq_address, hq_city, hq_county, is_default",
     )
     .eq("customer_id", customerId)
     .order("is_default", { ascending: false });
@@ -105,6 +107,8 @@ export async function getAccountDefaults(
       regNo: b.reg_no,
       iban: b.iban,
       hqAddress: b.hq_address,
+      hqCity: b.hq_city,
+      hqCounty: b.hq_county,
       isDefault: b.is_default,
     })),
     favoritePickupPoint: customer.favorite_pickup_point_id
@@ -267,6 +271,8 @@ export async function saveAccountFromOrder(args: {
         reg?: string;
         iban?: string;
         hq?: string;
+        hqCity?: string;
+        hqCounty?: string;
       };
       await supabase.from("billing_profiles").insert({
         customer_id: customerId,
@@ -277,6 +283,8 @@ export async function saveAccountFromOrder(args: {
         reg_no: b.reg || null,
         iban: b.iban || null,
         hq_address: b.hq || null,
+        hq_city: b.hqCity || null,
+        hq_county: b.hqCounty || null,
         is_default: isFirst,
       });
     }

@@ -202,10 +202,19 @@ export default async function AdminOrderDetailPage({
                 <div className="space-y-1 text-sm text-zinc-800">
                   <div className="font-medium">{String(bill.company ?? "")}</div>
                   {bill.cui && <div>CUI {String(bill.cui)}</div>}
-                  {bill.regNo && <div>Reg. {String(bill.regNo)}</div>}
-                  {bill.hqAddress && (
+                  {/* Snapshot-ul de la checkout scrie `reg`/`hq`; `regNo`/
+                      `hqAddress` sunt formele din profilurile salvate pe cont.
+                      Acceptăm ambele — altfel comenzile pe firmă apar fără
+                      sediu, ceea ce ascunde exact datele de pe factură. */}
+                  {(bill.reg ?? bill.regNo) != null && (
+                    <div>Reg. {String(bill.reg ?? bill.regNo)}</div>
+                  )}
+                  {(bill.hq ?? bill.hqAddress) != null && (
                     <div className="text-zinc-600">
-                      {String(bill.hqAddress)}
+                      {[bill.hq ?? bill.hqAddress, bill.hqCity, bill.hqCounty]
+                        .filter(Boolean)
+                        .map(String)
+                        .join(", ")}
                     </div>
                   )}
                 </div>

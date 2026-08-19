@@ -13,7 +13,7 @@ import type { FgoClient, FgoContinutItem, FgoTipClient } from "./types";
  *  - Prețurile din DB sunt cu TVA inclus → mergem pe direcția „inversă":
  *    trimitem `PretTotal` per linie (nu `PretUnitar`) ca să nu apară
  *    rotunjiri de cenți în TVA.
- *  - CotaTVA: 19% pentru vin (standard RO). SGR = 0%.
+ *  - CotaTVA: cota standard RO pentru vin (vezi VAT_STANDARD). SGR = 0%.
  */
 
 type BillingSnap = Record<string, unknown>;
@@ -66,11 +66,12 @@ export function buildFgoClient(
     const hq = stringField(billing, "hq") ?? "";
     const email =
       stringField(billing, "email") ?? customer.email ?? undefined;
-    /* Adresa în FGO se împarte în Adresa/Localitate/Judet. Aici avem doar
-       un singur string `hq` pentru sediu — îl trimitem pe Adresa și lăsăm
-       Localitate/Judet să vină ori din context, ori goale (FGO va pica dacă
-       Tara=RO și lipsește Judet, deci în viitor extindem billing_profiles
-       cu câmpuri separate). */
+    /* FGO cere adresa despărțită în Adresa/Localitate/Judet, așa că
+       formularul de checkout le colectează separat. Comenzile de dinainte
+       de despărțire au doar `hq`; pentru ele lăsăm câmpurile goale, ca FGO
+       să respingă factura, în loc să inventăm un județ. O factură refuzată
+       se repară dintr-un click; una emisă cu adresa greșită pleacă la ANAF
+       și se corectează prin storno. */
     return {
       Denumire: company,
       CodUnic: cui,
@@ -78,8 +79,8 @@ export function buildFgoClient(
       Email: email,
       Telefon: customer.phone ?? undefined,
       Tara: "ROMANIA",
-      Judet: "Bucuresti", // TODO: parse din hq_address; setat implicit pt PJ
-      Localitate: "Bucuresti",
+      Judet: stringField(billing, "hqCounty"),
+      Localitate: stringField(billing, "hqCity"),
       Adresa: hq,
       Tip: tip,
       ContBancar: iban,

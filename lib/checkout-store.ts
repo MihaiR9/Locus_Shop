@@ -56,7 +56,10 @@ export type BillingJuridica = {
   reg: string;
   iban: string;
   email: string;
+  /** Sediu social — stradă și număr. FGO cere localitatea și județul separat. */
   hq: string;
+  hqCity: string;
+  hqCounty: string;
 };
 export type Billing = BillingFizica | BillingJuridica;
 

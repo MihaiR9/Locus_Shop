@@ -48,6 +48,8 @@ type JuridicaForm = {
   iban: string;
   email: string;
   hq: string;
+  hqCity: string;
+  hqCounty: string;
 };
 
 export function StepBilling({ defaults }: Props) {
@@ -140,6 +142,8 @@ export function StepBilling({ defaults }: Props) {
         iban: first.iban ?? "",
         email: defaults?.customerEmail ?? "",
         hq: first.hqAddress ?? "",
+        hqCity: first.hqCity ?? "",
+        hqCounty: first.hqCounty ?? "",
       };
     }
     return {
@@ -150,6 +154,8 @@ export function StepBilling({ defaults }: Props) {
       iban: "",
       email: defaults?.customerEmail ?? "",
       hq: "",
+      hqCity: "",
+      hqCounty: "",
     };
   })();
 
@@ -197,6 +203,8 @@ export function StepBilling({ defaults }: Props) {
           iban: b.iban ?? "",
           email: defaults?.customerEmail ?? j.email,
           hq: b.hqAddress ?? "",
+          hqCity: b.hqCity ?? "",
+          hqCounty: b.hqCounty ?? "",
         };
         setJ(s);
         saveBilling(s as Billing);
@@ -249,8 +257,18 @@ export function StepBilling({ defaults }: Props) {
       setF(finalF);
       saveBilling(finalF as Billing);
     } else {
-      if (!j.company.trim() || !j.cui.trim() || !j.email.trim() || !j.hq.trim()) {
-        setError("Completează firmă, CUI, email și adresă sediu.");
+      /* Localitatea și județul sunt obligatorii, nu decorative: FGO le cere
+         pe câmpuri distincte când Tara=RO, iar factura pleacă mai departe
+         la ANAF prin e-Factura. */
+      if (
+        !j.company.trim() ||
+        !j.cui.trim() ||
+        !j.email.trim() ||
+        !j.hq.trim() ||
+        !j.hqCity.trim() ||
+        !j.hqCounty.trim()
+      ) {
+        setError("Completează firmă, CUI, email și adresa completă a sediului.");
         return;
       }
       if (!/^\S+@\S+\.\S+$/.test(j.email)) {
@@ -330,7 +348,13 @@ export function StepBilling({ defaults }: Props) {
                   CUI {j.cui || "—"}
                   {j.reg ? ` · ${j.reg}` : ""}
                 </div>
-                {j.hq && <div className="co-saved-line muted">{j.hq}</div>}
+                {j.hq && (
+                  <div className="co-saved-line muted">
+                    {j.hq}
+                    {j.hqCity ? `, ${j.hqCity}` : ""}
+                    {j.hqCounty ? `, ${j.hqCounty}` : ""}
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -417,6 +441,8 @@ export function StepBilling({ defaults }: Props) {
                   iban: "",
                   email: defaults?.customerEmail ?? "",
                   hq: "",
+                  hqCity: "",
+                  hqCounty: "",
                 });
               }
               setMode("form");
@@ -647,8 +673,34 @@ export function StepBilling({ defaults }: Props) {
               type="text"
               value={j.hq}
               onChange={(e) => setJ({ ...j, hq: e.target.value })}
-              placeholder="Stradă, număr, localitate, județ"
+              placeholder="Stradă, număr, bloc, apartament"
               autoComplete="street-address"
+            />
+          </div>
+          <div className="co-field">
+            <label htmlFor="co-bj-city">
+              Localitate<span className="req">*</span>
+            </label>
+            <input
+              id="co-bj-city"
+              type="text"
+              autoComplete="address-level2"
+              value={j.hqCity}
+              onChange={(e) => setJ({ ...j, hqCity: e.target.value })}
+              placeholder="București"
+            />
+          </div>
+          <div className="co-field">
+            <label htmlFor="co-bj-county">
+              Județ<span className="req">*</span>
+            </label>
+            <input
+              id="co-bj-county"
+              type="text"
+              autoComplete="address-level1"
+              value={j.hqCounty}
+              onChange={(e) => setJ({ ...j, hqCounty: e.target.value })}
+              placeholder="Ilfov"
             />
           </div>
 

@@ -12,6 +12,8 @@ type BillingInput = {
   regNo?: string;
   iban?: string;
   hqAddress: string;
+  hqCity: string;
+  hqCounty: string;
   isDefault: boolean;
 };
 
@@ -20,6 +22,10 @@ function validate(input: BillingInput): string | null {
   if (!/^(RO)?\d{2,10}$/i.test(input.cui.replace(/\s+/g, "")))
     return "CUI invalid (ex: RO12345678 sau 12345678).";
   if (input.hqAddress.trim().length < 4) return "Sediul social e obligatoriu.";
+  /* FGO cere localitatea și județul pe câmpuri separate când Tara=RO, iar
+     factura pleacă la ANAF prin e-Factura — nu le putem lăsa opționale. */
+  if (!input.hqCity.trim()) return "Localitatea sediului e obligatorie.";
+  if (!input.hqCounty.trim()) return "Județul sediului e obligatoriu.";
   return null;
 }
 
@@ -40,6 +46,8 @@ export async function addBillingProfile(input: BillingInput): Promise<Result> {
     reg_no: input.regNo?.trim() || null,
     iban: input.iban?.trim() || null,
     hq_address: input.hqAddress.trim(),
+    hq_city: input.hqCity.trim(),
+    hq_county: input.hqCounty.trim(),
   });
   if (error) return { ok: false, error: error.message };
 
@@ -66,6 +74,8 @@ export async function updateBillingProfile(
       reg_no: input.regNo?.trim() || null,
       iban: input.iban?.trim() || null,
       hq_address: input.hqAddress.trim(),
+      hq_city: input.hqCity.trim(),
+      hq_county: input.hqCounty.trim(),
     })
     .eq("id", id)
     .eq("customer_id", user.customerId);

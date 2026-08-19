@@ -125,6 +125,8 @@ export type Database = {
           cui: string | null
           customer_id: string
           hq_address: string | null
+          hq_city: string | null
+          hq_county: string | null
           iban: string | null
           id: string
           is_default: boolean
@@ -139,6 +141,8 @@ export type Database = {
           cui?: string | null
           customer_id: string
           hq_address?: string | null
+          hq_city?: string | null
+          hq_county?: string | null
           iban?: string | null
           id?: string
           is_default?: boolean
@@ -153,6 +157,8 @@ export type Database = {
           cui?: string | null
           customer_id?: string
           hq_address?: string | null
+          hq_city?: string | null
+          hq_county?: string | null
           iban?: string | null
           id?: string
           is_default?: boolean

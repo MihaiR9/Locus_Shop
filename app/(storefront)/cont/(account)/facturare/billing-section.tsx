@@ -14,6 +14,8 @@ export type BillingRow = {
   reg_no: string | null;
   iban: string | null;
   hq_address: string | null;
+  hq_city: string | null;
+  hq_county: string | null;
 };
 
 type Props = {
@@ -26,6 +28,8 @@ const EMPTY_FORM = {
   regNo: "",
   iban: "",
   hqAddress: "",
+  hqCity: "",
+  hqCounty: "",
   isDefault: false,
 };
 
@@ -49,6 +53,8 @@ export function BillingSection({ initial }: Props) {
       regNo: p.reg_no ?? "",
       iban: p.iban ?? "",
       hqAddress: p.hq_address ?? "",
+      hqCity: p.hq_city ?? "",
+      hqCounty: p.hq_county ?? "",
       isDefault: false,
     });
     setEditingId(p.id);
@@ -200,10 +206,26 @@ export function BillingSection({ initial }: Props) {
           />
           <Field
             id="bf-hq"
-            label="Sediu social"
+            label="Sediu social — stradă și număr"
             value={form.hqAddress}
             onChange={(v) => setForm({ ...form, hqAddress: v })}
-            placeholder="Str. Exemplu nr. 1, București"
+            placeholder="Str. Exemplu nr. 1"
+            required
+          />
+          <Field
+            id="bf-hq-city"
+            label="Localitate"
+            value={form.hqCity}
+            onChange={(v) => setForm({ ...form, hqCity: v })}
+            placeholder="București"
+            required
+          />
+          <Field
+            id="bf-hq-county"
+            label="Județ"
+            value={form.hqCounty}
+            onChange={(v) => setForm({ ...form, hqCounty: v })}
+            placeholder="Ilfov"
             required
           />
 
@@ -300,7 +322,9 @@ export function BillingSection({ initial }: Props) {
                 {p.hq_address && (
                   <>
                     <br />
-                    {p.hq_address}
+                    {[p.hq_address, p.hq_city, p.hq_county]
+                      .filter(Boolean)
+                      .join(", ")}
                   </>
                 )}
                 {p.iban && (
