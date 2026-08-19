@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { FanCourierPickupPoint, FanCourierPickupType } from "@/lib/fancourier/types";
-import { usePickupPoints } from "./use-pickup-points";
+import { foldDiacritics, usePickupPoints } from "./use-pickup-points";
 
 type SelectedPoint = {
   id: string;
@@ -38,7 +38,8 @@ export function PickupPointSelect({
   disabled,
 }: Props) {
   const [manualId, setManualId] = useState(value?.id ?? "");
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(value?.name ?? "");
+  const [listOpen, setListOpen] = useState(false);
 
   /* Luăm TOATE punctele tipului (~5k pentru FANbox) și filtrăm client-side,
      ca să nu refetch-uim la fiecare tastă în căutare. */
@@ -47,7 +48,10 @@ export function PickupPointSelect({
   const state = fetched.status;
   const errMsg = "message" in fetched ? fetched.message : null;
 
-  const norm = (s: string) => s.toLowerCase();
+  /* Datele FanCourier vin fără diacritice („Bucuresti", „Galati"), iar
+     județul din formular le are. Fără pliere, filtrarea pe zonă nu se
+     potrivea niciodată în județele scrise cu diacritice. */
+  const norm = foldDiacritics;
 
   /* Filtrarea combină `query` (căutare liberă) cu județul/localitatea pre-
      completate în formularul de checkout — dacă user-ul le-a scris deja,
@@ -70,6 +74,14 @@ export function PickupPointSelect({
     return true;
   });
 
+  /** Eticheta care rămâne în câmp după alegere — nume + stradă. */
+  function labelFor(p: FanCourierPickupPoint): string {
+    const street = [p.address.street, p.address.streetNo]
+      .filter(Boolean)
+      .join(" ");
+    return street ? `${p.name} — ${street}` : p.name;
+  }
+
   function selectPoint(p: FanCourierPickupPoint) {
     onChange({
       id: p.id,
@@ -83,6 +95,11 @@ export function PickupPointSelect({
         .filter(Boolean)
         .join(", "),
     });
+    /* Lockerul ales umple chiar câmpul de căutare și lista se închide —
+       altfel rămâneai cu o listă lungă deschisă și confirmarea undeva
+       dedesubt, fără să se vadă ce ai ales. */
+    setQuery(labelFor(p));
+    setListOpen(false);
   }
 
   function applyManual() {
@@ -144,11 +161,17 @@ export function PickupPointSelect({
             className="input"
             placeholder={`Caută după nume, stradă, cartier sau oraș · ${points.length} puncte`}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setListOpen(true);
+              // Scrie peste alegerea făcută: caută din nou, deci n-o mai are.
+              if (value) onChange(null);
+            }}
+            onFocus={() => setListOpen(true)}
             disabled={disabled}
             style={{ marginBottom: 8 }}
           />
-          {filtered.length === 0 ? (
+          {!listOpen ? null : filtered.length === 0 ? (
             <p className="step-note" style={{ marginTop: 6 }}>
               Nu am găsit nimic. Șterge din text sau caută alt oraș.
             </p>
@@ -180,12 +203,6 @@ export function PickupPointSelect({
                 </option>
               )}
             </select>
-          )}
-          {value && (
-            <p className="step-note" style={{ marginTop: 6, color: "#3E4336" }}>
-              ✓ {value.name}
-              {value.address ? ` · ${value.address}` : ""}
-            </p>
           )}
         </>
       )}

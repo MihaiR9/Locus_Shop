@@ -81,6 +81,25 @@ export function usePickupPoints(
 }
 
 /**
+ * Normalizare pentru comparat nume de locuri.
+ *
+ * FanCourier livrează totul fără diacritice — „Bucuresti", „Galati",
+ * „Timis" — în timp ce dropdown-ul nostru de județe folosește ortografia
+ * corectă. Comparate direct, cele două nu se potrivesc niciodată, iar
+ * clientul primea „nu există lockere" fix în județele mari.
+ */
+export function foldDiacritics(s: string): string {
+  return s
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    // ș/ț cu virgulă dedesubt nu se descompun în toate fonturile de date.
+    .replace(/[șş]/gi, "s")
+    .replace(/[țţ]/gi, "t")
+    .trim()
+    .toLowerCase();
+}
+
+/**
  * Localitățile distincte dintr-un județ, sortate românește. Sursa e chiar
  * lista de puncte: dacă un oraș nu apare aici, nu are locker, deci nu are
  * ce căuta în dropdown.
@@ -90,14 +109,14 @@ export function localitiesInCounty(
   county: string,
 ): string[] {
   if (!county.trim()) return [];
-  const target = county.trim().toLowerCase();
+  const target = foldDiacritics(county);
   const seen = new Map<string, string>();
   for (const p of points) {
-    if ((p.address.county ?? "").trim().toLowerCase() !== target) continue;
+    if (foldDiacritics(p.address.county ?? "") !== target) continue;
     const locality = (p.address.locality ?? "").trim();
     if (!locality) continue;
     // Cheie normalizată — FanCourier scrie uneori aceeași localitate diferit.
-    const key = locality.toLowerCase();
+    const key = foldDiacritics(locality);
     if (!seen.has(key)) seen.set(key, locality);
   }
   return [...seen.values()].sort((a, b) => a.localeCompare(b, "ro"));

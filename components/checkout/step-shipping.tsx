@@ -270,7 +270,12 @@ export function StepShipping({ defaults }: Props) {
           role="tab"
           aria-selected={tab === "fanbox"}
           className={`co-tab ${tab === "fanbox" ? "is-active" : ""}`}
-          onClick={() => setTab("fanbox")}
+          onClick={() => {
+            setTab("fanbox");
+            /* Câmpul de observații dispare pe FANbox, deci ce a scris omul
+               pentru curier nu trebuie să plece mai departe nevăzut. */
+            if (form.note) setForm({ ...form, note: "" });
+          }}
         >
           Locker FANbox
         </button>
@@ -606,17 +611,22 @@ export function StepShipping({ defaults }: Props) {
               </div>
             )}
 
-            <div className="co-field span-2">
-              <label htmlFor="co-note">
-                Observații <span className="opt">(opțional)</span>
-              </label>
-              <textarea
-                id="co-note"
-                value={form.note}
-                onChange={(e) => setForm({ ...form, note: e.target.value })}
-                placeholder="Interfon, program, alte detalii utile curierului"
-              />
-            </div>
+            {/* Doar la livrarea la ușă. Într-un locker nu există interfon,
+                program sau curier de instruit — câmpul n-ar face decât să
+                strângă text pe care nu-l citește nimeni. */}
+            {tab === "curier" && (
+              <div className="co-field span-2">
+                <label htmlFor="co-note">
+                  Observații <span className="opt">(opțional)</span>
+                </label>
+                <textarea
+                  id="co-note"
+                  value={form.note}
+                  onChange={(e) => setForm({ ...form, note: e.target.value })}
+                  placeholder="Interfon, program, alte detalii utile curierului"
+                />
+              </div>
+            )}
 
             {error && <p className="co-error">{error}</p>}
 
