@@ -9,14 +9,26 @@
 
 import { formatRon } from "@/lib/wines";
 import { interpolate } from "@/lib/email/schema";
+import { getSiteUrl } from "@/lib/site";
 
-const PAMANT = "#EBE1DA";
-const INK = "#1A1A1A";
-const INK_SOFT = "#4A3C2D";
-const INK_MUTE = "#6E5E4B";
-const VIE = "#3E4336";
-const SURFACE = "#F2EAE2";
-const LINE = "rgba(74,60,45,0.18)";
+/* Imaginile din email au nevoie de URL absolut — clientul de mail nu are
+   noțiunea de „origine". Vine din NEXT_PUBLIC_SITE_URL, aceeași sursă ca
+   linkurile din feed-uri și redirect-urile Stripe. */
+const SITE = getSiteUrl();
+
+/* Paleta e cea din `supabase/email-templates/magic-link.html`. Cele două
+   familii de emailuri — cele trimise de Supabase la autentificare și cele
+   trimise de noi prin Resend — arătau ca din proiecte diferite; acum
+   folosesc aceleași valori. Dacă schimbi ceva aici, schimbă și acolo. */
+const PAMANT = "#f0ede7"; // fundalul paginii, în spatele cardului
+const SURFACE = "#faf9f6"; // cardul propriu-zis
+const INK = "#1a1a1a";
+const INK_SOFT = "#4a3c2d";
+const INK_MUTE = "#6e5e4b";
+const GOLD = "#8b7841"; // tagline sub logo + linkuri
+const LEGAL = "#8a7c68"; // mențiunile de sub card
+const VIE = GOLD; // linkurile erau verzi; în design-ul nou sunt aurii
+const LINE = "rgba(74,60,45,0.14)";
 
 const SERIF = "'Italiana', Georgia, 'Times New Roman', serif";
 const MONO = "'IBM Plex Mono', 'Courier New', Courier, monospace";
@@ -31,33 +43,59 @@ export function shell(content: string, preheader = ""): string {
 </head>
 <body style="margin:0;padding:0;background:${PAMANT};font-family:${MONO};color:${INK};">
   ${preheader ? `<div style="display:none;visibility:hidden;opacity:0;height:0;width:0;overflow:hidden;">${escapeHtml(preheader)}</div>` : ""}
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${PAMANT};padding:32px 16px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${PAMANT};padding:40px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:${PAMANT};">
+
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:${SURFACE};border:1px solid ${LINE};">
+
           <tr>
-            <td style="padding:0 0 24px 0;text-align:center;">
-              <span style="font-family:${SERIF};font-size:32px;color:${INK};letter-spacing:-0.02em;">Domeniul Locus</span>
-              <div style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-top:6px;">un loc · un timp · un vin</div>
-            </td>
-          </tr>
-          <tr>
-            <td style="background:${SURFACE};border:1px solid ${LINE};padding:32px;">
+            <td style="padding:52px 44px 0 44px;">
               ${content}
             </td>
           </tr>
+
+          <!-- Logo. Identitatea stă la final, ca la emailurile de
+               autentificare: mesajul intră direct în subiect, semnătura
+               vine după. Fără fotografie — cerință de brand. -->
           <tr>
-            <td style="padding:24px 0 0 0;text-align:center;font-family:${MONO};font-size:11px;color:${INK_MUTE};line-height:1.6;">
-              SC ROMVINTEC SRL · Buciumeni, jud. Galați<br />
-              <a href="mailto:contact@domeniul-locus.ro" style="color:${INK_SOFT};text-decoration:none;">contact@domeniul-locus.ro</a>
-              · <a href="tel:+40752232912" style="color:${INK_SOFT};text-decoration:none;">0752 232 912</a>
-              <br /><br />
-              <span style="color:${INK_MUTE};font-size:10px;">
-                18+ · Conține sulfiți · Consumul excesiv de alcool dăunează sănătății.
-              </span>
+            <td align="center" style="padding:46px 44px 0 44px;">
+              <img src="${SITE}/brand/logo-locus.png" width="104" alt="Domeniul Locus"
+                   style="display:block;margin:0 auto;width:104px;height:auto;border:0;" />
+              <div style="font-family:${MONO};font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:${GOLD};padding-top:10px;">
+                un loc · un timp · un vin
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:40px 44px 0 44px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid ${LINE};">
+                <tr>
+                  <td style="padding:18px 0 0 0;font-family:${MONO};font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:${INK_MUTE};">Buciumeni, Galați</td>
+                  <td align="center" style="padding:18px 0 0 0;font-family:${MONO};font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:${INK_MUTE};">
+                    <a href="mailto:office@domeniul-locus.ro" style="color:${INK_MUTE};text-decoration:none;">office@domeniul-locus.ro</a>
+                  </td>
+                  <td align="right" style="padding:18px 0 0 0;font-family:${MONO};font-size:9px;letter-spacing:0.12em;color:${INK_MUTE};">
+                    <a href="tel:+40752232912" style="color:${INK_MUTE};text-decoration:none;">0752 232 912</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr><td style="padding:0 44px 44px 44px;"></td></tr>
+        </table>
+
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+          <tr>
+            <td align="center" style="padding:22px 20px 0 20px;font-family:${MONO};font-size:9px;line-height:1.8;letter-spacing:0.08em;color:${LEGAL};">
+              SC ROMVINTEC SRL · 18+ · Conține sulfiți<br />
+              Consumul excesiv de alcool dăunează sănătății.
             </td>
           </tr>
         </table>
+
       </td>
     </tr>
   </table>
@@ -192,16 +230,23 @@ export function assembleOrderConfirmation(
       : b(blocks, "payment_cash", vars);
   const footnoteText = b(blocks, "footnote", vars);
 
+  /* Antetul e centrat, ca la magic link: eyebrow mono uppercase, titlu
+     serif mare, apoi introducerea. De la tabelul de produse în jos revenim
+     la aliniere la stânga — cifrele și adresele centrate se citesc prost. */
   const content = `
-    <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:14px;">
-      ${escapeHtml(eyebrowText)}
+    <div style="text-align:center;">
+      <div style="font-family:${MONO};font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:${GOLD};">
+        ${escapeHtml(eyebrowText)}
+      </div>
+      <div style="font-family:${SERIF};font-size:38px;line-height:1.15;color:${INK};letter-spacing:-0.015em;padding-top:14px;">
+        ${escapeHtml(greetingText)}
+      </div>
+      <div style="font-family:${MONO};font-size:11px;line-height:2;letter-spacing:0.16em;text-transform:uppercase;color:${INK_SOFT};padding-top:18px;">
+        ${textToHtml(introText)}
+      </div>
     </div>
-    <span style="font-family:${SERIF};font-size:36px;color:${INK};letter-spacing:-0.015em;">${escapeHtml(greetingText)}</span>
-    <p style="font-family:${MONO};font-size:14px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
-      ${textToHtml(introText)}
-    </p>
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:32px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:38px;">
       ${itemsRows}
     </table>
 
@@ -209,17 +254,17 @@ export function assembleOrderConfirmation(
       ${totalsRows}
     </table>
 
-    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:32px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
-      <strong style="color:${INK};">${escapeHtml(shippingHeadingText)}</strong><br />
+    <p style="font-family:${MONO};font-size:12px;line-height:1.9;color:${INK_SOFT};margin:34px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
+      <span style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:${GOLD};">${escapeHtml(shippingHeadingText)}</span><br />
       ${textToHtml(shippingText)}
     </p>
 
-    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:16px 0 0 0;">
-      <strong style="color:${INK};">${escapeHtml(paymentHeadingText)}</strong><br />
+    <p style="font-family:${MONO};font-size:12px;line-height:1.9;color:${INK_SOFT};margin:20px 0 0 0;">
+      <span style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:${GOLD};">${escapeHtml(paymentHeadingText)}</span><br />
       ${textToHtml(paymentText)}
     </p>
 
-    <p style="font-family:${MONO};font-size:12px;line-height:1.7;color:${INK_MUTE};margin:32px 0 0 0;">
+    <p style="font-family:${MONO};font-size:10.5px;line-height:1.8;color:${INK_MUTE};margin:30px 0 0 0;">
       ${textToHtml(footnoteText)}
     </p>`;
 
