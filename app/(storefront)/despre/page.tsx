@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { Footer } from "@/components/landing/footer";
-import { ChapterThread } from "@/components/landing/chapter-thread";
 import { ChapterArt } from "@/components/despre/chapter-art";
 import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbSchema } from "@/lib/seo/schema";
@@ -87,10 +86,6 @@ export default function DesprePage() {
             <div className="poveste-coords">45.98°N 27.30°E · Buciumeni · Galați</div>
           </Reveal>
         </section>
-
-        {/* Linia ondulată care leagă capitolele, ca în landing-v6.
-            Doar pe desktop — vezi ChapterThread. */}
-        <ChapterThread count={CHAPTERS.length} />
 
         {CHAPTERS.map((ch, i) => (
           <section

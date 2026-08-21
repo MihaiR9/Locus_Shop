@@ -3740,44 +3740,8 @@
 }
 .poveste-head .lead { margin: 0 auto; max-width: 54ch; }
 
-/* ── Firul ondulat dintre capitole (desktop) ─────────────────────── */
-.chapter-thread {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  z-index: 0;
-  pointer-events: none;
-  overflow: visible;
-}
-.thread-track,
-.thread-fill {
-  fill: none;
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-}
-.thread-track { stroke: var(--line); }
-.thread-fill {
-  stroke: var(--vie);
-  opacity: 0.55;
-  transition: stroke-dashoffset 0.15s linear;
-}
-.thread-dot {
-  fill: var(--bg);
-  stroke: var(--line-strong, rgba(74, 60, 45, 0.28));
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-  transition: fill 0.4s var(--ease), stroke 0.4s var(--ease);
-}
-.thread-dot.is-on { fill: var(--vie); stroke: var(--vie); }
+/* `.chapter` rămâne poziționat: ilustrațiile și textul se așază peste el. */
 .chapter { position: relative; z-index: 1; }
-/* Firul are culoarul lui pe stânga; capitolele se retrag din el ca să nu
-   se suprapună niciodată peste text. */
-@media (min-width: 901px) {
-  .chapter { padding-left: max(var(--px), 120px); }
-}
-@media (max-width: 900px) {
-  .chapter-thread { display: none; }
-}
 
 .poveste-coords {
   margin-top: 32px;
@@ -8994,4 +8958,97 @@
   background: transparent;
   color: var(--ink-mute);
   border-color: var(--line);
+}
+
+/* ══ Antetul de pagină, unul singur ═══════════════════════════════
+   Fiecare pagină își crescuse propriul hero: Shop la 128px cu Bellefair
+   și tracking -0.06em, Livrare altfel, Parteneri altfel. Puse una după
+   alta, arătau a site-uri diferite.
+
+   Modelul e cel de pe /despre (`.poveste-head`): antet compact, centrat,
+   cu eyebrow deasupra, titlu serif la scara paginii și un lead îngust.
+   Compact intenționat — cititorul trebuie să ajungă la conținut fără să
+   deruleze un ecran întreg de titlu.
+
+   Blocul stă la finalul fișierului ca să bată definițiile de mai sus.
+   Când adaugi o pagină nouă cu antet, adaugă-i clasa în listele astea în
+   loc să-i scrii stiluri proprii. */
+
+.poveste-head,
+.shop-hero,
+.contact-hero,
+.parteneri-hero,
+.livrare-hero,
+.cum-cumperi-hero,
+.social-page-head {
+  padding: clamp(40px, 5vw, 68px) var(--px) clamp(32px, 4vw, 52px);
+  text-align: center;
+  background: transparent;
+  border-bottom: 1px solid var(--line);
+}
+
+.poveste-head-inner,
+.contact-hero-inner,
+.social-page-head-inner,
+.shop-hero .container-locus,
+.parteneri-hero .container-locus,
+.livrare-hero .container-locus,
+.cum-cumperi-hero .container-locus {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.poveste-head .eyebrow,
+.shop-hero .eyebrow,
+.contact-hero .eyebrow,
+.parteneri-hero .eyebrow,
+.livrare-hero .eyebrow,
+.cum-cumperi-hero .eyebrow,
+.social-page-head .eyebrow {
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.poveste-head h1,
+.shop-hero-title,
+.contact-hero h1,
+.parteneri-title,
+.livrare-hero-title,
+.cum-cumperi-title,
+.social-page-head h1 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(34px, 4.4vw, 62px);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+.poveste-head .lead,
+.shop-hero-lead,
+.contact-hero .lead,
+.parteneri-hero .lead,
+.livrare-hero-lead,
+.cum-cumperi-lead,
+.social-page-head .lead {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--ink-soft);
+  max-width: 54ch;
+  margin: 0 auto;
+}
+
+/* Paginile legale sunt documente, nu pagini de prezentare: textul rămâne
+   aliniat la stânga, ca să se citească. Le aducem doar titlul la aceeași
+   scară, ca să nu pară că vin din alt site. */
+.legal-prose h1 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: clamp(34px, 4.4vw, 62px);
+  line-height: 1.06;
+  letter-spacing: -0.015em;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 20px;
 }

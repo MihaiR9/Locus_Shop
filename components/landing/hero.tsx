@@ -73,7 +73,7 @@ export function Hero() {
                 <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
                   <use href="#star8" />
                 </svg>
-                Descoperă locul
+                Despre noi
                 <svg width="16" height="8" viewBox="0 0 24 12" aria-hidden="true">
                   <use href="#arrow-right" />
                 </svg>

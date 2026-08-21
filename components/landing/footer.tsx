@@ -40,8 +40,8 @@ export function Footer() {
           <h4>Navighează</h4>
           <ul>
             <li><Link href="/">Acasă</Link></li>
-            {/* Despre noi și Parteneri sunt ascunse cât timp lipsesc și din meniul de sus — vezi components/site-header.tsx. */}
-            {/* <li><Link href="/despre">Despre noi</Link></li> */}
+            {/* Parteneri e ascunsă cât timp lipsește și din meniul de sus — vezi components/site-header.tsx. */}
+            <li><Link href="/despre">Despre noi</Link></li>
             <li><Link href="/shop">Shop</Link></li>
             {/* <li><Link href="/parteneri">Parteneri</Link></li> */}
             <li><Link href="/contact">Contact</Link></li>

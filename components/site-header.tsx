@@ -13,15 +13,13 @@ type NavItem = {
   children?: { href: string; label: string }[];
 };
 
-/* „Despre noi” și „Colecție” sunt scoase din meniul de sus. Paginile
-   rămân publice și în sitemap: „Despre noi” e legată din hero, din
-   secțiunea despre, din harta de pe prima pagină și din subsol, iar
-   paginile de gamă din secțiunea de seturi și din firimiturile de pe
-   pagina de produs. Parteneri și Social sunt ascunse la fel. Ca să le
-   readuci în meniu, decomentează liniile de mai jos. */
+/* „Colecție”, „Parteneri” și „Social” sunt scoase din meniul de sus până
+   le mai lucrăm. Paginile rămân publice și în sitemap: cele de gamă sunt
+   legate din secțiunea de seturi și din firimiturile de pe pagina de
+   produs. Ca să le readuci în meniu, decomentează liniile de mai jos. */
 const NAV_LINKS: NavItem[] = [
   { href: "/", label: "Acasă" },
-  // { href: "/despre", label: "Despre noi" },
+  { href: "/despre", label: "Despre noi" },
   // {
   // href: "/shop",
   // label: "Colecție",
