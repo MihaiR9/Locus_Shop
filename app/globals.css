@@ -6898,8 +6898,11 @@
   margin: 0 auto;
 }
 
+/* Spațiu mic sub antet: lista de pași are propria linie de sus, iar
+   primul pas își aduce padding-ul lui. Cu 120px aici, între antet și
+   primul rând rămânea un ecran gol. */
 .cum-cumperi-content {
-  padding-top: clamp(60px, 8vw, 120px);
+  padding-top: clamp(18px, 2.2vw, 32px);
   padding-bottom: clamp(60px, 8vw, 120px);
   display: flex;
   flex-direction: column;
