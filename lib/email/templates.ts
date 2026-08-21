@@ -27,7 +27,6 @@ const INK_SOFT = "#4a3c2d";
 const INK_MUTE = "#6e5e4b";
 const GOLD = "#8b7841"; // tagline sub logo + linkuri
 const LEGAL = "#8a7c68"; // mențiunile de sub card
-const VIE = GOLD; // linkurile erau verzi; în design-ul nou sunt aurii
 const LINE = "rgba(74,60,45,0.14)";
 
 const SERIF = "'Italiana', Georgia, 'Times New Roman', serif";
