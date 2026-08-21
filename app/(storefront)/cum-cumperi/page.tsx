@@ -94,11 +94,6 @@ export default function CumCumperiPage() {
 
         <div className="container-locus cum-cumperi-content">
           <section className="steps-section" aria-label="Pași comandă">
-            <div className="livrare-section-head">
-              <div className="eyebrow">01 — pas cu pas</div>
-              <h2 className="h2">Cum funcționează.</h2>
-            </div>
-
             <ol className="steps-list">
               {STEPS.map((s) => (
                 <li key={s.n} className="step-item">
@@ -114,7 +109,7 @@ export default function CumCumperiPage() {
 
           <section className="cum-cumperi-faq" aria-label="Întrebări frecvente">
             <div className="livrare-section-head">
-              <div className="eyebrow">02 — întrebări frecvente</div>
+              <div className="eyebrow">Întrebări frecvente</div>
               <h2 className="h2">Ce ne mai întreabă lumea.</h2>
               <p className="lead">
                 Despre livrare specific, vezi{" "}
