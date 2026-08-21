@@ -13,22 +13,28 @@ type NavItem = {
   children?: { href: string; label: string }[];
 };
 
+/* „Despre noi” și „Colecție” sunt scoase din meniul de sus. Paginile
+   rămân publice și în sitemap: „Despre noi” e legată din hero, din
+   secțiunea despre, din harta de pe prima pagină și din subsol, iar
+   paginile de gamă din secțiunea de seturi și din firimiturile de pe
+   pagina de produs. Parteneri și Social sunt ascunse la fel. Ca să le
+   readuci în meniu, decomentează liniile de mai jos. */
 const NAV_LINKS: NavItem[] = [
   { href: "/", label: "Acasă" },
-  { href: "/despre", label: "Despre noi" },
-  {
-    href: "/shop",
-    label: "Colecție",
-    children: [
-      { href: "/cuvinte", label: "Cuvinte" },
-      { href: "/semne", label: "Semne" },
-      { href: "/pauze", label: "Pauze" },
-    ],
-  },
+  // { href: "/despre", label: "Despre noi" },
+  // {
+  // href: "/shop",
+  // label: "Colecție",
+  // children: [
+  // { href: "/cuvinte", label: "Cuvinte" },
+  // { href: "/semne", label: "Semne" },
+  // { href: "/pauze", label: "Pauze" },
+  // ],
+  // },
   { href: "/shop", label: "Shop" },
-  { href: "/social", label: "Social" },
+  // { href: "/social", label: "Social" },
   { href: "/contact", label: "Contact" },
-  { href: "/parteneri", label: "Parteneri" },
+  // { href: "/parteneri", label: "Parteneri" },
 ];
 
 type SessionUser = { firstName: string; fullName: string };
