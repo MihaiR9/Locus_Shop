@@ -87,13 +87,13 @@ async function renderWith<TCtx>(
   assemble: (
     blocks: Record<string, string>,
     ctx: TCtx,
-  ) => { content: string; preheader: string },
+  ) => { content: string; preheader: string; eyebrow: string; title: string },
 ): Promise<Rendered> {
   const { subject: subjectTpl, blocks } = await loadTemplate(key);
   const vars = ctx as unknown as Record<string, string | number | undefined>;
   const subject = interpolate(subjectTpl, vars);
-  const { content, preheader } = assemble(blocks, ctx);
-  return { subject, html: shell(content, preheader) };
+  const { content, preheader, eyebrow, title } = assemble(blocks, ctx);
+  return { subject, html: shell(content, preheader, { eyebrow, title }) };
 }
 
 export function renderOrderConfirmation(
@@ -162,27 +162,29 @@ export function previewTemplate(
 
   let content = "";
   let preheader = "";
+  let eyebrow = "";
+  let title = "";
   switch (key) {
     case "order_confirmation":
-      ({ content, preheader } = assembleOrderConfirmation(
+      ({ content, preheader, eyebrow, title } = assembleOrderConfirmation(
         blocks,
         SAMPLE_ORDER,
       ));
       break;
     case "shipped":
-      ({ content, preheader } = assembleShipped(blocks, SAMPLE_SHIPPED));
+      ({ content, preheader, eyebrow, title } = assembleShipped(blocks, SAMPLE_SHIPPED));
       break;
     case "delivered":
-      ({ content, preheader } = assembleDelivered(blocks, SAMPLE_DELIVERED));
+      ({ content, preheader, eyebrow, title } = assembleDelivered(blocks, SAMPLE_DELIVERED));
       break;
     case "refund_confirmation":
-      ({ content, preheader } = assembleRefundConfirmation(
+      ({ content, preheader, eyebrow, title } = assembleRefundConfirmation(
         blocks,
         SAMPLE_REFUND,
       ));
       break;
     case "return_status":
-      ({ content, preheader } = assembleReturnStatus(
+      ({ content, preheader, eyebrow, title } = assembleReturnStatus(
         blocks,
         SAMPLE_RETURN,
       ));
@@ -190,13 +192,13 @@ export function previewTemplate(
     case "newsletter_welcome":
       // `vars` conține sampleVariables (couponCode) — fără ele, preview-ul
       // din admin ar arăta emailul fără cod, adică altfel decât pleacă.
-      ({ content, preheader } = assembleNewsletterWelcome(blocks, vars));
+      ({ content, preheader, eyebrow, title } = assembleNewsletterWelcome(blocks, vars));
       break;
     default:
       throw new Error(`No preview handler for template ${key}`);
   }
 
-  return { subject, html: shell(content, preheader) };
+  return { subject, html: shell(content, preheader, { eyebrow, title }) };
 }
 
 // ─── Sample structured data pentru preview ──────────────────────
@@ -224,6 +226,9 @@ const SAMPLE_SHIPPED: ShippedEmailData = {
   customerName: "Andrei",
   awbNumber: "FC123456789",
   courierName: "FanCourier",
+  // Fara link, preview-ul ar ascunde butonul de urmarire — care in
+  // realitate exista pe orice expediere cu AWB.
+  trackingUrl: "https://www.fancourier.ro/awb-tracking/?awb=FC123456789",
   shippingAddress: "Str. Exemplu 12, București",
 };
 

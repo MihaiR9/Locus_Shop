@@ -33,7 +33,123 @@ const LINE = "rgba(74,60,45,0.14)";
 const SERIF = "'Italiana', Georgia, 'Times New Roman', serif";
 const MONO = "'IBM Plex Mono', 'Courier New', Courier, monospace";
 
-export function shell(content: string, preheader = ""): string {
+/* ─── Cărămizile design-ului ────────────────────────────────────
+   Emailul e „listă de vinuri tipărită": separăm cu linii de un pixel,
+   nu cu chenare imbricate. Fiecare bucată de mai jos e o mișcare din
+   partitura asta, ca să nu se rescrie stilul în fiecare șablon. */
+
+/** Linie orizontală subțire. `<div>` cu înălțime 1px — `<hr>` e imprevizibil în Outlook. */
+export function rule(marginTop = 0): string {
+  return `<div style="height:1px;background:${LINE};font-size:0;line-height:0;${marginTop ? `margin-top:${marginTop}px;` : ""}">&nbsp;</div>`;
+}
+
+/** Linie întreruptă la mijloc de un asterisc auriu. Marchează trecerea de la mesaj la date. */
+export function ornament(): string {
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td style="height:1px;background:${LINE};font-size:0;line-height:0;">&nbsp;</td>
+        <td width="34" align="center" style="width:34px;font-family:${MONO};font-size:9px;color:${GOLD};line-height:1;">&#10035;</td>
+        <td style="height:1px;background:${LINE};font-size:0;line-height:0;">&nbsp;</td>
+      </tr>
+    </table>`;
+}
+
+/**
+ * Datul important — număr de comandă, AWB, sumă, cod — tratat ca specimen
+ * tipografic: etichetă minusculă deasupra, valoarea mare în serif cu
+ * spațiere largă. E ancora vizuală a fiecărui email.
+ */
+export function specimen(
+  label: string,
+  value: string,
+  opts: { size?: number; tracking?: string; note?: string } = {},
+): string {
+  const size = opts.size ?? 29;
+  const tracking = opts.tracking ?? "0.16em";
+  return `
+    <div style="text-align:center;">
+      <div style="font-family:${MONO};font-size:8.5px;letter-spacing:0.32em;text-transform:uppercase;color:${INK_MUTE};">${escapeHtml(label)}</div>
+      <div style="font-family:${SERIF};font-size:${size}px;letter-spacing:${tracking};color:${INK};padding-top:9px;">${escapeHtml(value)}</div>
+      ${opts.note ? `<div style="font-family:${MONO};font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:${GOLD};padding-top:14px;">${escapeHtml(opts.note)}</div>` : ""}
+    </div>`;
+}
+
+/** Buton negru, construit ca tabel — singura formă pe care o respectă Outlook. */
+export function button(href: string, label: string): string {
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" align="center">
+      <tr><td align="center" bgcolor="${INK}" style="background:${INK};">
+        <a href="${escapeHtml(href)}" style="display:inline-block;padding:15px 38px;font-family:${MONO};font-size:9.5px;letter-spacing:0.26em;text-transform:uppercase;color:${SURFACE};text-decoration:none;">${escapeHtml(label)}</a>
+      </td></tr>
+    </table>`;
+}
+
+/** Etichetă auriuă de secțiune, mică și răsfirată. */
+export function sectionLabel(text: string): string {
+  return `<div style="font-family:${MONO};font-size:8.5px;letter-spacing:0.32em;text-transform:uppercase;color:${GOLD};">${escapeHtml(text)}</div>`;
+}
+
+/** Paragraf de corp. */
+export function para(html: string, size = 11): string {
+  return `<div style="font-family:${MONO};font-size:${size}px;line-height:1.95;color:${INK_SOFT};">${html}</div>`;
+}
+
+/**
+ * Un rând din lista de produse, cu puncte de conducere între nume și preț
+ * — ca într-o carte de vinuri. Punctele sunt `border-bottom` pe celula
+ * din mijloc; e tehnica ce ține în toate clienții de email.
+ */
+export function priceRow(name: string, sub: string, amount: string, last = false): string {
+  return `
+    <tr>
+      <td style="font-family:${SERIF};font-size:19px;color:${INK};white-space:nowrap;padding-bottom:2px;">${escapeHtml(name)}</td>
+      <td style="border-bottom:1px dotted rgba(74,60,45,0.34);font-size:0;line-height:0;padding:0 8px 4px 8px;">&nbsp;</td>
+      <td style="font-family:${MONO};font-size:12px;color:${INK};text-align:right;white-space:nowrap;padding-bottom:2px;">${escapeHtml(amount)}</td>
+    </tr>
+    <tr><td colspan="3" style="font-family:${MONO};font-size:8.5px;letter-spacing:0.24em;text-transform:uppercase;color:${INK_MUTE};padding:5px 0 ${last ? "0" : "24"}px 0;">${escapeHtml(sub)}</td></tr>`;
+}
+
+/** Două coloane egale — pentru Livrare / Plată. */
+export function twoColumns(
+  a: { label: string; body: string },
+  b2: { label: string; body: string },
+): string {
+  return `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td width="50%" valign="top" style="padding-right:18px;">
+          ${sectionLabel(a.label)}
+          <div style="font-family:${MONO};font-size:11px;line-height:1.95;color:${INK_SOFT};padding-top:10px;">${a.body}</div>
+        </td>
+        <td width="50%" valign="top" style="padding-left:18px;">
+          ${sectionLabel(b2.label)}
+          <div style="font-family:${MONO};font-size:11px;line-height:1.95;color:${INK_SOFT};padding-top:10px;">${b2.body}</div>
+        </td>
+      </tr>
+    </table>`;
+}
+
+/**
+ * Cadrul comun. Antet de hârtie cu antet (marcaj la stânga, logo la
+ * dreapta), linie, titlu, conținut, apoi semnătura.
+ */
+export function shell(
+  content: string,
+  preheader = "",
+  head: { eyebrow?: string; title?: string } = {},
+): string {
+  const titleBlock =
+    head.title || head.eyebrow
+      ? `
+          <tr>
+            <td style="padding:40px 46px 0 46px;">
+              ${head.eyebrow ? `<div style="font-family:${MONO};font-size:9px;letter-spacing:0.32em;text-transform:uppercase;color:${GOLD};">${escapeHtml(head.eyebrow)}</div>` : ""}
+              ${head.title ? `<div style="font-family:${SERIF};font-size:44px;line-height:1.08;color:${INK};letter-spacing:-0.01em;padding-top:${head.eyebrow ? "16px" : "0"};">${escapeHtml(head.title)}</div>` : ""}
+            </td>
+          </tr>`
+      : "";
+
   return `<!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -43,54 +159,55 @@ export function shell(content: string, preheader = ""): string {
 </head>
 <body style="margin:0;padding:0;background:${PAMANT};font-family:${MONO};color:${INK};">
   ${preheader ? `<div style="display:none;visibility:hidden;opacity:0;height:0;width:0;overflow:hidden;">${escapeHtml(preheader)}</div>` : ""}
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${PAMANT};padding:40px 16px;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${PAMANT};padding:44px 16px;">
     <tr>
       <td align="center">
 
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:${SURFACE};border:1px solid ${LINE};">
 
           <tr>
-            <td style="padding:52px 44px 0 44px;">
-              ${content}
-            </td>
-          </tr>
-
-          <!-- Logo. Identitatea stă la final, ca la emailurile de
-               autentificare: mesajul intră direct în subiect, semnătura
-               vine după. Fără fotografie — cerință de brand. -->
-          <tr>
-            <td align="center" style="padding:46px 44px 0 44px;">
-              <img src="${SITE}/brand/logo-locus.png" width="104" alt="Domeniul Locus"
-                   style="display:block;margin:0 auto;width:104px;height:auto;border:0;" />
-              <div style="font-family:${MONO};font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:${GOLD};padding-top:10px;">
-                un loc · un timp · un vin
-              </div>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding:40px 44px 0 44px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid ${LINE};">
+            <td style="padding:38px 46px 0 46px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="padding:18px 0 0 0;font-family:${MONO};font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:${INK_MUTE};">Buciumeni, Galați</td>
-                  <td align="center" style="padding:18px 0 0 0;font-family:${MONO};font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:${INK_MUTE};">
-                    <a href="mailto:office@domeniul-locus.ro" style="color:${INK_MUTE};text-decoration:none;">office@domeniul-locus.ro</a>
+                  <td valign="middle" style="font-family:${MONO};font-size:8.5px;letter-spacing:0.3em;text-transform:uppercase;color:${GOLD};line-height:1.9;">
+                    Domeniul Locus<br /><span style="color:${INK_MUTE};">Buciumeni &middot; Galați</span>
                   </td>
-                  <td align="right" style="padding:18px 0 0 0;font-family:${MONO};font-size:9px;letter-spacing:0.12em;color:${INK_MUTE};">
-                    <a href="tel:+40752232912" style="color:${INK_MUTE};text-decoration:none;">0752 232 912</a>
+                  <td valign="middle" align="right" width="72" style="width:72px;">
+                    <img src="${SITE}/brand/logo-locus.png" width="72" alt="Domeniul Locus"
+                         style="display:block;width:72px;height:auto;border:0;" />
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
+          <tr><td style="padding:26px 46px 0 46px;">${rule()}</td></tr>
 
-          <tr><td style="padding:0 44px 44px 44px;"></td></tr>
+          ${titleBlock}
+
+          <tr>
+            <td style="padding:${titleBlock ? "22px" : "40px"} 46px 0 46px;">
+              ${content}
+            </td>
+          </tr>
+
+          <tr>
+            <td align="center" style="padding:44px 46px 0 46px;">
+              ${rule()}
+              <div style="font-family:${SERIF};font-size:11px;letter-spacing:0.34em;text-transform:uppercase;color:${GOLD};padding-top:24px;">un loc &middot; un timp &middot; un vin</div>
+              <div style="font-family:${MONO};font-size:8.5px;letter-spacing:0.16em;text-transform:uppercase;color:${INK_MUTE};padding-top:14px;line-height:2;">
+                <a href="mailto:office@domeniul-locus.ro" style="color:${INK_MUTE};text-decoration:none;">office@domeniul-locus.ro</a>
+                &nbsp;&middot;&nbsp;
+                <a href="tel:+40752232912" style="color:${INK_MUTE};text-decoration:none;">0752 232 912</a>
+              </div>
+            </td>
+          </tr>
+          <tr><td style="padding:0 46px 46px 46px;"></td></tr>
         </table>
 
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
           <tr>
-            <td align="center" style="padding:22px 20px 0 20px;font-family:${MONO};font-size:9px;line-height:1.8;letter-spacing:0.08em;color:${LEGAL};">
-              SC ROMVINTEC SRL · 18+ · Conține sulfiți<br />
+            <td align="center" style="padding:20px 20px 0 20px;font-family:${MONO};font-size:8.5px;line-height:1.9;letter-spacing:0.1em;color:${LEGAL};">
+              SC ROMVINTEC SRL &middot; 18+ &middot; Conține sulfiți<br />
               Consumul excesiv de alcool dăunează sănătății.
             </td>
           </tr>
@@ -129,7 +246,18 @@ function b(
 }
 
 // Assemble output type — content + preheader (folosite de shell()).
-type Assembled = { content: string; preheader: string };
+/**
+ * Un email asamblat. `eyebrow` și `title` stau separat de `content`
+ * fiindcă antetul e un rând cu două coloane — text la stânga, logo la
+ * dreapta — construit de `shell()`. Dacă le-am lăsa în conținut, logo-ul
+ * n-ar avea lângă ce să se așeze.
+ */
+type Assembled = {
+  content: string;
+  preheader: string;
+  eyebrow: string;
+  title: string;
+};
 
 // ─── Data types (structured content, non-editable) ──────────────
 
@@ -193,87 +321,79 @@ export function assembleOrderConfirmation(
   const vars = d as unknown as Record<string, string | number | undefined>;
 
   const itemsRows = d.items
-    .map(
-      (it) => `
-        <tr>
-          <td style="padding:12px 0;border-bottom:1px solid ${LINE};font-family:${MONO};font-size:13px;color:${INK_SOFT};">
-            <div style="font-family:${SERIF};font-size:18px;color:${INK};letter-spacing:-0.005em;">${escapeHtml(it.name)}</div>
-            <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:${INK_MUTE};margin-top:2px;">${escapeHtml(it.code)} · cantitate ${it.qty}</div>
-          </td>
-          <td style="padding:12px 0;border-bottom:1px solid ${LINE};font-family:${MONO};font-size:13px;color:${INK};text-align:right;white-space:nowrap;">
-            ${escapeHtml(formatRon(it.unitPriceRon * it.qty))}
-          </td>
-        </tr>`,
+    .map((it, i) =>
+      priceRow(
+        it.name,
+        `${it.code} · ${it.qty} ${it.qty === 1 ? "sticlă" : "sticle"}`,
+        formatRon(it.unitPriceRon * it.qty),
+        i === d.items.length - 1,
+      ),
     )
     .join("");
 
-  const totalsRows = `
-    <tr><td style="padding:6px 0;font-family:${MONO};font-size:12px;color:${INK_SOFT};">Subtotal</td><td style="padding:6px 0;font-family:${MONO};font-size:12px;color:${INK_SOFT};text-align:right;">${formatRon(d.subtotalRon)}</td></tr>
-    <tr><td style="padding:6px 0;font-family:${MONO};font-size:12px;color:${INK_SOFT};">Transport</td><td style="padding:6px 0;font-family:${MONO};font-size:12px;color:${INK_SOFT};text-align:right;">${d.shippingRon === 0 ? "gratuit" : formatRon(d.shippingRon)}</td></tr>
-    ${d.discountRon > 0 ? `<tr><td style="padding:6px 0;font-family:${MONO};font-size:12px;color:${INK_SOFT};">Voucher</td><td style="padding:6px 0;font-family:${MONO};font-size:12px;color:${INK_SOFT};text-align:right;">−${formatRon(d.discountRon)}</td></tr>` : ""}
-    <tr><td style="padding:14px 0 6px 0;border-top:1px solid ${LINE};font-family:${SERIF};font-size:22px;color:${INK};">Total</td><td style="padding:14px 0 6px 0;border-top:1px solid ${LINE};font-family:${SERIF};font-size:22px;color:${INK};text-align:right;">${formatRon(d.totalRon)}</td></tr>`;
+  const totalLine = (label: string, value: string) => `
+    <tr>
+      <td style="font-family:${MONO};font-size:9.5px;letter-spacing:0.2em;text-transform:uppercase;color:${INK_MUTE};padding:5px 0;">${escapeHtml(label)}</td>
+      <td style="font-family:${MONO};font-size:11.5px;color:${INK_SOFT};text-align:right;padding:5px 0;">${escapeHtml(value)}</td>
+    </tr>`;
 
   const eyebrowText = b(blocks, "eyebrow", vars);
   const greetingText = d.customerName
     ? b(blocks, "greeting", vars)
     : b(blocks, "greeting_guest", vars);
   const introText = b(blocks, "intro", vars);
-  const shippingHeadingText = b(blocks, "shipping_heading", vars);
   const shippingText =
     d.shippingMethod === "ridicare"
       ? b(blocks, "shipping_ridicare", vars)
       : b(blocks, "shipping_curier", vars);
-  const paymentHeadingText = b(blocks, "payment_heading", vars);
   const paymentText =
     d.paymentMethod === "card-online"
       ? b(blocks, "payment_card", vars)
       : b(blocks, "payment_cash", vars);
-  const footnoteText = b(blocks, "footnote", vars);
 
-  /* Antetul e centrat, ca la magic link: eyebrow mono uppercase, titlu
-     serif mare, apoi introducerea. De la tabelul de produse în jos revenim
-     la aliniere la stânga — cifrele și adresele centrate se citesc prost. */
   const content = `
-    <div style="text-align:center;">
-      <div style="font-family:${MONO};font-size:10px;letter-spacing:0.24em;text-transform:uppercase;color:${GOLD};">
-        ${escapeHtml(eyebrowText)}
-      </div>
-      <div style="font-family:${SERIF};font-size:38px;line-height:1.15;color:${INK};letter-spacing:-0.015em;padding-top:14px;">
-        ${escapeHtml(greetingText)}
-      </div>
-      <div style="font-family:${MONO};font-size:11px;line-height:2;letter-spacing:0.16em;text-transform:uppercase;color:${INK_SOFT};padding-top:18px;">
-        ${textToHtml(introText)}
-      </div>
+    ${para(textToHtml(introText))}
+
+    <div style="margin-top:34px;">${ornament()}</div>
+
+    <div style="margin-top:30px;">
+      ${specimen("Comanda", d.orderNumber)}
     </div>
 
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:38px;">
       ${itemsRows}
     </table>
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:14px;">
-      ${totalsRows}
+    <div style="margin-top:30px;">${rule()}</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:18px;">
+      ${totalLine("Subtotal", formatRon(d.subtotalRon))}
+      ${totalLine("Transport", d.shippingRon === 0 ? "gratuit" : formatRon(d.shippingRon))}
+      ${d.discountRon > 0 ? totalLine("Voucher", `−${formatRon(d.discountRon)}`) : ""}
+      <tr>
+        <td style="font-family:${MONO};font-size:9px;letter-spacing:0.32em;text-transform:uppercase;color:${GOLD};padding:20px 0 0 0;border-top:1px solid ${LINE};">Total</td>
+        <td style="font-family:${SERIF};font-size:27px;color:${INK};text-align:right;padding:14px 0 0 0;border-top:1px solid ${LINE};">${escapeHtml(formatRon(d.totalRon))}</td>
+      </tr>
     </table>
 
-    <p style="font-family:${MONO};font-size:12px;line-height:1.9;color:${INK_SOFT};margin:34px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
-      <span style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:${GOLD};">${escapeHtml(shippingHeadingText)}</span><br />
-      ${textToHtml(shippingText)}
-    </p>
+    <div style="margin-top:36px;">${rule()}</div>
+    <div style="margin-top:22px;">
+      ${twoColumns(
+        { label: b(blocks, "shipping_heading", vars), body: textToHtml(shippingText) },
+        { label: b(blocks, "payment_heading", vars), body: textToHtml(paymentText) },
+      )}
+    </div>
 
-    <p style="font-family:${MONO};font-size:12px;line-height:1.9;color:${INK_SOFT};margin:20px 0 0 0;">
-      <span style="font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:${GOLD};">${escapeHtml(paymentHeadingText)}</span><br />
-      ${textToHtml(paymentText)}
-    </p>
-
-    <p style="font-family:${MONO};font-size:10.5px;line-height:1.8;color:${INK_MUTE};margin:30px 0 0 0;">
-      ${textToHtml(footnoteText)}
-    </p>`;
+    <div style="font-family:${MONO};font-size:10px;line-height:1.9;color:${INK_MUTE};margin-top:32px;">
+      ${textToHtml(b(blocks, "footnote", vars))}
+    </div>`;
 
   return {
     content,
+    eyebrow: eyebrowText,
+    title: greetingText,
     preheader: `${greetingText} ${d.orderNumber}, total ${formatRon(d.totalRon)}.`,
   };
 }
-
 // ─── Shipped ────────────────────────────────────────────────────
 
 export function assembleShipped(
@@ -289,43 +409,38 @@ export function assembleShipped(
     ? b(blocks, "intro", vars)
     : b(blocks, "intro_no_address", vars);
 
+  /* AWB-ul e datul pe care omul îl caută — îl tratăm ca specimen, nu
+     îngropat într-o casetă. Butonul apare doar dacă avem link real. */
   const awbBlock = d.awbNumber
     ? `
-    <div style="margin-top:32px;padding:20px;background:${PAMANT};border:1px solid ${LINE};">
-      <div style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:8px;">
-        AWB${d.courierName ? ` · ${escapeHtml(d.courierName)}` : ""}
-      </div>
-      <div style="font-family:${MONO};font-size:20px;font-weight:500;color:${INK};letter-spacing:0.06em;">
-        ${escapeHtml(d.awbNumber)}
-      </div>
-      ${
-        d.trackingUrl
-          ? `<p style="margin:14px 0 0 0;"><a href="${escapeHtml(d.trackingUrl)}" style="font-family:${MONO};font-size:12px;color:${VIE};text-decoration:underline;">Urmărește coletul →</a></p>`
-          : ""
-      }
-    </div>`
+    <div style="margin-top:34px;">${ornament()}</div>
+    <div style="margin-top:30px;">
+      ${specimen(`AWB${d.courierName ? ` · ${d.courierName}` : ""}`, d.awbNumber)}
+    </div>
+    ${d.trackingUrl ? `<div style="margin-top:26px;">${button(d.trackingUrl, "Urmărește coletul")}</div>` : ""}`
     : "";
 
   const content = `
-    <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:14px;">
-      ${escapeHtml(b(blocks, "eyebrow", vars))}
-    </div>
-    <span style="font-family:${SERIF};font-size:36px;color:${INK};letter-spacing:-0.015em;">${escapeHtml(greetingText)}</span>
-    <p style="font-family:${MONO};font-size:14px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
-      ${textToHtml(introText)}
-    </p>
+    ${para(textToHtml(introText))}
 
     ${awbBlock}
 
-    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:32px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
-      ${textToHtml(b(blocks, "advice", vars))}
-    </p>
-    <p style="font-family:${MONO};font-size:12px;line-height:1.7;color:${INK_MUTE};margin:20px 0 0 0;">
+    <div style="margin-top:${awbBlock ? "40" : "34"}px;">${rule()}</div>
+    <div style="margin-top:22px;">
+      ${sectionLabel("La primire")}
+      <div style="font-family:${MONO};font-size:11px;line-height:1.95;color:${INK_SOFT};padding-top:10px;">
+        ${textToHtml(b(blocks, "advice", vars))}
+      </div>
+    </div>
+
+    <div style="font-family:${MONO};font-size:10px;line-height:1.9;color:${INK_MUTE};margin-top:26px;">
       ${textToHtml(b(blocks, "footnote", vars))}
-    </p>`;
+    </div>`;
 
   return {
     content,
+    eyebrow: b(blocks, "eyebrow", vars),
+    title: greetingText,
     preheader: d.awbNumber
       ? `Coletul e pe drum. AWB ${d.awbNumber}.`
       : `Coletul e pe drum.`,
@@ -344,31 +459,35 @@ export function assembleDelivered(
     ? b(blocks, "greeting", vars)
     : b(blocks, "greeting_guest", vars);
 
+  /* Singurul email fără specimen: n-are niciun număr de arătat. În locul
+     lui, ornamentul deschide cele două sfaturi, servire și retur. */
   const content = `
-    <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:14px;">
-      ${escapeHtml(b(blocks, "eyebrow", vars))}
+    ${para(textToHtml(b(blocks, "intro", vars)))}
+
+    <div style="margin-top:36px;">${ornament()}</div>
+
+    <div style="margin-top:30px;">
+      ${twoColumns(
+        {
+          label: b(blocks, "serving_heading", vars),
+          body: textToHtml(b(blocks, "serving_body", vars)),
+        },
+        {
+          label: b(blocks, "return_heading", vars),
+          body: textToHtml(b(blocks, "return_body", vars)),
+        },
+      )}
     </div>
-    <span style="font-family:${SERIF};font-size:36px;color:${INK};letter-spacing:-0.015em;">${escapeHtml(greetingText)}</span>
-    <p style="font-family:${MONO};font-size:14px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
-      ${textToHtml(b(blocks, "intro", vars))}
-    </p>
 
-    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:32px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
-      <strong style="color:${INK};">${escapeHtml(b(blocks, "serving_heading", vars))}</strong><br />
-      ${textToHtml(b(blocks, "serving_body", vars))}
-    </p>
-
-    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:20px 0 0 0;">
-      <strong style="color:${INK};">${escapeHtml(b(blocks, "return_heading", vars))}</strong><br />
-      ${textToHtml(b(blocks, "return_body", vars))}
-    </p>
-
-    <p style="font-family:${MONO};font-size:12px;line-height:1.7;color:${INK_MUTE};margin:32px 0 0 0;">
+    <div style="margin-top:34px;">${rule()}</div>
+    <div style="font-family:${MONO};font-size:10px;line-height:1.9;color:${INK_MUTE};margin-top:22px;">
       ${textToHtml(b(blocks, "footnote", vars))}
-    </p>`;
+    </div>`;
 
   return {
     content,
+    eyebrow: b(blocks, "eyebrow", vars),
+    title: greetingText,
     preheader: "Coletul a ajuns. Deschide-l cu o urgență liniștită.",
   };
 }
@@ -399,34 +518,33 @@ export function assembleRefundConfirmation(
           : b(blocks, "method_other", vars);
 
   const content = `
-    <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:14px;">
-      ${escapeHtml(b(blocks, "eyebrow", vars))}
-    </div>
-    <span style="font-family:${SERIF};font-size:32px;color:${INK};letter-spacing:-0.015em;">${escapeHtml(greetingText)}</span>
-    <p style="font-family:${MONO};font-size:14px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
-      ${textToHtml(b(blocks, "intro", vars))}
-    </p>
+    ${para(textToHtml(b(blocks, "intro", vars)))}
 
-    <div style="margin-top:32px;padding:24px;background:${PAMANT};border:1px solid ${LINE};text-align:center;">
-      <div style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:8px;">
-        ${escapeHtml(b(blocks, "amount_label", vars))}
-      </div>
-      <div style="font-family:${SERIF};font-size:36px;color:${INK};letter-spacing:-0.01em;">
-        ${formatRon(d.refundedRon)}
-      </div>
+    <div style="margin-top:34px;">${ornament()}</div>
+
+    <div style="margin-top:30px;">
+      ${specimen(b(blocks, "amount_label", vars), formatRon(d.refundedRon), {
+        size: 36,
+        tracking: "-0.01em",
+      })}
     </div>
 
-    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:32px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
-      <strong style="color:${INK};">${escapeHtml(b(blocks, "method_heading", vars))}</strong><br />
-      ${textToHtml(methodText)}
-    </p>
+    <div style="margin-top:38px;">${rule()}</div>
+    <div style="margin-top:22px;">
+      ${sectionLabel(b(blocks, "method_heading", vars))}
+      <div style="font-family:${MONO};font-size:11px;line-height:1.95;color:${INK_SOFT};padding-top:10px;">
+        ${textToHtml(methodText)}
+      </div>
+    </div>
 
-    <p style="font-family:${MONO};font-size:12px;line-height:1.7;color:${INK_MUTE};margin:32px 0 0 0;">
+    <div style="font-family:${MONO};font-size:10px;line-height:1.9;color:${INK_MUTE};margin-top:28px;">
       ${textToHtml(b(blocks, "footnote", vars))}
-    </p>`;
+    </div>`;
 
   return {
     content,
+    eyebrow: b(blocks, "eyebrow", vars),
+    title: greetingText,
     preheader: `${formatRon(d.refundedRon)} rambursat pentru comanda ${d.orderNumber}.`,
   };
 }
@@ -446,34 +564,37 @@ export function assembleReturnStatus(
     ? b(blocks, "eyebrow_with_order", vars)
     : b(blocks, "eyebrow_no_order", vars);
 
+  /* Mesajul scris de noi rămâne singurul bloc cu fundal din tot design-ul:
+     e vocea unui om, nu date, și merită să se distingă de restul. */
   const adminBlock = d.adminMessage
     ? `
-    <div style="margin-top:24px;padding:16px 20px;border-left:2px solid ${VIE};background:${PAMANT};">
-      <div style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:6px;">
+    <div style="margin-top:32px;padding:20px 22px;border-left:2px solid ${GOLD};background:${PAMANT};">
+      <div style="font-family:${MONO};font-size:8.5px;letter-spacing:0.32em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:10px;">
         mesaj din partea noastră
       </div>
-      <p style="font-family:${MONO};font-size:13px;line-height:1.7;color:${INK};margin:0;">
+      <div style="font-family:${MONO};font-size:11.5px;line-height:1.9;color:${INK};">
         ${escapeHtml(d.adminMessage)}
-      </p>
+      </div>
     </div>`
     : "";
 
   const content = `
-    <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:14px;">
-      ${escapeHtml(eyebrow)}
+    ${para(textToHtml(body))}
+
+    <div style="margin-top:34px;">${ornament()}</div>
+
+    <div style="margin-top:30px;">
+      ${specimen("Retur", d.returnNumber)}
     </div>
-    <span style="font-family:${SERIF};font-size:32px;color:${INK};letter-spacing:-0.015em;">${escapeHtml(headline)}</span>
-    <p style="font-family:${MONO};font-size:14px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
-      ${textToHtml(body)}
-    </p>
 
     ${adminBlock}
 
-    <p style="font-family:${MONO};font-size:12px;line-height:1.7;color:${INK_MUTE};margin:32px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
+    <div style="margin-top:34px;">${rule()}</div>
+    <div style="font-family:${MONO};font-size:10px;line-height:1.9;color:${INK_MUTE};margin-top:22px;">
       ${textToHtml(b(blocks, "footnote", vars))}
-    </p>`;
+    </div>`;
 
-  return { content, preheader: headline };
+  return { content, eyebrow, title: headline, preheader: headline };
 }
 
 // ─── Newsletter welcome ────────────────────────────────────────
@@ -485,42 +606,41 @@ export function assembleNewsletterWelcome(
   /* Codul apare doar dacă expeditorul a găsit un cupon activ. Un cod pe
      care checkout-ul l-ar refuza e mai rău decât niciun cod. */
   const code = String(vars.couponCode ?? "").trim();
+
+  /* Când există cod, el e eroul emailului — specimen mare, cu tracking
+     larg, urmat de buton. Fără cod, rămâne doar textul. */
   const couponBlock = code
     ? `
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:28px 0 0 0;">
-      <tr>
-        <td align="center" style="border:1px solid ${LINE};background:${PAMANT};padding:22px 16px;">
-          <div style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};">
-            ${escapeHtml(b(blocks, "coupon_label", vars))}
-          </div>
-          <div style="font-family:${MONO};font-size:26px;letter-spacing:0.18em;color:${INK};margin-top:12px;font-weight:600;">
-            ${escapeHtml(code)}
-          </div>
-          <div style="font-family:${MONO};font-size:11px;line-height:1.7;color:${INK_SOFT};margin-top:12px;">
-            ${escapeHtml(b(blocks, "coupon_note", vars))}
-          </div>
-        </td>
-      </tr>
-    </table>`
+    <div style="margin-top:34px;">${ornament()}</div>
+    <div style="margin-top:32px;">
+      ${specimen(b(blocks, "coupon_label", vars), code, {
+        size: 42,
+        tracking: "0.24em",
+        note: b(blocks, "coupon_note", vars),
+      })}
+    </div>
+    <div style="margin-top:30px;">${button(`${SITE}/shop`, "Vezi vinurile")}</div>`
     : "";
 
   const content = `
-    <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:14px;">
-      ${escapeHtml(b(blocks, "eyebrow", vars))}
-    </div>
-    <span style="font-family:${SERIF};font-size:36px;color:${INK};letter-spacing:-0.015em;">${escapeHtml(b(blocks, "greeting", vars))}</span>
-    ${couponBlock}
-    <p style="font-family:${MONO};font-size:14px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
-      ${textToHtml(b(blocks, "para_1", vars))}
-    </p>
-    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:24px 0 0 0;">
-      ${textToHtml(b(blocks, "para_2", vars))}
-    </p>
-    <p style="font-family:${MONO};font-size:13px;line-height:1.85;color:${INK_SOFT};margin:32px 0 0 0;border-top:1px solid ${LINE};padding-top:24px;">
-      ${textToHtml(b(blocks, "para_3", vars))}
-    </p>`;
+    ${para(textToHtml(b(blocks, "para_1", vars)))}
 
-  return { content, preheader: "Notițe rare din vie și pivniță." };
+    ${couponBlock}
+
+    <div style="margin-top:${code ? "40" : "32"}px;">${rule()}</div>
+    <div style="font-family:${MONO};font-size:10.5px;line-height:1.95;color:${INK_MUTE};margin-top:22px;">
+      ${textToHtml(b(blocks, "para_2", vars))}
+    </div>
+    <div style="font-family:${MONO};font-size:10.5px;line-height:1.95;color:${INK_MUTE};margin-top:16px;">
+      ${textToHtml(b(blocks, "para_3", vars))}
+    </div>`;
+
+  return {
+    content,
+    eyebrow: b(blocks, "eyebrow", vars),
+    title: b(blocks, "greeting", vars),
+    preheader: "Notițe rare din vie și pivniță.",
+  };
 }
 
 // ─── Admin order notification (STAYS HARDCODED — nu e editabil) ─
@@ -541,12 +661,7 @@ export function adminOrderNotificationHtml(
     .join("");
 
   const content = `
-    <div style="font-family:${MONO};font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:${VIE};margin-bottom:14px;">
-      comandă nouă
-    </div>
-    <span style="font-family:${SERIF};font-size:32px;color:${INK};">${escapeHtml(d.orderNumber)}</span>
-
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;font-family:${MONO};font-size:13px;color:${INK_SOFT};">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:${MONO};font-size:13px;color:${INK_SOFT};">
       <tr><td style="padding:6px 0;color:${INK_MUTE};text-transform:uppercase;letter-spacing:0.16em;font-size:10px;">Total</td><td style="padding:6px 0;text-align:right;color:${INK};font-family:${SERIF};font-size:18px;">${formatRon(d.totalRon)}</td></tr>
       <tr><td style="padding:6px 0;color:${INK_MUTE};text-transform:uppercase;letter-spacing:0.16em;font-size:10px;">Plată</td><td style="padding:6px 0;text-align:right;">${escapeHtml(d.paymentMethod)}</td></tr>
       <tr><td style="padding:6px 0;color:${INK_MUTE};text-transform:uppercase;letter-spacing:0.16em;font-size:10px;">Livrare</td><td style="padding:6px 0;text-align:right;">${escapeHtml(d.shippingMethod)}${d.shippingAddress ? " — " + escapeHtml(d.shippingAddress) : ""}</td></tr>
@@ -568,6 +683,9 @@ export function adminOrderNotificationHtml(
 
   return {
     subject: `🍷 Comandă nouă · ${d.orderNumber} · ${formatRon(d.totalRon)}`,
-    html: shell(content, `${d.orderNumber} · ${formatRon(d.totalRon)}`),
+    html: shell(content, `${d.orderNumber} · ${formatRon(d.totalRon)}`, {
+      eyebrow: "comandă nouă",
+      title: d.orderNumber,
+    }),
   };
 }
