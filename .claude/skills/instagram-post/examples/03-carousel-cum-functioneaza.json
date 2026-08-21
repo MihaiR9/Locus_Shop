@@ -1,0 +1,33 @@
+{
+  "slug": "cum-functioneaza-finbot",
+  "format": "4x5",
+  "default_theme": "bone",
+  "theme_mix": ["bone", "ink", "ink", "ink", "lime"],
+  "slides": [
+    {
+      "variant": "statement",
+      "headline": "Cum funcționează *Finbot.*",
+      "eyebrow": "GHID · 01"
+    },
+    {
+      "variant": "statement",
+      "headline": "1. Conectezi conturile.",
+      "subtext": "Bănci, ANAF, e-Factura. O dată."
+    },
+    {
+      "variant": "statement",
+      "headline": "2. Finbot preia tot.",
+      "subtext": "Facturi, plăți, cifre. Automat."
+    },
+    {
+      "variant": "statement",
+      "headline": "3. Vezi totul live.",
+      "subtext": "Dashboard, rapoarte, AI."
+    },
+    {
+      "variant": "statement",
+      "headline": "Înscrie-te.",
+      "subtext": "Lista de așteptare e deschisă."
+    }
+  ]
+}

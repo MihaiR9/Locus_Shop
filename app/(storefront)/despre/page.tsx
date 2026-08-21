@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { Footer } from "@/components/landing/footer";
 import { ChapterThread } from "@/components/landing/chapter-thread";
+import { ChapterArt } from "@/components/despre/chapter-art";
 import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbSchema } from "@/lib/seo/schema";
 
 export const metadata: Metadata = {
   title: "Povestea locului",
   description:
-    "Povestea Domeniului Locus în trei capitole — locul dintre Panciu și Nicorești, timpul care lucrează în sticlă, și mâna care doar orientează.",
+    "Povestea Domeniului Locus în trei capitole — familia care a început-o, tradiția care o ține, și continuitatea dusă mai departe de la tată la copii.",
   alternates: { canonical: "/despre" },
   openGraph: {
     type: "website",
     url: "/despre",
     title: "Povestea locului · Domeniul Locus",
     description:
-      "Trei capitole despre un loc, un timp și un vin. Buciumeni, între Panciu și Nicorești.",
+      "O poveste de familie, dusă mai departe firesc, de la tată la copii. Buciumeni, între Panciu și Nicorești.",
   },
 };
 
@@ -26,43 +26,40 @@ export const metadata: Metadata = {
  * pe home, iar butonul „Vezi povestea locului" din `MapSection` ducea la
  * ea printr-o ancoră. Două locuri care spuneau același lucru; acum e unul.
  *
- * ⚠️ TEXTELE SUNT PROVIZORII. Structura în trei capitole e finală, dar
- * conținutul îl scrie Mihai. Fiecare capitol are: un titlu, două-trei
- * paragrafe și o fotografie. Se înlocuiește direct în `CHAPTERS`.
+ * Textele sunt scrise de Mihai. Titlul fiecărui capitol e prima frază a
+ * paragrafului lui, decupată — nimic nu e inventat aici. Dacă schimbi
+ * copy-ul, păstrează regula: titlul iese din text, nu îl comentează.
  */
 const CHAPTERS = [
   {
     num: "01",
-    kicker: "Locul",
-    title: "Coama dintre două areale.",
+    kicker: "Familie",
+    title: "Înainte de a fi o cramă.",
     body: [
-      "TEXT PROVIZORIU. Pământul vorbește primul. Coama dintre Panciu și Nicorești are propria respirație: relief blând, sol calcaros, vânt care vine din nord și usucă bobul exact cât trebuie.",
-      "TEXT PROVIZORIU. Aici nu se plantează unde e comod, ci unde ține locul. Aceleași parcele, an după an, până le știi caracterul mai bine decât pe al tău.",
+      "Domeniul Locus este o poveste de familie. Totul începe cu pasiunea tatălui pentru vie și continuă firesc prin generația următoare, unde experiența se întâlnește cu o perspectivă nouă.",
+      "Fiecare vin poartă amprenta acestui parcurs și a unei legături autentice cu pământul.",
     ],
-    photo: "/photos/hero/dealuri.jpg",
-    alt: "Dealurile viticole dintre Panciu și Nicorești",
+    art: "familie",
   },
   {
     num: "02",
-    kicker: "Timpul",
-    title: "Nimic nu se grăbește.",
+    kicker: "Tradiție",
+    title: "Nu despre trecut, ci despre continuitate.",
     body: [
-      "TEXT PROVIZORIU. Cules la maturitate deplină, vinificat fără urgență. Anul nu se grăbește, iar noi nu îl forțăm. Sticlele așteaptă să-și găsească singure echilibrul.",
-      "TEXT PROVIZORIU. Răbdarea nu e o virtute pe care ne-o asumăm — e o condiție. Vinul care iese repede spune puțin și uită repede de unde vine.",
+      "Despre răbdarea de a aștepta momentul potrivit al recoltei, despre respectul pentru ritmul naturii și despre grija acordată fiecărei etape a vinificației.",
+      "Astfel ia naștere un vin care exprimă sincer locul din care provine.",
     ],
-    photo: "/photos/homepage-amfora.webp",
-    alt: "Amforă la Centrul de Vinificație Buciumeni",
+    art: "traditie",
   },
   {
     num: "03",
-    kicker: "Mâna",
-    title: "O intervenție măsurată.",
+    kicker: "Continuitate",
+    title: "Locus înseamnă loc.",
     body: [
-      "TEXT PROVIZORIU. O mână care orientează, nu una care impune. Decizii puține, atent cântărite. Restul îl face locul.",
-      "TEXT PROVIZORIU. Fiecare sticlă rămâne o consemnare: un fragment dintr-un an, dintr-un parcurs, dintr-o atenție. Ce ajunge în pahar nu e o promisiune — e o constatare.",
+      "Un loc în care rădăcinile rămân vii, iar fiecare generație adaugă propriul capitol aceleiași povești.",
+      "Domeniul Locus unește experiența, viziunea și timpul într-o identitate construită cu autenticitate și dusă mai departe, firesc, de la tată la copii.",
     ],
-    photo: "/photos/dining-setup.webp",
-    alt: "Masă pusă cu vin de la Domeniul Locus",
+    art: "continuitate",
   },
 ] as const;
 
@@ -84,8 +81,8 @@ export default function DesprePage() {
             <div className="eyebrow">Povestea locului</div>
             <h1>Un loc. Un timp. Un vin.</h1>
             <p className="lead">
-              Trei capitole despre cum ajunge un deal din Buciumeni să încapă
-              într-o sticlă — și de ce ne-am hotărât să nu grăbim nimic.
+              O poveste de familie, o tradiție care înseamnă continuitate, și un
+              loc în care rădăcinile rămân vii.
             </p>
             <div className="poveste-coords">45.98°N 27.30°E · Buciumeni · Galați</div>
           </Reveal>
@@ -102,13 +99,7 @@ export default function DesprePage() {
             aria-label={`Capitolul ${ch.num} — ${ch.kicker}`}
           >
             <Reveal as="div" className="chapter-media">
-              <Image
-                src={ch.photo}
-                alt={ch.alt}
-                width={1200}
-                height={800}
-                sizes="(max-width: 900px) 100vw, 50vw"
-              />
+              <ChapterArt variant={ch.art} />
             </Reveal>
 
             <Reveal as="div" className="chapter-text">

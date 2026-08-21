@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<title>ANAF.\n*Fără stres.*</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Finbot LinkedIn post — shared styles
+   All templates inherit from this. Theme variables are injected via inline <style>
+   block (see generate_post.py). */
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 1080px;
+  height: 1350px;
+  overflow: hidden;
+}
+
+body {
+  background: #CDFF00;
+  color: #0A0A0A;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Subtle dot grid texture — visible only on light themes */
+body.has-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(10,10,10,0.12) 1.4px, transparent 1.4px);
+  background-size: 28px 28px;
+  background-position: 0 0;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ========== Header (logo top-left + meta top-right) ========== */
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 72px 80px 0;
+  position: relative;
+  z-index: 2;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #0A0A0A;
+}
+
+.brand-lockup svg {
+  width: 44px;
+  height: 44px;
+  display: block;
+}
+
+.brand-lockup .wordmark {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 38px;
+  letter-spacing: -1.4px;
+  line-height: 1;
+  color: #0A0A0A;
+}
+
+.meta {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(10,10,10,0.65);
+}
+
+/* ========== Footer (CTA) ========== */
+.post-cta {
+  margin: 0 80px 64px;
+  padding: 28px 32px;
+  border-radius: 18px;
+  background: #0A0A0A;
+  color: #CDFF00;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.post-cta .cta-text {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.4px;
+}
+
+.post-cta .cta-url {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  opacity: 0.9;
+}
+
+/* ========== Main content area (fills middle) ========== */
+.post-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 80px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Common typography utilities */
+.eyebrow {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(10,10,10,0.65);
+  margin-bottom: 28px;
+}
+
+.accent-line {
+  width: 64px;
+  height: 4px;
+  background: #0A0A0A;
+  border: none;
+  border-radius: 2px;
+  margin: 28px 0;
+}
+
+.subtext {
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 26px;
+  line-height: 1.4;
+  color: rgba(10,10,10,0.65);
+  max-width: 760px;
+}
+
+
+.headline {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 800;
+  font-size: 140px;
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  color: #0A0A0A;
+  max-width: 880px;
+}
+
+.headline em {
+  font-style: normal;
+  color: #CDFF00;
+  background: linear-gradient(180deg, transparent 8%, #0A0A0A 8%, #0A0A0A 96%, transparent 96%);
+  padding: 0 0.08em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+</style>
+</head>
+<body class="">
+  <header class="post-header">
+    <div class="brand-lockup">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-label="Finbot mark">
+  <g fill="currentColor">
+    <rect x="2" y="2" width="20" height="20" rx="9"/>
+    <rect x="2" y="26" width="20" height="20" rx="9"/>
+    <rect x="2" y="50" width="20" height="20" rx="9"/>
+    <rect x="26" y="2" width="44" height="20" rx="9"/>
+    <rect x="26" y="26" width="30" height="20" rx="9"/>
+  </g>
+</svg>
+
+      <span class="wordmark">Finbot</span>
+    </div>
+    <div class="meta">04 / TEASER</div>
+  </header>
+
+  <main class="post-content">
+    
+    <h1 class="headline">ANAF.<br><em>Fără stres.</em></h1>
+    <hr class="accent-line"><p class="subtext">TVA și impozitul pe profit, calculate.</p>
+  </main>
+
+  <footer class="post-cta">
+    <span class="cta-text">Înscrie-te pe lista de așteptare</span>
+    <span class="cta-url">finbot.ro</span>
+  </footer>
+</body>
+</html>

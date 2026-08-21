@@ -3800,6 +3800,131 @@
 }
 /* Capitolele alternează stânga/dreapta, ca lectura să nu devină o coloană. */
 .chapter--flip .chapter-media { order: 2; }
+/* ── Ilustrațiile capitolelor din /despre ─────────────────────────
+   Desen de linie în locul fotografiilor, până apar cele reale. Fiecare
+   traseu are pathLength="1" în markup, deci dasharray:1 trasează corect
+   indiferent de lungimea curbei.
+
+   Animațiile NU pornesc la încărcarea paginii. Mai jos e doar starea
+   nedesenată; pornirea atârnă de clasa `.in`, pusă de `Reveal` prin
+   IntersectionObserver când blocul intră în ecran. Altfel capitolele
+   2 și 3 s-ar juca sub linia de plutire și ai ajunge la ele terminate.
+
+   Întârzierile sunt lungi intenționat: desenul trebuie să se aștearnă. */
+.chapter-art {
+  display: block;
+  width: 100%;
+  height: clamp(320px, 40vw, 520px);
+  background: var(--bg-alt);
+}
+.chapter-art .ca-ink { stroke: var(--ink); }
+.chapter-art .ca-gold { stroke: #8b7841; }
+
+/* Starea de repaus — tot ce urmează să fie desenat pleacă ascuns. */
+.chapter-art .ca-ground,
+.chapter-art .ca-arc,
+.chapter-art .ca-draw,
+.chapter-art .ca-ring {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.chapter-art .ca-ground {
+  stroke: var(--ink-mute);
+  stroke-width: 1;
+  opacity: 0.45;
+}
+.chapter-art .ca-arc {
+  stroke: #8b7841;
+  opacity: 0.4;
+}
+.chapter-art .ca-dot {
+  fill: var(--ink);
+  stroke: none;
+  opacity: 0;
+}
+.chapter-art .ca-gold-fill { fill: #8b7841; }
+.chapter-art .ca-berry {
+  stroke: var(--ink);
+  fill: none;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.chapter-art .ca-b7 { stroke: #8b7841; }
+.chapter-art .ca-ring {
+  stroke: var(--ink-mute);
+  opacity: 0;
+}
+.chapter-art .ca-ring-gold { stroke: #8b7841; }
+
+/* ── Pornirea, la intrarea în ecran ─────────────────────────────── */
+.chapter-media.in .chapter-art .ca-ground {
+  animation: ca-draw 1.4s var(--ease) forwards;
+}
+.chapter-media.in .chapter-art .ca-arc {
+  animation: ca-draw 3.2s var(--ease) 0.3s forwards;
+}
+.chapter-media.in .chapter-art .ca-draw {
+  animation: ca-draw 1.8s var(--ease) forwards;
+}
+.chapter-media.in .chapter-art .ca-d1 { animation-delay: 0.25s; }
+.chapter-media.in .chapter-art .ca-d2 { animation-delay: 0.75s; }
+.chapter-media.in .chapter-art .ca-d3 { animation-delay: 1.15s; }
+.chapter-media.in .chapter-art .ca-d4 { animation-delay: 1.55s; }
+.chapter-media.in .chapter-art .ca-d5 { animation-delay: 1.95s; }
+.chapter-media.in .chapter-art .ca-dot {
+  animation: ca-fade 0.9s var(--ease) forwards;
+}
+.chapter-media.in .chapter-art .ca-d6 { animation-delay: 2.3s; }
+.chapter-media.in .chapter-art .ca-d7 { animation-delay: 2.6s; }
+
+/* Boabele se umplu una câte una — răbdarea e chiar ritmul animației. */
+.chapter-media.in .chapter-art .ca-berry {
+  animation: ca-berry 1s var(--ease) forwards;
+}
+.chapter-media.in .chapter-art .ca-b1 { animation-delay: 0.9s; }
+.chapter-media.in .chapter-art .ca-b2 { animation-delay: 1.25s; }
+.chapter-media.in .chapter-art .ca-b3 { animation-delay: 1.6s; }
+.chapter-media.in .chapter-art .ca-b4 { animation-delay: 1.95s; }
+.chapter-media.in .chapter-art .ca-b5 { animation-delay: 2.3s; }
+.chapter-media.in .chapter-art .ca-b6 { animation-delay: 2.65s; }
+.chapter-media.in .chapter-art .ca-b7 { animation-delay: 3s; }
+
+/* Inelele — capitolele care se adaugă. Ultimul rămâne viu, foarte încet. */
+.chapter-media.in .chapter-art .ca-ring {
+  animation: ca-ring 2.4s var(--ease) forwards;
+}
+.chapter-media.in .chapter-art .ca-r1 { animation-delay: 1.6s; }
+.chapter-media.in .chapter-art .ca-r2 { animation-delay: 2.1s; }
+.chapter-media.in .chapter-art .ca-r3 { animation-delay: 2.6s; }
+.chapter-media.in .chapter-art .ca-ring-gold {
+  animation:
+    ca-ring 2.4s var(--ease) 2.6s forwards,
+    ca-breathe 7s var(--ease) 5.2s infinite;
+}
+
+@keyframes ca-draw { to { stroke-dashoffset: 0; } }
+@keyframes ca-fade { to { opacity: 1; } }
+@keyframes ca-berry {
+  from { opacity: 0; transform: scale(0.82); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes ca-ring { to { opacity: 0.55; stroke-dashoffset: 0; } }
+@keyframes ca-breathe {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 0.9; }
+}
+
+/* Cine are animațiile oprite din sistem primește desenul complet și
+   static. `Reveal` pune oricum `.in` imediat în acest caz. */
+@media (prefers-reduced-motion: reduce) {
+  .chapter-art * {
+    animation: none !important;
+    opacity: 1 !important;
+    stroke-dashoffset: 0 !important;
+  }
+}
+
 .chapter-media img {
   width: 100%;
   height: clamp(320px, 40vw, 520px);
@@ -3830,7 +3955,18 @@
   padding: clamp(72px, 9vw, 128px) var(--px);
   text-align: center;
 }
-.poveste-outro-inner { max-width: 640px; margin: 0 auto; }
+/* Titlul de final stă pe un singur rând pe ecrane late — se rupea în două
+   fiindcă moștenea lățimea de 640px a paragrafului. Îi dăm containerul
+   întreg și o scară puțin mai mică decât .h2; sub 760px lăsăm să curgă. */
+.poveste-outro-inner { max-width: 900px; margin: 0 auto; }
+.poveste-outro .h2 {
+  font-size: clamp(30px, 5.1vw, 62px);
+  line-height: 1.05;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .poveste-outro .h2 { white-space: normal; }
+}
 .poveste-outro p {
   margin: 18px auto 32px;
   max-width: 46ch;
@@ -6138,6 +6274,45 @@
   transition: transform var(--t-base) var(--ease);
 }
 .btn-solid:hover:not(:disabled) .arrow { transform: translateX(6px); }
+
+/* .btn-primary era folosită în trei locuri — outro-ul de pe /despre, CTA-ul
+   de pe /social și butonul de set — dar nu fusese definită niciodată. Fără
+   reguli, linkul se aranja ca text simplu: eticheta prindea centrarea
+   secțiunii, iar săgeata cădea pe rândul următor, lipită de stânga.
+   E fratele mai apăsat al lui .btn-solid: aceeași familie, puțin mai
+   mare, ca să poarte greutatea unui final de pagină. */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 17px 34px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease), gap var(--t-fast) var(--ease);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--vie);
+  border-color: var(--vie);
+  gap: 18px;
+}
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-primary svg {
+  width: 16px;
+  height: 8px;
+  flex-shrink: 0;
+  transition: transform var(--t-base) var(--ease);
+}
+.btn-primary:hover:not(:disabled) svg { transform: translateX(6px); }
 
 /* ── Summary as bottom bar (eMAG-style): items left, totals+submit right ── */
 .summary {
