@@ -49,7 +49,7 @@ export function Hero() {
         <div className="hero-content">
           <div>
             <div className="eyebrow hero-eyebrow">
-              Domeniul Locus · Panciu — Nicorești
+              Domeniul Locus · Buciumeni, Galați
             </div>
           </div>
 
