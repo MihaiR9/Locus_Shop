@@ -66,7 +66,7 @@ export function PartnerForm() {
     }
 
     // TODO Faza 2: înlocuiește cu Server Action care trimite email prin Resend
-    // către b2b@locus.ro și salvează lead-ul în Supabase tabel `partner_leads`.
+    // către office@domeniul-locus.ro și salvează lead-ul în Supabase tabel `partner_leads`.
     console.log("[partner lead]", data);
 
     setSubmitted(true);
@@ -84,7 +84,7 @@ export function PartnerForm() {
         </p>
         <p className="partner-form-success-note">
           Pentru urgențe, scrie direct la{" "}
-          <a href="mailto:b2b@locus.ro">b2b@locus.ro</a>.
+          <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>.
         </p>
       </div>
     );
@@ -194,7 +194,7 @@ export function PartnerForm() {
 
       <div className="partner-form-actions">
         <span className="save-note">
-          Datele se trimit către <strong>b2b@locus.ro</strong>. Răspundem în 48h.
+          Datele se trimit către <strong>office@domeniul-locus.ro</strong>. Răspundem în 48h.
         </span>
         <button type="submit" className="btn btn-solid">
           Trimite cererea

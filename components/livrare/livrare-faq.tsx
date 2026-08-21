@@ -13,7 +13,7 @@ const FAQ = [
   },
   {
     q: "Pot schimba adresa după ce am plasat comanda?",
-    a: "Da, dacă AWB-ul nu a fost încă generat (cam 4 ore după plată). Scrie-ne urgent pe contact@locus.ro cu numărul comenzii.",
+    a: "Da, dacă AWB-ul nu a fost încă generat (cam 4 ore după plată). Scrie-ne urgent pe office@domeniul-locus.ro cu numărul comenzii.",
   },
   {
     q: "Sticla a ajuns spartă. Ce fac?",

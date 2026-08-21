@@ -39,7 +39,7 @@ const STEPS = [
 const FAQ = [
   {
     q: "Pot anula o comandă după ce am plătit?",
-    a: "Da, dacă AWB-ul nu a plecat încă (cam 4 ore după plată). Scrie-ne urgent la contact@locus.ro cu numărul comenzii. Banii revin pe card în 3–7 zile lucrătoare.",
+    a: "Da, dacă AWB-ul nu a plecat încă (cam 4 ore după plată). Scrie-ne urgent la office@domeniul-locus.ro cu numărul comenzii. Banii revin pe card în 3–7 zile lucrătoare.",
   },
   {
     q: "Cum schimb cantitatea după ce am plătit?",
@@ -71,7 +71,7 @@ const FAQ = [
       <>
         Da, avem program separat pentru HoReCa și parteneri. Vezi pagina{" "}
         <Link href="/parteneri">Parteneri</Link> sau scrie-ne direct la{" "}
-        <a href="mailto:b2b@locus.ro">b2b@locus.ro</a>.
+        <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>.
       </>
     ),
   },

@@ -9052,3 +9052,22 @@
   color: var(--ink);
   margin-bottom: 20px;
 }
+
+/* Titlurile de secțiune din interiorul paginilor stau SUB antetul de
+   pagină, nu la egalitate cu el. Foloseau `.h2`, care urcă la 88px —
+   mai mare decât titlul paginii, deci „Cum funcționează.” arăta ca un
+   al doilea hero și răsturna ierarhia. Aici sunt marcaje de secțiune. */
+.livrare-section-head { margin-bottom: clamp(28px, 3.5vw, 48px); }
+.livrare-section-head .h2 {
+  font-size: clamp(24px, 2.6vw, 36px);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+}
+.livrare-section-head .eyebrow { margin-bottom: 14px; }
+
+/* Răspunsurile din întrebări frecvente curgeau pe 60ch, deci se rupeau
+   după câteva cuvinte deși aveau loc. Le lăsăm să meargă mult mai lung —
+   multe intră acum pe un singur rând. 92ch e pragul peste care ochiul
+   pierde începutul rândului următor. */
+.livrare-faq-item p { max-width: 92ch; }

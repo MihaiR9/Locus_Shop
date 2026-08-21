@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Footer } from "@/components/landing/footer";
 import { PartnerForm } from "@/components/parteneri/partner-form";
 
@@ -96,8 +95,8 @@ export default function ParteneriPage() {
                   <use href="#arrow-right" />
                 </svg>
               </a>
-              <a href="mailto:b2b@locus.ro" className="parteneri-mail-link">
-                sau scrie direct: <strong>b2b@locus.ro</strong>
+              <a href="mailto:office@domeniul-locus.ro" className="parteneri-mail-link">
+                sau scrie direct: <strong>office@domeniul-locus.ro</strong>
               </a>
             </div>
           </div>
