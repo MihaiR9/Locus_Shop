@@ -14,7 +14,7 @@ import Link from "next/link";
 
 const BOTTLES = [
   {
-    src: "/photos/products/cuvinte-feteasca-neagra-nobg.png",
+    src: "/photos/products/cuvinte-feteasca-neagra-nobg-v2.png",
     label: "cuvinte",
     wine: "Fetească Neagră",
     href: "/cuvinte",

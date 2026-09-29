@@ -63,11 +63,12 @@ export function abvLabel(w: Pick<Wine, "abv">): string {
 // Sufixul `-nobg` nu e cosmetic: fișierele fără el aveau fundal alb, iar
 // înlocuirea lor păstrând același nume lăsa browserele să servească la
 // nesfârșit versiunea veche din cache (URL identic → hit de cache).
-// Numele nou garantează că toată lumea primește decupajul.
+// Numele nou garantează că toată lumea primește decupajul. La fel `-v2`:
+// sticlele cuvinte au fost reîncadrate la scara lui semne (1610px înălțime).
 const PRODUCT_PHOTO: Record<string, string> = {
-  LC01: "/photos/products/cuvinte-feteasca-regala-nobg.png",
-  LC02: "/photos/products/cuvinte-feteasca-neagra-nobg.png",
-  LC04: "/photos/products/cuvinte-riesling-italian-nobg.png",
+  LC01: "/photos/products/cuvinte-feteasca-regala-nobg-v2.png",
+  LC02: "/photos/products/cuvinte-feteasca-neagra-nobg-v2.png",
+  LC04: "/photos/products/cuvinte-riesling-italian-nobg-v2.png",
   LS01: "/photos/products/semne-nobg.png",
   LS02: "/photos/products/semne-nobg.png",
   LS04: "/photos/products/semne-nobg.png",

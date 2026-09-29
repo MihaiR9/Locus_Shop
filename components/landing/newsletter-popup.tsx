@@ -151,7 +151,7 @@ export function NewsletterPopup() {
 
         <div className="nl-pop-visual" aria-hidden="true">
           <Image
-            src="/photos/products/cuvinte-feteasca-regala-nobg.png"
+            src="/photos/products/cuvinte-feteasca-regala-nobg-v2.png"
             alt=""
             width={941}
             height={1672}
