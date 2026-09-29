@@ -94,7 +94,7 @@ export function Footer() {
 
       <div className="footer-bottom">
         <span className="coords-line">45.98°N 27.30°E · Buciumeni · România</span>
-        <span className="legal">© 2026 Domeniul Locus · Identitate vizuală: STUDIOMASURA</span>
+        <span className="legal">© 2026 Domeniul Locus</span>
       </div>
     </footer>
   );
