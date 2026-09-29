@@ -28,7 +28,9 @@ export async function adminLoginWithEmail(email: string): Promise<Result> {
   const { error } = await supabase.auth.signInWithOtp({
     email: clean,
     options: {
-      emailRedirectTo: `${origin}/admin/auth/callback`,
+      // `?next=` e aici doar ca URL-ul să aibă deja query: șablonul de
+      // email lipește `&token_hash=…` direct după {{ .RedirectTo }}.
+      emailRedirectTo: `${origin}/admin/auth/callback?next=/admin`,
       shouldCreateUser: false,
     },
   });

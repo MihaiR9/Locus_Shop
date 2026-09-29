@@ -29,6 +29,28 @@ modificările să se vadă în istoric — dashboard-ul nu are versionare.
 | `reset-password.html` | Reset password | `Resetare parolă · Domeniul Locus` |
 | `change-email.html` | Change email address | `Confirmă adresa nouă · Domeniul Locus` |
 | `invite-user.html` | Invite user | `Ai un cont pregătit · Domeniul Locus` |
+| `reauthentication.html` | Reauthentication | `Cod de confirmare · Domeniul Locus` |
+
+## Linkurile: `token_hash`, nu `ConfirmationURL`
+
+Butoanele folosesc
+`{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=<tip>`, nu
+`{{ .ConfirmationURL }}`. Motivul: `ConfirmationURL` duce la fluxul PKCE,
+care cere cookie-ul din browserul care a cerut linkul. Deschis pe alt
+dispozitiv sau în aplicația Gmail, dădea eroarea „code challenge does not
+match” și clientul ajungea înapoi la login. `token_hash` se verifică pe
+server (`app/auth/callback/route.ts`) și merge oriunde.
+
+Două condiții ca să meargă:
+- fiecare `emailRedirectTo` din cod conține deja `?` (ex.
+  `/auth/callback?next=/cont`), fiindcă șablonul lipește `&token_hash=`
+  direct după el;
+- URL-ul trebuie să fie în **Authentication → URL Configuration →
+  Redirect URLs**; altfel Supabase pune Site URL-ul simplu și linkul se
+  strică.
+
+`invite-user.html` rămâne pe `ConfirmationURL`: invitațiile trimise din
+dashboard nu au `RedirectTo` propriu.
 
 ## Variabile disponibile
 

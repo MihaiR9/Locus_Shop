@@ -392,15 +392,23 @@ export function SignupForm() {
         </button>
       </form>
 
-      <div className="auth-divider">Sau rapid cu</div>
+      {SHOW_SOCIAL_LOGIN && (
+        <>
+          <div className="auth-divider">Sau rapid cu</div>
 
-      <div className="auth-social-row">
-        <GoogleButton label="Google" onClick={onGoogle} />
-        <PhoneButton label="Telefon" onClick={startPhone} />
-      </div>
+          <div className="auth-social-row">
+            <GoogleButton label="Google" onClick={onGoogle} />
+            <PhoneButton label="Telefon" onClick={startPhone} />
+          </div>
+        </>
+      )}
     </>
   );
 }
+
+// Google și Telefon ascunse temporar la cererea lui Mihai (29 sep 2026).
+// Codul rămâne funcțional — pune true ca să reapară.
+const SHOW_SOCIAL_LOGIN = false;
 
 const resetLinkStyle: React.CSSProperties = {
   background: "transparent",

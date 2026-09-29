@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Invitație · Domeniul Locus</title>
+  <title>Cod de confirmare · Domeniul Locus</title>
 </head>
 <body style="margin:0;padding:0;background:#EBE1DA;font-family:'IBM Plex Mono','Courier New',Courier,monospace;color:#1A1A1A;">
 
-  <div style="display:none;visibility:hidden;opacity:0;height:0;width:0;overflow:hidden;">Ai fost invitat să îți activezi contul.</div>
+  <div style="display:none;visibility:hidden;opacity:0;height:0;width:0;overflow:hidden;">Codul tău de confirmare: {{ .Token }}</div>
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#EBE1DA;padding:32px 16px;">
     <tr>
@@ -25,41 +25,31 @@
             <td style="background:#F2EAE2;border:1px solid rgba(74,60,45,0.18);padding:36px 32px;">
 
               <div style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#6E5E4B;margin-bottom:14px;">
-                Invitație
+                Securitate
               </div>
 
               <div style="font-family:Italiana,Georgia,'Times New Roman',serif;font-size:36px;line-height:1.15;color:#1A1A1A;letter-spacing:-0.015em;">
-                Ai un cont pregătit.
+                Confirmă că ești tu.
               </div>
 
               <p style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:14px;line-height:1.85;color:#4A3C2D;margin:22px 0 0 0;">
-                Cineva de la Domeniul Locus ți-a creat un cont pe adresa
-                <strong style="color:#1A1A1A;">{{ .Email }}</strong>. Apasă
-                butonul de mai jos ca să îl activezi.
+                Pentru a continua modificarea din contul
+                <strong style="color:#1A1A1A;">{{ .Email }}</strong>, introdu
+                codul de mai jos.
               </p>
 
-              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:32px 0 0 0;">
-                <tr>
-                  <td align="center" bgcolor="#3E4336" style="background:#3E4336;">
-                    <a href="{{ .ConfirmationURL }}" style="display:inline-block;padding:16px 34px;font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#EBE1DA;text-decoration:none;">Activează contul</a>
-                  </td>
-                </tr>
-              </table>
+              <div style="margin:32px 0 0 0;padding:22px 0;text-align:center;background:#F6EFE8;border:1px solid rgba(74,60,45,0.18);font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:30px;letter-spacing:0.32em;color:#1A1A1A;">
+                {{ .Token }}
+              </div>
 
               <p style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:12px;line-height:1.8;color:#6E5E4B;margin:28px 0 0 0;">
-                Linkul e valabil <strong style="color:#4A3C2D;">24 de ore</strong>.
-                Dacă expiră, cere o invitație nouă persoanei care ți-a trimis-o.
+                Codul poate fi folosit <strong style="color:#4A3C2D;">o singură dată</strong>
+                și expiră în scurt timp.
               </p>
 
               <p style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:12px;line-height:1.8;color:#6E5E4B;margin:20px 0 0 0;border-top:1px solid rgba(74,60,45,0.18);padding-top:22px;">
-                Dacă butonul nu funcționează, copiază adresa asta în browser:
-                <br />
-                <a href="{{ .ConfirmationURL }}" style="color:#4A3C2D;word-break:break-all;">{{ .ConfirmationURL }}</a>
-              </p>
-
-              <p style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:12px;line-height:1.8;color:#6E5E4B;margin:20px 0 0 0;">
-                Nu așteptai nicio invitație? Ignoră mesajul — fără activare,
-                contul rămâne inutilizabil.
+                Nu tu ai cerut codul? Ignoră mesajul — contul rămâne neschimbat.
+                Dacă primești astfel de mesaje repetat, scrie-ne.
               </p>
 
             </td>

@@ -67,7 +67,7 @@
                 <tr>
                   <td align="center" bgcolor="#1a1a1a" style="background:#1a1a1a;">
                     <a
-                      href="{{ .ConfirmationURL }}"
+                      href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email"
                       style="display:inline-block;padding:17px 42px;font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:#faf9f6;text-decoration:none;"
                     >Autentifică-mă</a>
                   </td>
@@ -103,7 +103,7 @@
                     Buciumeni, Galați
                   </td>
                   <td align="center" style="padding:18px 0 0 0;font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:#6e5e4b;">
-                    <a href="mailto:contact@domeniul-locus.ro" style="color:#6e5e4b;text-decoration:none;">contact@domeniul-locus.ro</a>
+                    <a href="mailto:office@domeniul-locus.ro" style="color:#6e5e4b;text-decoration:none;">office@domeniul-locus.ro</a>
                   </td>
                   <td align="right" style="padding:18px 0 0 0;font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:9px;letter-spacing:0.12em;color:#6e5e4b;">
                     <a href="tel:+40752232912" style="color:#6e5e4b;text-decoration:none;">0752 232 912</a>
@@ -118,7 +118,7 @@
             <td style="padding:24px 44px 44px 44px;">
               <div style="font-family:'IBM Plex Mono','Courier New',Courier,monospace;font-size:9.5px;line-height:1.7;color:#6e5e4b;">
                 Nu funcționează butonul?
-                <a href="{{ .ConfirmationURL }}" style="color:#8b7841;">Deschide linkul direct</a>.
+                <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email" style="color:#8b7841;">Deschide linkul direct</a>.
                 Nu tu ai cerut autentificarea? Ignoră mesajul — fără o apăsare, nu se întâmplă nimic.
               </div>
             </td>
