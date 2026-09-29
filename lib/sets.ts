@@ -31,12 +31,8 @@ export const SETS: SetDefinition[] = [
     label: "Set Cuvinte",
     note: "trei sticle · gama completă",
   },
-  {
-    key: "semne",
-    codes: ["LS01", "LS02", "LS04"],
-    label: "Set Semne",
-    note: "trei sticle · gama completă",
-  },
+  // Setul Semne a fost scos pe 29 sep 2026: nu mai e oferit pe home, deci
+  // nici coșul nu mai dă reducerea. Readus = readăugat aici + în sets-section.
 ];
 
 export type SetMatch = {
