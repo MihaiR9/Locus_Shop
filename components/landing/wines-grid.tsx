@@ -1,6 +1,7 @@
 import { Reveal } from "@/components/reveal";
 import { WineCard } from "@/components/landing/wine-card";
 import { WinesFilters } from "@/components/landing/wines-filters";
+import { WinesFiller } from "@/components/landing/wines-filler";
 import { getAllWines } from "@/lib/wines-queries";
 
 export async function WinesGrid() {
@@ -28,6 +29,7 @@ export async function WinesGrid() {
         {wines.map((w) => (
           <WineCard key={w.code} wine={w} />
         ))}
+        <WinesFiller />
       </Reveal>
     </section>
   );

@@ -4,7 +4,7 @@ import { Manifesto } from "@/components/landing/manifesto";
 import { MapSection } from "@/components/landing/map-section";
 import { GameSection } from "@/components/landing/game-section";
 import { SetsSection } from "@/components/landing/sets-section";
-import { SocialCarousel } from "@/components/landing/social-carousel";
+// import { SocialCarousel } from "@/components/landing/social-carousel";
 import { Newsletter } from "@/components/landing/newsletter";
 import { Footer } from "@/components/landing/footer";
 
@@ -32,9 +32,11 @@ export default function HomePage() {
         <MapSection />
         <GameSection />
         <SetsSection />
-        {/* Dovada socială vine după produs: întâi vezi ce cumperi,
-            apoi vezi că există și în afara studioului. */}
-        <SocialCarousel />
+        {/* Ascuns temporar la cererea lui Mihai (29 sep 2026) — revine când
+            avem poze reale trimise de clienți. Dovada socială vine după
+            produs: întâi vezi ce cumperi, apoi vezi că există și în afara
+            studioului. */}
+        {/* <SocialCarousel /> */}
         <Newsletter />
       </main>
       <Footer />

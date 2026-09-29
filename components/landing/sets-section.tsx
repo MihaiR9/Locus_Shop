@@ -9,7 +9,7 @@ import { productPhoto, type Gama, type Wine } from "@/lib/wines";
 import { SET_DISCOUNT_PCT } from "@/lib/sets";
 
 /**
- * Secțiunea de vânzare de pe home: două seturi, câte unul de gamă.
+ * Secțiunea de vânzare de pe home: setul Cuvinte.
  *
  * Înlocuiește grila completă a colecției, care se dubla cu /shop.
  * Home-ul propune o singură decizie clară — „iau setul" — iar cine vrea
@@ -27,12 +27,6 @@ const SETS: {
     eyebrow: "trei sticle · cuvinte",
     title: "Setul Cuvinte",
     body: "Cele trei vinuri ale gamei, într-un singur colet. Pentru mese lungi și cadouri care nu au nevoie de explicații.",
-  },
-  {
-    gama: "semne",
-    eyebrow: "trei sticle · semne",
-    title: "Setul Semne",
-    body: "Aceleași trei soiuri, altă mână la sticlă. Pentru mese obișnuite care merită totuși un vin cu origine.",
   },
 ];
 

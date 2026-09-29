@@ -775,6 +775,10 @@
   grid-template-columns: repeat(2, 1fr);
   gap: clamp(20px, 2.6vw, 40px);
 }
+.sets-grid:has(> .set-card:only-child) {
+  grid-template-columns: 1fr;
+  max-width: 560px;
+}
 .set-card {
   display: flex;
   flex-direction: column;
@@ -1658,6 +1662,140 @@
 .wine-add:hover {
   background: var(--ink);
   color: var(--bg);
+}
+
+/* ── Celula care umple golul din ultimul rând (WinesFiller) ─────── */
+.wine-filler {
+  grid-column-end: -1;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  overflow: hidden;
+}
+.wine-filler[hidden] { display: none; }
+.wf-art {
+  flex: 1;
+  width: 100%;
+  min-height: 260px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--line);
+}
+.wf-contour {
+  stroke: var(--ink-mute);
+  stroke-width: 1;
+  opacity: 0.55;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.wf-contour--gold { stroke: #8b7841; opacity: 0.8; }
+.wf-contours {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.wf-route {
+  stroke: var(--ink-soft);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 6;
+  opacity: 0;
+}
+.wf-point { fill: #8b7841; opacity: 0; }
+.wf-pulse {
+  fill: none;
+  stroke: #8b7841;
+  stroke-width: 1;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.wf-star { color: #8b7841; opacity: 0; }
+.wf-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  fill: var(--ink-soft);
+  opacity: 0;
+}
+
+.wine-filler.in .wf-contour {
+  animation: wf-draw 2.4s var(--ease) forwards;
+  animation-delay: calc(var(--i) * 0.22s);
+}
+.wine-filler.in .wf-contours {
+  animation: wf-drift 14s ease-in-out 3s infinite alternate;
+}
+.wine-filler.in .wf-route {
+  animation:
+    wf-fade 1s var(--ease) 1.6s forwards,
+    wf-march 2.4s linear 1.6s infinite;
+}
+.wine-filler.in .wf-point,
+.wine-filler.in .wf-star,
+.wine-filler.in .wf-label {
+  animation: wf-fade 0.9s var(--ease) 2.2s forwards;
+}
+.wine-filler.in .wf-pulse {
+  animation: wf-pulse 3.2s var(--ease) 2.6s infinite;
+}
+
+@keyframes wf-draw { to { stroke-dashoffset: 0; } }
+@keyframes wf-fade { to { opacity: 1; } }
+@keyframes wf-march { to { stroke-dashoffset: -18; } }
+@keyframes wf-drift {
+  from { transform: translate(0, 0) rotate(0deg) scale(1); }
+  to   { transform: translate(-6px, 4px) rotate(-2.5deg) scale(1.03); }
+}
+@keyframes wf-pulse {
+  0%   { opacity: 0.7; transform: scale(1); }
+  100% { opacity: 0;   transform: scale(5); }
+}
+
+.wf-body {
+  padding: 28px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.wf-title {
+  font-family: var(--font-serif), serif;
+  font-size: clamp(30px, 2.8vw, 40px);
+  line-height: 1.05;
+  color: var(--ink);
+}
+.wf-text {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--ink-soft);
+  max-width: 36ch;
+}
+.wf-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.wf-link svg {
+  width: 18px;
+  height: 9px;
+  transition: transform var(--t-fast) var(--ease);
+}
+.wf-link:hover svg { transform: translateX(6px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .wf-contour { stroke-dashoffset: 0; }
+  .wf-route, .wf-point, .wf-star, .wf-label { opacity: 1; }
+  .wine-filler.in .wf-contour,
+  .wine-filler.in .wf-contours,
+  .wine-filler.in .wf-route,
+  .wine-filler.in .wf-pulse { animation: none; }
 }
 
 @media (max-width: 1024px) {
