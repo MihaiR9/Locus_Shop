@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { INSTAGRAM_URL } from "@/lib/social-posts";
 
 export function Footer() {
   return (
@@ -32,7 +33,7 @@ export function Footer() {
           <p>
             <a href="tel:+40752232912">(0752) 232 912</a>
             <br />
-            <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>
+            <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>
           </p>
         </div>
 
@@ -63,8 +64,8 @@ export function Footer() {
         <div className="footer-col">
           <h4>Urmărește-ne</h4>
           <ul>
-            <li><a href="#" target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
-            <li><a href="#" target="_blank" rel="noopener noreferrer">Facebook ↗</a></li>
+            <li><a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
+            {/* Facebook ascuns până există pagina (29 sep 2026). */}
           </ul>
           <h4 style={{ marginTop: 32 }}>Reclamații</h4>
           <ul>

@@ -272,7 +272,7 @@ export default async function CheckoutSuccessPage({
           <p className="cs-empty-p">
             Nu am găsit nicio comandă cu numărul cerut. Dacă ai plasat o
             comandă și nu vezi confirmarea, scrie-ne la{" "}
-            <a href="mailto:contact@domeniul-locus.ro">contact@domeniul-locus.ro</a>.
+            <a href="mailto:office@domeniul-locus.ro">office@domeniul-locus.ro</a>.
           </p>
           <Link href="/" className="cs-cta">
             înapoi la domeniu

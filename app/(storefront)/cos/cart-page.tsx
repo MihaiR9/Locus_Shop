@@ -333,7 +333,6 @@ export function CartPage({ catalog }: Props) {
                 <input
                   id="voucher-input"
                   className="input"
-                  placeholder="ex: LOCUS10"
                   value={voucherInput}
                   onChange={(e) => setVoucherInput(e.target.value)}
                   disabled={voucherPending}

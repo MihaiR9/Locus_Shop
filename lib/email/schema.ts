@@ -117,7 +117,7 @@ export const ORDER_CONFIRMATION: EmailTemplateDef = {
       label: "Notă finală",
       kind: "textarea",
       defaultValue:
-        "Pentru întrebări, scrie la contact@domeniul-locus.ro. Vinul, ca și locul, are nevoie de timp.",
+        "Pentru întrebări, scrie la office@domeniul-locus.ro. Vinul, ca și locul, are nevoie de timp.",
     },
   ],
   sampleVariables: {
@@ -192,7 +192,7 @@ export const SHIPPED: EmailTemplateDef = {
       label: "Notă finală (deschidere colet)",
       kind: "textarea",
       defaultValue:
-        "Recomandăm să deschizi coletul în prezența curierului — sticlele sunt fragile, iar dacă găsești ceva stricat, marchezi rezervă pe AWB și ne scrii la contact@domeniul-locus.ro.",
+        "Recomandăm să deschizi coletul în prezența curierului — sticlele sunt fragile, iar dacă găsești ceva stricat, marchezi rezervă pe AWB și ne scrii la office@domeniul-locus.ro.",
     },
   ],
   sampleVariables: {
@@ -261,7 +261,7 @@ export const DELIVERED: EmailTemplateDef = {
       label: "Text drept retur (14 zile)",
       kind: "textarea",
       defaultValue:
-        "Ai 14 zile calendaristice pentru drept de retragere (OUG 34/2014). Sticlele deschise sau deteriorate după livrare nu intră în acest drept. Deschide o cerere din contul tău sau scrie-ne direct la contact@domeniul-locus.ro.",
+        "Ai 14 zile calendaristice pentru drept de retragere (OUG 34/2014). Sticlele deschise sau deteriorate după livrare nu intră în acest drept. Deschide o cerere din contul tău sau scrie-ne direct la office@domeniul-locus.ro.",
     },
     {
       key: "footnote",
@@ -364,7 +364,7 @@ export const REFUND_CONFIRMATION: EmailTemplateDef = {
       label: "Notă finală",
       kind: "textarea",
       defaultValue:
-        "Dacă nu vezi suma pe extras după termenul menționat, scrie la contact@domeniul-locus.ro cu numărul comenzii — verificăm imediat.",
+        "Dacă nu vezi suma pe extras după termenul menționat, scrie la office@domeniul-locus.ro cu numărul comenzii — verificăm imediat.",
     },
   ],
   sampleVariables: {
@@ -450,7 +450,7 @@ export const RETURN_STATUS: EmailTemplateDef = {
       label: "RESPINS — text",
       kind: "textarea",
       defaultValue:
-        "După verificare, cererea ta nu a putut fi aprobată. Motivul e adesea legat de termenul de 14 zile de la livrare (OUG 34/2014) sau de starea produsului. Dacă vrei mai multe detalii sau contești decizia, scrie-ne la contact@domeniul-locus.ro.",
+        "După verificare, cererea ta nu a putut fi aprobată. Motivul e adesea legat de termenul de 14 zile de la livrare (OUG 34/2014) sau de starea produsului. Dacă vrei mai multe detalii sau contești decizia, scrie-ne la office@domeniul-locus.ro.",
     },
     {
       key: "footnote",

@@ -71,10 +71,10 @@ export default async function ReturnsListPage() {
               de la livrare a expirat sau nu există comenzi recente).
               Pentru orice problemă cu o comandă, scrie-ne la{" "}
               <a
-                href="mailto:contact@domeniul-locus.ro"
+                href="mailto:office@domeniul-locus.ro"
                 style={{ color: "var(--ink)" }}
               >
-                contact@domeniul-locus.ro
+                office@domeniul-locus.ro
               </a>
               .
             </p>

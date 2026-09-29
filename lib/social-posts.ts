@@ -51,4 +51,4 @@ export const SOCIAL_POSTS: SocialPost[] = [
   },
 ];
 
-export const INSTAGRAM_URL = "https://instagram.com";
+export const INSTAGRAM_URL = "https://www.instagram.com/domeniul.locus/";

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Reveal } from "@/components/reveal";
 import { Footer } from "@/components/landing/footer";
 import { ContactForm } from "./contact-form";
+import { INSTAGRAM_URL } from "@/lib/social-posts";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -54,8 +55,8 @@ export default function ContactPage() {
               <div className="contact-info-block">
                 <span className="contact-info-label">Email</span>
                 <span className="contact-info-value">
-                  <a href="mailto:contact@domeniul-locus.ro">
-                    contact@domeniul-locus.ro
+                  <a href="mailto:office@domeniul-locus.ro">
+                    office@domeniul-locus.ro
                   </a>
                 </span>
               </div>
@@ -72,12 +73,10 @@ export default function ContactPage() {
               <div className="contact-info-block">
                 <span className="contact-info-label">Social</span>
                 <div className="contact-social">
-                  <a href="#" target="_blank" rel="noopener noreferrer">
+                  <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
                     Instagram ↗
                   </a>
-                  <a href="#" target="_blank" rel="noopener noreferrer">
-                    Facebook ↗
-                  </a>
+                  {/* Facebook ascuns până există pagina (29 sep 2026). */}
                 </div>
               </div>
             </Reveal>

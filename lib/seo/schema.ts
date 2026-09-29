@@ -60,7 +60,7 @@ export function organizationSchema(): JsonLdObject {
     description:
       "Producător de vin din Buciumeni, între Panciu și Nicorești. Vânzare directă, gamele cuvinte și semne.",
     telephone: "+40752232912",
-    email: "contact@domeniul-locus.ro",
+    email: "office@domeniul-locus.ro",
     address: {
       "@type": "PostalAddress",
       streetAddress: "Str. Portului nr. 20, tronson 1, camera 211",
