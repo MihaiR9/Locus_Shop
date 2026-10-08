@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { submitContact, type ContactState } from "./actions";
 
 const INITIAL: ContactState = { ok: false };
@@ -101,25 +101,10 @@ export function ContactForm() {
           />
         </div>
         <div className="contact-field">
-          <label className="contact-label" htmlFor="contact-reason">
+          <span className="contact-label" id="contact-reason-label">
             Motiv<span className="req">*</span>
-          </label>
-          <select
-            id="contact-reason"
-            name="reason"
-            className="contact-select"
-            required
-            defaultValue=""
-          >
-            <option value="" disabled>
-              alege un motiv
-            </option>
-            {REASONS.map((r) => (
-              <option key={r.value} value={r.value}>
-                {r.label}
-              </option>
-            ))}
-          </select>
+          </span>
+          <ReasonSelect />
         </div>
       </div>
 
@@ -147,5 +132,121 @@ export function ContactForm() {
         </svg>
       </button>
     </form>
+  );
+}
+
+function ReasonSelect() {
+  const [value, setValue] = useState("");
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
+
+  const selected = REASONS.find((r) => r.value === value);
+
+  function openList() {
+    const index = REASONS.findIndex((r) => r.value === value);
+    setActive(index === -1 ? 0 : index);
+    setOpen(true);
+  }
+
+  function choose(index: number) {
+    setValue(REASONS[index].value);
+    setOpen(false);
+    buttonRef.current?.focus();
+  }
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (!open) {
+      if (["ArrowDown", "ArrowUp", "Enter", " "].includes(e.key)) {
+        e.preventDefault();
+        openList();
+      }
+      return;
+    }
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setActive((i) => Math.min(i + 1, REASONS.length - 1));
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setActive((i) => Math.max(i - 1, 0));
+        break;
+      case "Home":
+        e.preventDefault();
+        setActive(0);
+        break;
+      case "End":
+        e.preventDefault();
+        setActive(REASONS.length - 1);
+        break;
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        choose(active);
+        break;
+      case "Escape":
+        e.preventDefault();
+        setOpen(false);
+        break;
+      case "Tab":
+        setOpen(false);
+        break;
+    }
+  }
+
+  return (
+    <div className="contact-select" ref={rootRef}>
+      <input type="hidden" name="reason" value={value} />
+      <button
+        ref={buttonRef}
+        type="button"
+        id="contact-reason"
+        className="contact-select-trigger"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls="contact-reason-list"
+        aria-labelledby="contact-reason-label contact-reason"
+        aria-activedescendant={open ? `contact-reason-${active}` : undefined}
+        data-placeholder={selected ? undefined : ""}
+        onClick={() => (open ? setOpen(false) : openList())}
+        onKeyDown={onKeyDown}
+      >
+        {selected ? selected.label : "alege un motiv"}
+      </button>
+      {open && (
+        <ul
+          id="contact-reason-list"
+          role="listbox"
+          aria-labelledby="contact-reason-label"
+          className="contact-select-list"
+        >
+          {REASONS.map((r, i) => (
+            <li
+              key={r.value}
+              id={`contact-reason-${i}`}
+              role="option"
+              aria-selected={r.value === value}
+              data-active={i === active ? "" : undefined}
+              className="contact-select-option"
+              onPointerEnter={() => setActive(i)}
+              onClick={() => choose(i)}
+            >
+              {r.label}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

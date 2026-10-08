@@ -4283,7 +4283,7 @@
   margin-left: 4px;
 }
 .contact-input,
-.contact-select,
+.contact-select-trigger,
 .contact-textarea {
   font-family: var(--font-mono), monospace;
   font-size: 13px;
@@ -4297,7 +4297,8 @@
   transition: border-color var(--t-fast) var(--ease);
 }
 .contact-input:focus,
-.contact-select:focus,
+.contact-select-trigger:focus-visible,
+.contact-select-trigger[aria-expanded="true"],
 .contact-textarea:focus {
   outline: none;
   border-bottom-color: var(--ink);
@@ -4313,12 +4314,57 @@
   padding: 14px 0;
 }
 .contact-select {
-  appearance: none;
+  position: relative;
+}
+.contact-select-trigger {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  padding-right: 24px;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1 L6 6 L11 1' stroke='%23A89D8D' stroke-width='1.2' fill='none'/></svg>");
   background-repeat: no-repeat;
   background-position: right 4px center;
+}
+.contact-select-trigger[data-placeholder] {
+  color: var(--ink-mute);
+}
+.contact-select-trigger[aria-expanded="true"] {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 7 L6 2 L11 7' stroke='%23A89D8D' stroke-width='1.2' fill='none'/></svg>");
+}
+.contact-select-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin: 0;
+  padding: 6px 0;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 32px rgba(26, 26, 26, 0.12);
+}
+.contact-select-option {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  padding: 10px 16px;
+  color: var(--ink-soft);
   cursor: pointer;
-  padding-right: 24px;
+  transition:
+    background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease);
+}
+.contact-select-option[data-active] {
+  background: var(--bg-alt);
+  color: var(--ink);
+}
+.contact-select-option[aria-selected="true"] {
+  color: var(--vie);
+}
+[data-theme="dark"] .contact-select-option[aria-selected="true"] {
+  color: var(--nisip);
 }
 .contact-submit {
   align-self: flex-start;
