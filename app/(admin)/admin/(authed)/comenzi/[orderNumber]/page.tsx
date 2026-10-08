@@ -32,9 +32,13 @@ const SHIP_METHOD_LABEL: Record<string, string> = {
 };
 
 const EVENT_LABEL: Record<string, string> = {
+  order_created: "Comandă plasată",
   payment_succeeded: "Plată confirmată",
   payment_failed: "Plată eșuată",
   session_expired: "Sesiune Stripe expirată",
+  payment_reminder_sent: "Reminder de plată trimis clientului",
+  payment_reminder_failed: "⚠ Reminder de plată netrimis",
+  payment_link_used: "Client a redeschis plata din link",
   marked_shipped: "Marcată expediată",
   marked_delivered: "Marcată livrată",
   refund_requested: "Rambursare inițiată",
@@ -43,7 +47,28 @@ const EVENT_LABEL: Record<string, string> = {
   stock_decrement_failed: "⚠ Decrement stoc eșuat",
   stock_restore_failed: "⚠ Restore stoc eșuat",
   manual_cancel: "Anulată manual",
+  refund_webhook_ack: "Rambursare confirmată de Stripe",
+  awb_generated: "AWB generat",
+  awb_generate_failed: "⚠ Generare AWB eșuată",
+  awb_cancelled: "AWB anulat",
+  fgo_invoice_issued: "Factură emisă",
+  fgo_invoice_failed: "⚠ Emitere factură eșuată",
+  fgo_invoice_cancelled: "Factură anulată",
+  fgo_invoice_email_sent: "Factură trimisă pe email",
+  fgo_invoice_email_failed: "⚠ Email factură netrimis",
+  fgo_invoice_email_resent: "Factură retrimisă pe email",
+  email_shipped_failed: "⚠ Email expediere netrimis",
+  email_delivered_failed: "⚠ Email livrare netrimis",
+  email_refund_failed: "⚠ Email rambursare netrimis",
+  meta_capi_sent: "Conversie trimisă la Meta",
+  meta_capi_failed: "⚠ Conversie Meta netrimisă",
 };
+
+/** Doar mesajul de eroare din payload — restul sunt ID-uri tehnice. */
+function eventError(payload: unknown): string | null {
+  const error = (payload as { error?: unknown } | null)?.error;
+  return typeof error === "string" && error ? error : null;
+}
 
 type Params = { orderNumber: string };
 
@@ -256,9 +281,9 @@ export default async function AdminOrderDetailPage({
                       <div className="text-sm text-zinc-900">
                         {EVENT_LABEL[e.type] ?? e.type}
                       </div>
-                      {e.payload && Object.keys(e.payload).length > 0 && (
-                        <div className="mt-0.5 truncate text-[11px] font-mono text-zinc-500">
-                          {JSON.stringify(e.payload)}
+                      {eventError(e.payload) && (
+                        <div className="mt-0.5 text-[11px] text-red-700">
+                          {eventError(e.payload)}
                         </div>
                       )}
                     </div>
