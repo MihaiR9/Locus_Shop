@@ -17,14 +17,25 @@ const GAME = [
   },
 ] as const;
 
+const SOON = [
+  {
+    key: "pauze",
+    body: "Momentul când vinul tace și asculți. O gamă în lansare — vinuri de rezervă, ediții limitate, păstrate dincolo de recolta lor.",
+  },
+  {
+    key: "urme",
+    body: "Drumul bătut de cei dinainte. O gamă în lansare — vinuri făcute după felul vechi al locului.",
+  },
+] as const;
+
 export function GameSection() {
   return (
     <section className="vinuri" id="vinuri" aria-label="Game de vin">
       <Reveal as="div" className="vinuri-head">
-        <div className="eyebrow">trei game · același loc</div>
+        <div className="eyebrow">patru game · același loc</div>
         <h2 className="display">Vinul vorbește.</h2>
         <p className="lead">
-          Trei feluri în care vinul vorbește. Trei game, același loc, aceeași
+          Patru feluri în care vinul vorbește. Patru game, același loc, aceeași
           mână de om.
         </p>
       </Reveal>
@@ -57,16 +68,15 @@ export function GameSection() {
           </a>
         ))}
 
-        <article className="gama gama--soon" data-gama="pauze">
-          <div className="gama-tag">pauze</div>
-          <div className="gama-body">
-            <p>
-              Momentul când vinul tace și asculți. O gamă în lansare — vinuri de
-              rezervă, ediții limitate, păstrate dincolo de recolta lor.
-            </p>
-          </div>
-          <div className="gama-cta" />
-        </article>
+        {SOON.map((g) => (
+          <article key={g.key} className="gama gama--soon" data-gama={g.key}>
+            <div className="gama-tag">{g.key}</div>
+            <div className="gama-body">
+              <p>{g.body}</p>
+            </div>
+            <div className="gama-cta" />
+          </article>
+        ))}
       </div>
     </section>
   );
