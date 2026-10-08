@@ -7,11 +7,13 @@ import {
 } from "@/lib/resend/server";
 import {
   adminOrderNotificationHtml,
+  adminPaymentExpiredHtml,
   type OrderConfirmationData,
   type ShippedEmailData,
   type DeliveredEmailData,
   type RefundEmailData,
   type ReturnStatusEmailData,
+  type PaymentReminderData,
 } from "@/lib/email/templates";
 import {
   renderOrderConfirmation,
@@ -20,6 +22,7 @@ import {
   renderRefundConfirmation,
   renderReturnStatus,
   renderNewsletterWelcome,
+  renderPaymentReminder,
 } from "@/lib/email/render";
 
 type SendResult = { ok: true; id: string } | { ok: false; error: string };
@@ -75,6 +78,26 @@ export async function sendOrderNotificationToAdmin(
 ): Promise<SendResult> {
   const tpl = adminOrderNotificationHtml(data);
   return sendRendered(adminEmail(), tpl, "admin notification");
+}
+
+/**
+ * Payment reminder — fires once, when the Stripe session expires unpaid.
+ */
+export async function sendPaymentReminder(
+  to: string,
+  data: PaymentReminderData,
+): Promise<SendResult> {
+  const rendered = await renderPaymentReminder(data);
+  return sendRendered(to, rendered, "payment reminder");
+}
+
+/**
+ * Internal alert — a card-online order's Stripe session expired unpaid.
+ */
+export async function sendPaymentExpiredToAdmin(
+  data: Parameters<typeof adminPaymentExpiredHtml>[0],
+): Promise<SendResult> {
+  return sendRendered(adminEmail(), adminPaymentExpiredHtml(data), "admin payment expired");
 }
 
 /**

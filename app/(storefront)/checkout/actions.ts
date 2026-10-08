@@ -3,7 +3,7 @@
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import type { Json } from "@/lib/supabase/database.types";
-import { getStripe, getSiteUrl } from "@/lib/stripe/server";
+import { createOrderCheckoutSession } from "@/lib/stripe/checkout-session";
 import { collectAttribution } from "@/lib/meta/attribution";
 import {
   calculateShippingRon,
@@ -293,103 +293,33 @@ export async function createOrder(
   let stripeSessionUrl: string | undefined;
   if (input.payment === "card-online") {
     try {
-      const stripe = getStripe();
-
-      // Build line_items inline (price_data) — no need to pre-create
-      // products in Stripe. Item totals already in cents (RON).
-      const lineItems = input.items.map((it) => {
-        const p = byCode.get(it.code)!;
-        return {
-          quantity: it.qty,
-          price_data: {
-            currency: "ron",
-            unit_amount: p.price_cents,
-            product_data: {
-              name: p.name,
-              metadata: { code: p.code },
-            },
-          },
-        };
-      });
-
-      // Shipping as a separate line so the receipt is honest.
-      if (shippingCents > 0) {
-        lineItems.push({
-          quantity: 1,
-          price_data: {
-            currency: "ron",
-            unit_amount: shippingCents,
-            product_data: {
-              name: "Transport curier",
-              metadata: { code: "SHIPPING" },
-            },
-          },
-        });
-      }
-
-      // SGR — garanție returnare, obligatoriu legal, linie separată.
-      if (sgrCents > 0) {
-        lineItems.push({
-          quantity: 1,
-          price_data: {
-            currency: "ron",
-            unit_amount: sgrCents,
-            product_data: {
-              name: `Garanție SGR (${bottleCount} sticle × 0.5 lei)`,
-              metadata: { code: `SGR-${bottleCount}` },
-            },
-          },
-        });
-      }
-
-      // Discount via Stripe Coupon would be ideal, but for simplicity
-      // we bake it into a negative line item via discounts[]. Stripe
-      // doesn't allow negative price_data; we use `discounts` with
-      // an inline coupon created on-the-fly.
-      const session = await stripe.checkout.sessions.create({
-        mode: "payment",
-        // Default ui_mode is hosted (Stripe-hosted checkout page), which
-        // is what we want — minimizes our PCI scope to SAQ-A.
-        line_items: lineItems,
-        ...(discountCents > 0 && {
-          discounts: [
-            {
-              coupon: (
-                await stripe.coupons.create({
-                  amount_off: discountCents,
-                  currency: "ron",
-                  duration: "once",
-                  // Eticheta de pe bonul Stripe. Reflectă ce a produs
-                  // reducerea, ca să nu apară „voucher" acolo unde de fapt
-                  // clientul a beneficiat de prețul de set.
-                  name:
-                    input.couponCode?.toUpperCase() ??
-                    (setResult.matches.length > 0
-                      ? setResult.matches.map((m) => m.def.label).join(" + ")
-                      : "Reducere Domeniul Locus"),
-                })
-              ).id,
-            },
-          ],
+      const session = await createOrderCheckoutSession({
+        orderId,
+        orderNumber,
+        lines: input.items.map((it) => {
+          const p = byCode.get(it.code)!;
+          return {
+            name: p.name,
+            code: p.code,
+            qty: it.qty,
+            unitPriceCents: p.price_cents,
+          };
         }),
-        customer_email: guestEmail ?? undefined,
-        success_url: `${getSiteUrl()}/checkout/success?id=${encodeURIComponent(orderNumber)}&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${getSiteUrl()}/checkout?cancelled=${encodeURIComponent(orderNumber)}`,
-        metadata: {
-          order_id: orderId,
-          order_number: orderNumber,
-          idempotency_key: input.idempotencyKey,
-        },
-        payment_intent_data: {
-          metadata: {
-            order_id: orderId,
-            order_number: orderNumber,
-          },
-        },
+        shippingCents,
+        sgrCents,
+        bottleCount,
+        discountCents,
+        // Eticheta de pe bonul Stripe. Reflectă ce a produs reducerea, ca
+        // să nu apară „voucher" acolo unde clientul a avut prețul de set.
+        discountName:
+          input.couponCode?.toUpperCase() ??
+          (setResult.matches.length > 0
+            ? setResult.matches.map((m) => m.def.label).join(" + ")
+            : "Reducere Domeniul Locus"),
+        customerEmail: guestEmail,
+        metadata: { idempotency_key: input.idempotencyKey },
         // Stripe will retry idempotently on the same key — same order
         // creating two Stripe sessions would otherwise be possible.
-        // (Note: this is Stripe's idempotency, separate from our DB key.)
-      }, {
         idempotencyKey: `session-${input.idempotencyKey}`,
       });
 

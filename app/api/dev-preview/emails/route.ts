@@ -5,6 +5,7 @@ import { loadTemplate, previewTemplate } from "@/lib/email/render";
 import { ALL_EMAIL_TEMPLATES } from "@/lib/email/schema";
 import {
   adminOrderNotificationHtml,
+  adminPaymentExpiredHtml,
   type OrderConfirmationData,
 } from "@/lib/email/templates";
 
@@ -74,6 +75,23 @@ export async function GET() {
       adminTpl.subject,
       "Notificare internă. Nu e editabilă din admin — textul stă în cod.",
       adminTpl.html,
+    ),
+  );
+
+  const expiredTpl = adminPaymentExpiredHtml({
+    ...SAMPLE_ORDER,
+    customerEmail: "andrei@exemplu.ro",
+    customerPhone: "07xx xxx xxx",
+    reminderSent: true,
+    adminUrl: "#",
+  });
+  cards.push(
+    card(
+      "Plată neefectuată (către tine)",
+      "admin_payment_expired",
+      expiredTpl.subject,
+      "Notificare internă, când pagina de plată Stripe expiră fără plată.",
+      expiredTpl.html,
     ),
   );
 
@@ -203,7 +221,9 @@ function page(body: string): string {
     <a href="#refund_confirmation">rambursare</a>
     <a href="#return_status">retur</a>
     <a href="#newsletter_welcome">bun venit + cod</a>
+    <a href="#payment_reminder">reminder plată</a>
     <a href="#admin_order_notification">comandă nouă (intern)</a>
+    <a href="#admin_payment_expired">plată neefectuată (intern)</a>
     <a href="#magic-link.html">magic link</a>
     <a href="#confirm-signup.html">confirmare cont</a>
     <a href="#reset-password.html">resetare parolă</a>

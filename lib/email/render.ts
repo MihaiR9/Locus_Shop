@@ -14,6 +14,7 @@ import {
   assembleRefundConfirmation,
   assembleReturnStatus,
   assembleNewsletterWelcome,
+  assemblePaymentReminder,
 } from "@/lib/email/templates";
 import type {
   OrderConfirmationData,
@@ -21,6 +22,7 @@ import type {
   DeliveredEmailData,
   RefundEmailData,
   ReturnStatusEmailData,
+  PaymentReminderData,
 } from "@/lib/email/templates";
 
 // ─── Load blocks din DB ─────────────────────────────────────────
@@ -142,6 +144,12 @@ export function renderNewsletterWelcome(
   return renderWith("newsletter_welcome", vars, assembleNewsletterWelcome);
 }
 
+export function renderPaymentReminder(
+  data: PaymentReminderData,
+): Promise<Rendered> {
+  return renderWith("payment_reminder", data, assemblePaymentReminder);
+}
+
 // ─── Preview (folosit din admin) ─────────────────────────────────
 // Randează un template cu datele sample din schema, folosind blocks
 // pasate direct (nu din DB). Astfel poți vedea preview la edit înainte
@@ -193,6 +201,13 @@ export function previewTemplate(
       // `vars` conține sampleVariables (couponCode) — fără ele, preview-ul
       // din admin ar arăta emailul fără cod, adică altfel decât pleacă.
       ({ content, preheader, eyebrow, title } = assembleNewsletterWelcome(blocks, vars));
+      break;
+    case "payment_reminder":
+      ({ content, preheader, eyebrow, title } = assemblePaymentReminder(blocks, {
+        ...SAMPLE_ORDER,
+        paymentUrl: "#",
+        validUntil: String(vars.validUntil),
+      }));
       break;
     default:
       throw new Error(`No preview handler for template ${key}`);

@@ -688,3 +688,109 @@ export function adminOrderNotificationHtml(
     }),
   };
 }
+
+// ─── Payment reminder ───────────────────────────────────────────
+
+export type PaymentReminderData = OrderConfirmationData & {
+  paymentUrl: string;
+  /** Data până la care merge linkul, deja formatată („15 octombrie"). */
+  validUntil: string;
+};
+
+export function assemblePaymentReminder(
+  blocks: Record<string, string>,
+  d: PaymentReminderData,
+): Assembled {
+  const vars = d as unknown as Record<string, string | number | undefined>;
+
+  const greetingText = d.customerName
+    ? b(blocks, "greeting", vars)
+    : b(blocks, "greeting_guest", vars);
+
+  const itemsRows = d.items
+    .map((it, i) =>
+      priceRow(
+        it.name,
+        `${it.code} · ${it.qty} ${it.qty === 1 ? "sticlă" : "sticle"}`,
+        formatRon(it.unitPriceRon * it.qty),
+        i === d.items.length - 1,
+      ),
+    )
+    .join("");
+
+  const content = `
+    ${para(textToHtml(b(blocks, "intro", vars)))}
+
+    <div style="margin-top:34px;">${ornament()}</div>
+
+    <div style="margin-top:30px;">
+      ${specimen("De plată", formatRon(d.totalRon), { note: d.orderNumber })}
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:38px;">
+      ${itemsRows}
+    </table>
+
+    <div style="margin-top:34px;">${button(d.paymentUrl, b(blocks, "button_label", vars))}</div>
+    <div style="font-family:${MONO};font-size:10px;letter-spacing:0.08em;color:${INK_MUTE};text-align:center;margin-top:16px;">
+      ${escapeHtml(b(blocks, "validity", vars))}
+    </div>
+
+    <div style="margin-top:36px;">${rule()}</div>
+    <div style="font-family:${MONO};font-size:10px;line-height:1.9;color:${INK_MUTE};margin-top:22px;">
+      ${textToHtml(b(blocks, "footnote", vars))}
+    </div>`;
+
+  return {
+    content,
+    eyebrow: b(blocks, "eyebrow", vars),
+    title: greetingText,
+    preheader: `Comanda ${d.orderNumber} așteaptă plata — ${formatRon(d.totalRon)}.`,
+  };
+}
+
+// ─── Admin: plată neefectuată (HARDCODED, ca notificarea de comandă) ─
+
+export function adminPaymentExpiredHtml(
+  d: OrderConfirmationData & {
+    customerEmail?: string | null;
+    customerPhone?: string | null;
+    reminderSent: boolean;
+    adminUrl: string;
+  },
+): { subject: string; html: string } {
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding:6px 0;color:${INK_MUTE};text-transform:uppercase;letter-spacing:0.16em;font-size:10px;">${label}</td><td style="padding:6px 0;text-align:right;">${value}</td></tr>`;
+
+  const itemsList = d.items
+    .map(
+      (it) =>
+        `<li style="margin-bottom:6px;">${escapeHtml(it.name)} <span style="color:${INK_MUTE};">(${escapeHtml(it.code)})</span> × ${it.qty}</li>`,
+    )
+    .join("");
+
+  const content = `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:${MONO};font-size:13px;color:${INK_SOFT};">
+      <tr><td style="padding:6px 0;color:${INK_MUTE};text-transform:uppercase;letter-spacing:0.16em;font-size:10px;">Total</td><td style="padding:6px 0;text-align:right;color:${INK};font-family:${SERIF};font-size:18px;">${formatRon(d.totalRon)}</td></tr>
+      ${d.customerEmail ? row("Email", `<a href="mailto:${escapeHtml(d.customerEmail)}" style="color:${INK_SOFT};">${escapeHtml(d.customerEmail)}</a>`) : ""}
+      ${d.customerPhone ? row("Telefon", `<a href="tel:${escapeHtml(d.customerPhone)}" style="color:${INK_SOFT};">${escapeHtml(d.customerPhone)}</a>`) : ""}
+      ${row("Reminder client", d.reminderSent ? "trimis acum, cu link de plată valabil 7 zile" : "nu — a mai primit unul sau nu are email")}
+    </table>
+
+    <div style="margin-top:24px;padding-top:24px;border-top:1px solid ${LINE};">
+      <div style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${INK_MUTE};margin-bottom:10px;">Articole</div>
+      <ul style="font-family:${MONO};font-size:13px;line-height:1.8;color:${INK_SOFT};margin:0;padding-left:20px;">
+        ${itemsList}
+      </ul>
+    </div>
+
+    <div style="margin-top:32px;">${button(d.adminUrl, "Vezi comanda")}</div>`;
+
+  return {
+    subject: `Plată neefectuată · ${d.orderNumber} · ${formatRon(d.totalRon)}`,
+    html: shell(content, `${d.orderNumber} nu a fost plătită`, {
+      eyebrow: "plată neefectuată",
+      title: d.orderNumber,
+    }),
+  };
+}

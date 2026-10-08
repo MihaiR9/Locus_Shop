@@ -529,6 +529,70 @@ export const NEWSLETTER_WELCOME: EmailTemplateDef = {
   sampleVariables: { couponCode: "LOCUS10" },
 };
 
+// ─── Payment reminder ────────────────────────────────────────────
+export const PAYMENT_REMINDER: EmailTemplateDef = {
+  key: "payment_reminder",
+  name: "Reminder plată neefectuată (client)",
+  description:
+    "Trimis o singură dată, când pagina de plată Stripe expiră (3 ore după comandă) fără plată. Conține un link de plată nou, valabil 7 zile.",
+  destination: "client",
+  variables: ["orderNumber", "customerName", "totalRon", "validUntil"],
+  subject: "Comanda {{orderNumber}} așteaptă plata",
+  blocks: [
+    {
+      key: "eyebrow",
+      label: "Eyebrow",
+      kind: "input",
+      defaultValue: "plată neefectuată · {{orderNumber}}",
+    },
+    {
+      key: "greeting",
+      label: "Titlu (cu nume)",
+      kind: "input",
+      defaultValue: "Comanda ta te așteaptă, {{customerName}}.",
+    },
+    {
+      key: "greeting_guest",
+      label: "Titlu (fără nume)",
+      kind: "input",
+      defaultValue: "Comanda ta te așteaptă.",
+    },
+    {
+      key: "intro",
+      label: "Paragraf introductiv",
+      kind: "textarea",
+      defaultValue:
+        "Ai ales vinurile, dar plata nu s-a încheiat. Comanda e salvată așa cum ai lăsat-o — o poți finaliza de aici, într-un singur pas.",
+    },
+    {
+      key: "button_label",
+      label: "Text buton",
+      kind: "input",
+      defaultValue: "Finalizează plata",
+    },
+    {
+      key: "validity",
+      label: "Valabilitate link",
+      hint: "{{validUntil}} = data până la care merge linkul.",
+      kind: "input",
+      defaultValue: "Linkul e valabil până pe {{validUntil}}.",
+    },
+    {
+      key: "footnote",
+      label: "Notă finală",
+      kind: "textarea",
+      defaultValue:
+        "Dacă plata n-a mers sau te-ai răzgândit, răspunde la acest email. Ne ajută să știm.",
+    },
+  ],
+  sampleVariables: {
+    orderNumber: "LC26071500001",
+    customerName: "Andrei",
+    totalRon: 247,
+    validUntil: "15 octombrie",
+  },
+};
+
 // ─── Registry ────────────────────────────────────────────────────
 // Toate template-urile pe care admin le poate edita.
 // admin_order_notification (către tine) NU e aici — rămâne cu textul din cod
@@ -540,6 +604,7 @@ export const ALL_EMAIL_TEMPLATES: readonly EmailTemplateDef[] = [
   REFUND_CONFIRMATION,
   RETURN_STATUS,
   NEWSLETTER_WELCOME,
+  PAYMENT_REMINDER,
 ];
 
 export function getTemplateDef(key: string): EmailTemplateDef | undefined {

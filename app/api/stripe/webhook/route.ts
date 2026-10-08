@@ -7,8 +7,14 @@ import { sendPurchaseEvent } from "@/lib/meta/capi";
 import {
   sendOrderConfirmation,
   sendOrderNotificationToAdmin,
+  sendPaymentExpiredToAdmin,
+  sendPaymentReminder,
 } from "@/lib/email/send";
-import type { OrderEmailItem } from "@/lib/email/templates";
+import type {
+  OrderConfirmationData,
+  OrderEmailItem,
+} from "@/lib/email/templates";
+import { createPaymentLink } from "@/lib/payment-link";
 
 // Webhook handlers must read the RAW body to validate Stripe's signature.
 // Next App Router gives us request.text() which is the raw string —
@@ -244,6 +250,37 @@ async function sendMetaPurchase(orderId: string) {
  * but DON'T re-throw — a Resend outage shouldn't undo a paid order.
  */
 async function sendOrderEmails(orderId: string) {
+  const loaded = await loadOrderEmailData(orderId);
+  if (!loaded) return;
+  const { data, customerEmail, customerPhone } = loaded;
+
+  // Customer email — only if we have one.
+  if (customerEmail) {
+    const r = await sendOrderConfirmation(customerEmail, data);
+    if (r.ok) {
+      console.info("[email] order confirmation sent", r.id);
+    }
+  } else {
+    console.warn("[email] no customer email on order", orderId);
+  }
+
+  // Admin email — always
+  const a = await sendOrderNotificationToAdmin({
+    ...data,
+    customerEmail,
+    customerPhone,
+  });
+  if (a.ok) {
+    console.info("[email] admin notification sent", a.id);
+  }
+}
+
+/** Order + items + contact, in the shape every order email needs. */
+async function loadOrderEmailData(orderId: string): Promise<{
+  data: OrderConfirmationData;
+  customerEmail: string | null;
+  customerPhone: string | null;
+} | null> {
   const supabase = getSupabaseAdminClient();
 
   const { data: order, error: orderErr } = await supabase
@@ -256,7 +293,7 @@ async function sendOrderEmails(orderId: string) {
 
   if (orderErr || !order) {
     console.error("[email] order lookup failed", orderId, orderErr);
-    return;
+    return null;
   }
 
   const { data: items } = await supabase
@@ -305,28 +342,14 @@ async function sendOrderEmails(orderId: string) {
     paymentMethod: order.payment_method,
   };
 
-  // Customer email — only if we have one.
-  if (customerEmail) {
-    const r = await sendOrderConfirmation(customerEmail, data);
-    if (r.ok) {
-      console.info("[email] order confirmation sent", r.id);
-    }
-  } else {
-    console.warn("[email] no customer email on order", orderId);
-  }
-
-  // Admin email — always
-  const a = await sendOrderNotificationToAdmin({
-    ...data,
+  return {
+    data,
     customerEmail,
     customerPhone:
       ((shipping?.phone as string | undefined) ??
         (billing?.phone as string | undefined)) ||
       null,
-  });
-  if (a.ok) {
-    console.info("[email] admin notification sent", a.id);
-  }
+  };
 }
 
 async function handleSessionFailed(event: Stripe.Event) {
@@ -352,19 +375,85 @@ async function handleSessionExpired(event: Stripe.Event) {
   if (!orderId) return;
 
   const supabase = getSupabaseAdminClient();
-  // Mark cancelled — user abandoned the Stripe page or it timed out
-  // (24h default). Their cart/checkout-store is already cleared, so
-  // they'd start fresh anyway.
-  await supabase
+
+  const { data: order } = await supabase
     .from("orders")
-    .update({ status: "cancelled" })
+    .select("order_number, payment_status, stripe_session_id")
     .eq("id", orderId)
-    .eq("status", "pending_payment");
+    .maybeSingle();
+  if (!order) return;
+
   await supabase.from("order_events").insert({
     order_id: orderId,
     type: "session_expired",
     payload: { stripe_event_id: event.id, stripe_session_id: session.id },
   });
+
+  // O sesiune veche care expiră după ce clientul a deschis una nouă din
+  // linkul de plată (sau a plătit deja) nu spune nimic despre comandă.
+  if (
+    order.payment_status === "succeeded" ||
+    order.stripe_session_id !== session.id
+  ) {
+    return;
+  }
+
+  // Clientul a închis pagina Stripe sau a lăsat-o să expire. Comanda se
+  // anulează; dacă plătește din linkul din reminder, webhook-ul de plată
+  // o trece înapoi pe `paid`.
+  await supabase
+    .from("orders")
+    .update({ status: "cancelled" })
+    .eq("id", orderId)
+    .eq("status", "pending_payment");
+
+  const loaded = await loadOrderEmailData(orderId);
+  if (!loaded) return;
+  const { data, customerEmail, customerPhone } = loaded;
+
+  // Un singur reminder pe comandă: dacă expiră și sesiunea deschisă din
+  // link, primești doar tu alerta.
+  const { count: remindersSent } = await supabase
+    .from("order_events")
+    .select("id", { count: "exact", head: true })
+    .eq("order_id", orderId)
+    .eq("type", "payment_reminder_sent");
+
+  let reminderSent = false;
+  if (customerEmail && !remindersSent) {
+    const link = createPaymentLink(order.order_number);
+    const r = await sendPaymentReminder(customerEmail, {
+      ...data,
+      paymentUrl: link.url,
+      validUntil: link.expiresAt.toLocaleDateString("ro-RO", {
+        day: "numeric",
+        month: "long",
+        timeZone: "Europe/Bucharest",
+      }),
+    });
+    reminderSent = r.ok;
+    await supabase.from("order_events").insert({
+      order_id: orderId,
+      type: r.ok ? "payment_reminder_sent" : "payment_reminder_failed",
+      payload: r.ok
+        ? { email_id: r.id, link_expires_at: link.expiresAt.toISOString() }
+        : { error: r.error },
+    });
+  }
+
+  await sendPaymentExpiredToAdmin({
+    ...data,
+    customerEmail,
+    customerPhone,
+    reminderSent,
+    adminUrl: adminOrderUrl(order.order_number),
+  });
+}
+
+function adminOrderUrl(orderNumber: string): string {
+  const adminHost = process.env.ADMIN_HOST?.trim();
+  const origin = adminHost ? `https://${adminHost}` : getSiteUrl();
+  return `${origin}/admin/comenzi/${encodeURIComponent(orderNumber)}`;
 }
 
 async function handleChargeRefunded(event: Stripe.Event) {
