@@ -3,6 +3,7 @@ import { absUrl, isComingSoon } from "@/lib/site";
 import { getAllWinesStrict } from "@/lib/wines-queries";
 import { metaLine, type Wine } from "@/lib/wines";
 import { BRAND_NAME, wineDescription, wineImageUrl } from "@/lib/seo/schema";
+import { SHIPPING_METHODS, getReferencePrice } from "@/lib/shipping";
 
 /**
  * Feed-uri de produse pentru Google Merchant Center și Meta Commerce Manager.
@@ -16,8 +17,19 @@ import { BRAND_NAME, wineDescription, wineImageUrl } from "@/lib/seo/schema";
  * marchează produsele „Mismatched value" și le scoate din Shopping.
  */
 
-/** Tarif curier standard — sursa e lib/shipping.ts (sameday-standard). */
-const SHIPPING_RON = 19;
+/**
+ * Livrarea pentru un singur produs, din aceleași tarife ca checkout-ul. Un
+ * singur vin nu atinge pragul de transport gratuit, deci prețul e cel întreg.
+ * Pragul de 250 lei se setează separat, în Merchant Center.
+ */
+const SHIPPING_XML = SHIPPING_METHODS.map(
+  (m) => `
+    <g:shipping>
+      <g:country>RO</g:country>
+      <g:service>${escapeXml(m.name)}</g:service>
+      <g:price>${getReferencePrice(m.id).toFixed(2)} RON</g:price>
+    </g:shipping>`,
+).join("");
 
 /**
  * Taxonomia Google pentru vin. Folosim calea text (acceptată oficial) în loc
@@ -138,12 +150,7 @@ export function buildGoogleFeed(items: FeedItem[], skipped: string[]): string {
     <g:mpn>${escapeXml(it.mpn)}</g:mpn>
     <g:condition>new</g:condition>
     <g:google_product_category>${escapeXml(GOOGLE_PRODUCT_CATEGORY)}</g:google_product_category>
-    <g:product_type>${escapeXml(it.productType)}</g:product_type>
-    <g:shipping>
-      <g:country>RO</g:country>
-      <g:service>Standard</g:service>
-      <g:price>${SHIPPING_RON.toFixed(2)} RON</g:price>
-    </g:shipping>
+    <g:product_type>${escapeXml(it.productType)}</g:product_type>${SHIPPING_XML}
   </item>`,
     )
     .join("\n");
