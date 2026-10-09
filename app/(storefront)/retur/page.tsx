@@ -54,15 +54,20 @@ const STEPS = [
   {
     n: "04",
     title: "Predai coletul.",
-    body: <>Îl dai curierului la ora stabilită.</>,
+    body: (
+      <>
+        Îl dai curierului la ora stabilită, în cel mult 14 zile de la data la
+        care ne-ai anunțat.
+      </>
+    ),
   },
   {
     n: "05",
     title: "Primești banii.",
     body: (
       <>
-        În maxim 14 zile de la primirea produselor înapoi, îți rambursăm
-        contravaloarea pe aceeași metodă de plată.
+        În maxim 14 zile de la data la care ne-ai anunțat, îți rambursăm tot
+        ce ai plătit, inclusiv livrarea inițială, pe aceeași metodă de plată.
       </>
     ),
   },
@@ -114,9 +119,23 @@ export default function ReturnsPage() {
             <div className="callout">
               <strong>Termen retur:</strong> 14 zile calendaristice de la
               primirea coletului. <br />
-              <strong>Rambursare:</strong> în maxim 14 zile de la primirea
-              produselor înapoi.
+              <strong>Trimiterea produselor:</strong> în cel mult 14 zile de la
+              data la care ne-ai anunțat retragerea. <br />
+              <strong>Rambursare:</strong> în maxim 14 zile de la data la care
+              ne-ai anunțat retragerea (art. 13 OUG 34/2014). Putem amâna
+              rambursarea până primim produsele înapoi sau până ne trimiți
+              dovada că le-ai expediat, oricare dintre acestea intervine prima.
             </div>
+
+            <h2>Ce rambursăm</h2>
+            <p>
+              Îți rambursăm <strong>toate sumele plătite</strong>, inclusiv
+              costul livrării inițiale. Dacă ai ales o livrare mai scumpă decât
+              cea mai ieftină variantă standard oferită la comandă, rambursăm
+              livrarea la nivelul variantei celei mai ieftine. Rambursarea se
+              face prin aceeași metodă de plată pe care ai folosit-o, fără
+              comisioane pentru tine.
+            </p>
 
             <h2>Excepții — dreptul de retragere nu se aplică</h2>
             <p>
