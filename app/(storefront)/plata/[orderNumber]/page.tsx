@@ -121,7 +121,7 @@ export default async function PaymentLinkPage({
 function Notice({
   title,
   children,
-  href = "/vinuri",
+  href = "/shop",
   cta = "vezi vinurile",
 }: {
   title: string;
