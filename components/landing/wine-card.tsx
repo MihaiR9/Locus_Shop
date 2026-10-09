@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ProductBottle } from "@/components/landing/product-bottle";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
-import { metaLine, type Wine } from "@/lib/wines";
+import { metaLine, pricePerLitreLabel, type Wine } from "@/lib/wines";
 
 const TYPE_TAG: Record<string, string> = { alb: "alb", rosu: "rosu", rose: "rose" };
 
@@ -53,6 +53,7 @@ export function WineCard({ wine }: { wine: Wine }) {
         <span className="wine-price">
           {wine.priceRon.toLocaleString("ro-RO")}
           <span className="currency">lei</span>
+          <span className="unit-price">{pricePerLitreLabel(wine.priceRon)}</span>
         </span>
         <AddToCartButton wine={wine} />
       </div>

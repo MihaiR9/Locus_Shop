@@ -37,6 +37,21 @@ export function formatRon(n: number): string {
   return `${n.toLocaleString("ro-RO")} lei`;
 }
 
+/** Volumul unei sticle, în ml. Toate vinurile sunt acum la 750 ml. */
+export const BOTTLE_ML = 750;
+
+/**
+ * Prețul pe litru, obligatoriu lângă prețul de vânzare pentru produse
+ * vândute la volum (HG 947/2000, Directiva 98/6/CE).
+ */
+export function pricePerLitreLabel(priceRon: number): string {
+  const perLitre = (priceRon * 1000) / BOTTLE_ML;
+  return `${perLitre.toLocaleString("ro-RO", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} lei / litru`;
+}
+
 const TYPE_LABEL: Record<WineType, string> = {
   alb: "Alb",
   rosu: "Roșu",

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ProductBottle } from "@/components/landing/product-bottle";
-import type { Wine } from "@/lib/wines";
+import { pricePerLitreLabel, type Wine } from "@/lib/wines";
 
 export function WineRelated({ wines }: { wines: Wine[] }) {
   if (wines.length === 0) return null;
@@ -35,6 +35,7 @@ export function WineRelated({ wines }: { wines: Wine[] }) {
             <div className="price">
               {r.priceRon}
               <span className="currency">lei</span>
+              <span className="unit-price">{pricePerLitreLabel(r.priceRon)}</span>
             </div>
             <span className="arrow-link">
               Vezi fișa

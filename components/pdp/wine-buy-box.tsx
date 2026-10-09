@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useCartStore } from "@/lib/cart-store";
 import { trackAddToCart } from "@/lib/analytics/gtm";
-import { abvLabel, metaLine, type Wine } from "@/lib/wines";
+import { abvLabel, metaLine, pricePerLitreLabel, type Wine } from "@/lib/wines";
 
 export function WineBuyBox({ wine }: { wine: Wine }) {
   const [qty, setQty] = useState(1);
@@ -77,6 +77,7 @@ export function WineBuyBox({ wine }: { wine: Wine }) {
         <span className="price">{wine.priceRon}</span>
         <span className="price-currency">lei / sticlă</span>
         <span className="price-sub">TVA inclus</span>
+        <span className="price-unit">{pricePerLitreLabel(wine.priceRon)}</span>
       </div>
 
       <p className="short-note">{wine.short}</p>

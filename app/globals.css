@@ -2686,6 +2686,13 @@
   color: var(--ink-mute);
   margin-left: auto;
 }
+.buy .price-unit {
+  flex-basis: 100%;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ink-mute);
+}
 .buy .qty-add {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -2995,6 +3002,15 @@
   color: var(--ink-mute);
   text-transform: uppercase;
   margin-left: 6px;
+}
+.wine-price .unit-price,
+.related-card .price .unit-price {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--ink-mute);
 }
 .related-card .arrow-link {
   font-family: var(--font-mono), monospace;

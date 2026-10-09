@@ -1,7 +1,7 @@
 import "server-only";
 import { absUrl, isComingSoon } from "@/lib/site";
 import { getAllWinesStrict } from "@/lib/wines-queries";
-import { metaLine, type Wine } from "@/lib/wines";
+import { BOTTLE_ML, metaLine, type Wine } from "@/lib/wines";
 import { BRAND_NAME, wineDescription, wineImageUrl } from "@/lib/seo/schema";
 import { SHIPPING_METHODS, getReferencePrice } from "@/lib/shipping";
 
@@ -148,6 +148,8 @@ export function buildGoogleFeed(items: FeedItem[], skipped: string[]): string {
     <g:price>${escapeXml(it.price)}</g:price>
     <g:brand>${escapeXml(it.brand)}</g:brand>
     <g:mpn>${escapeXml(it.mpn)}</g:mpn>
+    <g:unit_pricing_measure>${BOTTLE_ML}ml</g:unit_pricing_measure>
+    <g:unit_pricing_base_measure>1l</g:unit_pricing_base_measure>
     <g:condition>new</g:condition>
     <g:google_product_category>${escapeXml(GOOGLE_PRODUCT_CATEGORY)}</g:google_product_category>
     <g:product_type>${escapeXml(it.productType)}</g:product_type>${SHIPPING_XML}
