@@ -10,6 +10,13 @@
 
 ---
 
+## ▶ Lucru în curs (citește întâi)
+
+- **Audit SEO, pas cu pas:** `docs/SEO_AUDIT.md` — ce s-a rezolvat, ce urmează (următorul: #3 canonical), starea Google Merchant Center și alte lucruri deschise. Luăm punctele pe rând, cu confirmarea lui Mihai înainte de push.
+- Unele secțiuni de mai jos sunt depășite (ex. Smartbill/Sameday → FGO/FanCourier; prețurile gamelor). Starea reală e în cod și în baza de date.
+
+---
+
 ## 0. STARE CURENTĂ (mai 2026)
 
 **Stadiu:** **prototip vizual finalizat**, NU lansabil ca atare.
