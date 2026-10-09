@@ -11,7 +11,7 @@ import { getAccountDefaults } from "@/lib/account/defaults";
 export const metadata: Metadata = {
   title: "Detalii comandă · Domeniul Locus",
   description:
-    "Finalizează comanda — livrare prin curier sau FANbox, plată card online sau la livrare.",
+    "Finalizează comanda — livrare prin curier sau FANbox, plată cu cardul, online sau la livrare.",
 };
 
 export default async function CheckoutPage() {

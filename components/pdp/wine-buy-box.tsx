@@ -105,6 +105,7 @@ export function WineBuyBox({ wine }: { wine: Wine }) {
 
       <div className="extras">
         <span>Livrare 2–4 zile</span>
+        <span>Plata cu cardul la livrare</span>
       </div>
     </div>
   );

@@ -110,7 +110,7 @@ export const ORDER_CONFIRMATION: EmailTemplateDef = {
       key: "payment_cash",
       label: "Text plată — la livrare",
       kind: "input",
-      defaultValue: "La livrare (ramburs)",
+      defaultValue: "Cu cardul, la livrare",
     },
     {
       key: "footnote",

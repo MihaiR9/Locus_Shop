@@ -59,7 +59,7 @@ export default function TermsPage() {
       </p>
       <ul>
         <li>Online cu cardul (procesare prin Stripe — nu stocăm date de card)</li>
-        <li>La livrare (ramburs), cu numerar sau card la curier</li>
+        <li>La livrare, cu cardul, prin POS-ul curierului</li>
       </ul>
 
       <h2>4. Livrare</h2>

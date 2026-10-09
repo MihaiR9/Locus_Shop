@@ -248,7 +248,7 @@ export default async function CheckoutSuccessPage({
         : [
             { n: "01", title: "confirmare", text: email ? `Email trimis la ${email}.` : "Îți trimitem un email de confirmare." },
             { n: "02", title: "contact curier", text: "Te sună înainte de livrare." },
-            { n: "03", title: "plată", text: "La livrare, cash sau card." },
+            { n: "03", title: "plată", text: "La livrare, cu cardul." },
             { n: "04", title: "factură", text: "Emisă și trimisă după livrare." },
           ];
 

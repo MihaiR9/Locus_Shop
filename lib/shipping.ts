@@ -123,7 +123,7 @@ export const SHIPPING_METHODS: ShippingMethod[] = [
     carrier: "FanCourier",
     fanCourierService: "Standard",
     name: "Curier la ușă (FanCourier Standard)",
-    duration: "1–3 zile lucrătoare",
+    duration: "2–4 zile lucrătoare",
     description:
       "Coletul ajunge direct la adresa pe care o introduci. Curierul te sună înainte de livrare. Acoperire în toată țara.",
     notes: [
@@ -141,7 +141,7 @@ export const SHIPPING_METHODS: ShippingMethod[] = [
     carrier: "FanCourier",
     fanCourierService: "FANbox",
     name: "FANbox (locker 24/7)",
-    duration: "1–3 zile lucrătoare",
+    duration: "2–4 zile lucrătoare",
     description:
       "Ridici coletul dintr-un locker FANbox 24/7 din apropiere. Primești cod prin SMS + email. Mai ieftin decât livrarea la ușă.",
     notes: [

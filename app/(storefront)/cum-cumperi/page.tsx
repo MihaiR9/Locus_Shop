@@ -5,7 +5,7 @@ import { Footer } from "@/components/landing/footer";
 export const metadata: Metadata = {
   title: "Cum cumperi · Domeniul Locus",
   description:
-    "Pași simpli pentru a comanda vin de la Domeniul Locus. Plată online sau la livrare, factură electronică, livrare prin FanCourier. Răspundem la întrebările tale.",
+    "Pași simpli pentru a comanda vin de la Domeniul Locus. Plată cu cardul, online sau la livrare, factură electronică, livrare prin FanCourier. Răspundem la întrebările tale.",
 };
 
 const STEPS = [
@@ -32,7 +32,7 @@ const STEPS = [
   {
     n: "05",
     title: "Primești vinul.",
-    body: "1–3 zile lucrătoare prin FanCourier, la ușă sau într-un locker FANbox. Transport gratuit peste 250 lei. Email cu tracking + factură electronică pe drum.",
+    body: "2–4 zile lucrătoare prin FanCourier, la ușă sau într-un locker FANbox. Transport gratuit peste 250 lei. Email cu tracking + factură electronică pe drum.",
   },
 ];
 
@@ -55,7 +55,7 @@ const FAQ = [
   },
   {
     q: "Plătesc cu cardul la livrare?",
-    a: "Da. Curierul FanCourier are POS mobil, accepți cardul (Visa, Mastercard) sau cash. Numerar maxim 5.000 lei conform legii.",
+    a: "Da. Curierul FanCourier are POS mobil — plătești cu cardul (Visa, Mastercard) la predarea coletului.",
   },
   {
     q: "Pot cumpăra cu factură pentru firmă?",
