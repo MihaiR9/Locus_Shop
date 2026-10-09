@@ -19,6 +19,7 @@ import {
   getWineBySlug,
   getRelatedWines,
 } from "@/lib/wines-queries";
+import { pageOpenGraph } from "@/lib/seo/open-graph";
 
 type Params = { slug: string };
 
@@ -50,12 +51,12 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: url },
-    openGraph: {
-      type: "website",
+    openGraph: pageOpenGraph({
       url,
       title,
       description: wineDescription(wine),
-    },
+      image: false,
+    }),
     twitter: {
       card: "summary_large_image",
       title,

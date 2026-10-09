@@ -4,6 +4,7 @@ import { WinesGrid } from "@/components/landing/wines-grid";
 import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbSchema, itemListSchema } from "@/lib/seo/schema";
 import { getAllWines } from "@/lib/wines-queries";
+import { pageOpenGraph } from "@/lib/seo/open-graph";
 
 const DESCRIPTION =
   "Cumpără vinurile Domeniului Locus — gamele cuvinte, semne și pauze. Livrare în toată România prin curier, gratuit peste 250 lei.";
@@ -12,12 +13,11 @@ export const metadata: Metadata = {
   title: "Shop · Domeniul Locus",
   description: DESCRIPTION,
   alternates: { canonical: "/shop" },
-  openGraph: {
-    type: "website",
+  openGraph: pageOpenGraph({
     url: "/shop",
     title: "Shop · Domeniul Locus",
     description: DESCRIPTION,
-  },
+  }),
 };
 
 export default async function ShopPage() {

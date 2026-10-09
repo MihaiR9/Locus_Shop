@@ -9,6 +9,7 @@ import { ALL_GAMA, GAMA_META } from "@/lib/gama-meta";
 import { breadcrumbSchema, itemListSchema } from "@/lib/seo/schema";
 import type { Gama } from "@/lib/wines";
 import { getWinesByGama } from "@/lib/wines-queries";
+import { pageOpenGraph } from "@/lib/seo/open-graph";
 
 type Params = { gama: string };
 
@@ -38,12 +39,11 @@ export async function generateMetadata({
     title,
     description: meta.manifesto,
     alternates: { canonical: `/${gama}` },
-    openGraph: {
-      type: "website",
+    openGraph: pageOpenGraph({
       url: `/${gama}`,
       title,
       description: meta.manifesto,
-    },
+    }),
   };
 }
 

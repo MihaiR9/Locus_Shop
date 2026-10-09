@@ -5,19 +5,19 @@ import { Footer } from "@/components/landing/footer";
 import { ChapterArt } from "@/components/despre/chapter-art";
 import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbSchema } from "@/lib/seo/schema";
+import { pageOpenGraph } from "@/lib/seo/open-graph";
 
 export const metadata: Metadata = {
   title: "Povestea locului",
   description:
     "Povestea Domeniului Locus în trei capitole — familia care a început-o, tradiția care o ține, și continuitatea dusă mai departe de la tată la copii.",
   alternates: { canonical: "/despre" },
-  openGraph: {
-    type: "website",
+  openGraph: pageOpenGraph({
     url: "/despre",
     title: "Povestea locului · Domeniul Locus",
     description:
       "O poveste de familie, dusă mai departe firesc, de la tată la copii. Buciumeni, între Panciu și Nicorești.",
-  },
+  }),
 };
 
 /**
