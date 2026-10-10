@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // AVIF primul (~20–30% mai mic decât WebP), WebP pentru browserele fără AVIF.
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   // Router client cache — navigarea între pagini deja vizitate revine din
   // cache (dynamic) 30s, static 5min. Simte-se instant după prima vizită.
   experimental: {
