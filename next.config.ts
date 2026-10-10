@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
       static: 300,
     },
   },
+  // Lista de vinuri trăiește pe /shop; /vinuri există doar ca prefix al
+  // paginilor de vin și dădea 404 (URL ghicit de oameni și de crawlere).
+  async redirects() {
+    return [{ source: "/vinuri", destination: "/shop", permanent: true }];
+  },
 };
 
 export default nextConfig;
