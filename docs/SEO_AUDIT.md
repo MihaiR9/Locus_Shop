@@ -30,6 +30,7 @@ Textele vizibile (titluri, descrieri, copy) se propun întâi, nu se schimbă di
 | 16 | Accessibility 100 pe toate paginile publice: titlurile din footer `h4` → `h2`, pașii de pe /cum-cumperi `h3` → `h2`, cardurile „în curând" opacity 0.65 → 0.8 (contrast ≥ 4.5:1) (`7ca839a`) | `components/landing/footer.tsx`, `app/(storefront)/cum-cumperi/page.tsx`, `app/globals.css` |
 | 17 | Fonturi: fără Cormorant italic și fără text înclinat (`ff70489`); un singur serif, Libre Caslon Display, în loc de Cormorant + Bellefair (`44c2c89`). Preload pe paginile obișnuite: 5 fișiere (era 12), ~75–85 KB fonturi (era 287 KB) | `app/layout.tsx`, `app/globals.css` |
 | 6 | Pagini ascunse de Google până sunt gata: `/parteneri`, `/pauze`, `/social` → `noindex` + scoase din sitemap. `/cuvinte` și `/semne` rămân indexate (se ajunge la ele din gamele de pe home). Lista e într-un singur loc: `lib/seo/hidden-pages.ts` | `lib/seo/hidden-pages.ts` |
+| 18 | `/llms.txt` — rezumatul magazinului pentru asistenții AI (vinuri, prețuri, livrare, contact), generat din catalog la fiecare oră. Crawlerele AI rămân permise (decizia lui Mihai: vrea să apară în răspunsurile asistenților) | `app/llms.txt/route.ts` |
 
 Rezolvate tot atunci, în afara listei de audit:
 - Preț pe litru afișat lângă fiecare preț (HG 947/2000) + `unit_pricing_measure` în feed — cerut de Merchant Center.
