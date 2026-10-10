@@ -24,6 +24,7 @@ export type OrderRow = {
     | "cancelled"
     | "refunded";
   payment_method: "card-online" | "card-livrare" | "ramburs";
+  payment_status: string | null;
   shipping_method: "curier" | "ridicare";
   shipping_address: { city?: string } | null;
   awb_number: string | null;
@@ -43,7 +44,7 @@ export async function listMyOrders(customerId: string): Promise<OrderRow[]> {
   const { data } = await supabase
     .from("orders")
     .select(`
-      id, order_number, status, payment_method, shipping_method,
+      id, order_number, status, payment_status, payment_method, shipping_method,
       shipping_address, awb_number,
       subtotal_cents, shipping_cents, discount_cents, total_cents,
       created_at, paid_at, shipped_at, delivered_at,
@@ -69,7 +70,7 @@ export async function getMyOrder(
   const { data } = await supabase
     .from("orders")
     .select(`
-      id, order_number, status, payment_method, shipping_method,
+      id, order_number, status, payment_status, payment_method, shipping_method,
       shipping_address, awb_number,
       subtotal_cents, shipping_cents, discount_cents, total_cents,
       created_at, paid_at, shipped_at, delivered_at,
@@ -90,12 +91,29 @@ export async function getMyOrder(
 
 export const STATUS_LABEL: Record<OrderRow["status"], string> = {
   pending_payment: "în așteptare",
-  paid: "plătită",
+  paid: "plătită · în pregătire",
   shipped: "expediată",
   delivered: "livrată",
   cancelled: "anulată",
   refunded: "returnată",
 };
+
+/**
+ * Statusul arătat clientului. `status` singur nu spune ce așteaptă comanda:
+ * o plată cu cardul neterminată și o plată la livrare sunt amândouă
+ * `pending_payment`. `canRepay` vine din `repayableOrderNumbers`.
+ * `tone` alimentează culoarea pastilei (`data-status`).
+ */
+export function customerStatus(
+  order: Pick<OrderRow, "status" | "payment_method">,
+  canRepay: boolean,
+): { label: string; tone: string } {
+  if (canRepay) return { label: "plată neefectuată", tone: "unpaid" };
+  if (order.status === "pending_payment" && order.payment_method !== "card-online") {
+    return { label: "confirmată · plata la livrare", tone: "pending_payment" };
+  }
+  return { label: STATUS_LABEL[order.status], tone: order.status };
+}
 
 export function ronFromCents(cents: number): number {
   return Math.round(cents) / 100;

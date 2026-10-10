@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { formatRon } from "@/lib/wines";
 import {
+  customerStatus,
   ronFromCents,
-  STATUS_LABEL,
   type OrderRow,
 } from "@/lib/account/orders";
 
@@ -22,7 +22,14 @@ function summary(items: OrderRow["items"]): string {
   return `${firstLabel} + încă ${rest} ${rest === 1 ? "soi" : "soiuri"}`;
 }
 
-export function OrderCard({ order }: { order: OrderRow }) {
+export function OrderCard({
+  order,
+  canRepay = false,
+}: {
+  order: OrderRow;
+  canRepay?: boolean;
+}) {
+  const status = customerStatus(order, canRepay);
   return (
     <Link
       href={`/cont/comenzi/${encodeURIComponent(order.order_number)}`}
@@ -38,8 +45,8 @@ export function OrderCard({ order }: { order: OrderRow }) {
         <div className="items">{summary(order.items)}</div>
       </div>
       <div className="right">
-        <span className="status-pill" data-status={order.status}>
-          {STATUS_LABEL[order.status]}
+        <span className="status-pill" data-status={status.tone}>
+          {status.label}
         </span>
         <span className="total">
           {formatRon(ronFromCents(order.total_cents))}

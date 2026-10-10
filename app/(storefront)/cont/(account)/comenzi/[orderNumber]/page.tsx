@@ -5,10 +5,12 @@ import { ProductBottle } from "@/components/landing/product-bottle";
 import { formatRon } from "@/lib/wines";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import {
+  customerStatus,
   getMyOrder,
   ronFromCents,
-  STATUS_LABEL,
 } from "@/lib/account/orders";
+import { PAYMENT_LINK_TTL_MS } from "@/lib/payment-link";
+import { repayableOrderNumbers, repayUrl } from "@/lib/account/repay";
 
 const RO_DATETIME = new Intl.DateTimeFormat("ro-RO", {
   timeZone: "Europe/Bucharest",
@@ -42,6 +44,10 @@ export default async function OrderDetailPage({
   const order = await getMyOrder(user.customerId, orderNumber);
   if (!order) notFound();
 
+  const canRepay = (await repayableOrderNumbers([order])).has(order.order_number);
+  const status = customerStatus(order, canRepay);
+  const payBy = new Date(Date.parse(order.created_at) + PAYMENT_LINK_TTL_MS);
+
   const timeline = [
     { label: "creată", at: order.created_at },
     { label: "plată", at: order.paid_at },
@@ -63,7 +69,7 @@ export default async function OrderDetailPage({
 
   return (
     <>
-      <div className="eyebrow">comandă · {STATUS_LABEL[order.status]}</div>
+      <div className="eyebrow">comandă · {status.label}</div>
 
       <div className="order-detail-head">
         <div>
@@ -87,10 +93,25 @@ export default async function OrderDetailPage({
             )}
           </div>
         </div>
-        <span className="status-pill" data-status={order.status}>
-          {STATUS_LABEL[order.status]}
+        <span className="status-pill" data-status={status.tone}>
+          {status.label}
         </span>
       </div>
+
+      {canRepay && (
+        <section className="order-repay" aria-label="Plată neefectuată">
+          <p>
+            Plata cu cardul nu a fost finalizată. Comanda rămâne disponibilă
+            până pe {RO_DATETIME.format(payBy)}.
+          </p>
+          <a href={repayUrl(order.order_number)} className="btn-primary">
+            <span>Plătește acum</span>
+            <svg width="16" height="8" viewBox="0 0 24 12" aria-hidden="true">
+              <use href="#arrow-right" />
+            </svg>
+          </a>
+        </section>
+      )}
 
       <section className="order-timeline" aria-label="Parcurs comandă">
         <ol>

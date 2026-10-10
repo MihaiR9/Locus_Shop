@@ -5354,7 +5354,29 @@
 .status-pill[data-status="shipped"],
 .status-pill[data-status="delivered"] { color: var(--vie); border-color: rgba(62, 67, 54, 0.3); }
 .status-pill[data-status="cancelled"],
-.status-pill[data-status="refunded"] { color: #a23; }
+.status-pill[data-status="refunded"],
+.status-pill[data-status="unpaid"] { color: #a23; }
+.status-pill[data-status="unpaid"]::before { background: #a23; }
+
+/* Comandă din cont plătită cu cardul, dar neterminată: mesaj + buton de plată. */
+.order-repay {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  margin: 0 0 32px;
+  padding: 20px 24px;
+  border: 1px solid rgba(170, 34, 51, 0.3);
+  background: var(--surface);
+}
+.order-repay p {
+  margin: 0;
+  max-width: 52ch;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
 
 /* ── Quick action tiles (dashboard) ── */
 .cont-quick {

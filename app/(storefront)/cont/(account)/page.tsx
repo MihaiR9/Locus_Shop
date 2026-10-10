@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { OrderCard } from "@/components/account/order-card";
+import { repayableOrderNumbers } from "@/lib/account/repay";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { listMyOrders, ronFromCents } from "@/lib/account/orders";
 import { listMyReturns } from "@/lib/account/returns";
@@ -21,6 +22,7 @@ export default async function ContDashboardPage() {
   ]);
 
   const recent = orders.slice(0, 3);
+  const repayable = await repayableOrderNumbers(recent);
   const totalSpentCents = orders
     .filter((o) => o.status !== "cancelled" && o.status !== "refunded")
     .reduce((s, o) => s + o.total_cents, 0);
@@ -131,7 +133,11 @@ export default async function ContDashboardPage() {
         ) : (
           <div>
             {recent.map((o) => (
-              <OrderCard key={o.id} order={o} />
+              <OrderCard
+                key={o.id}
+                order={o}
+                canRepay={repayable.has(o.order_number)}
+              />
             ))}
           </div>
         )}

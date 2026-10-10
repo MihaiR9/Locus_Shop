@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { OrderCard } from "@/components/account/order-card";
+import { repayableOrderNumbers } from "@/lib/account/repay";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { listMyOrders } from "@/lib/account/orders";
 
@@ -13,6 +14,7 @@ export default async function OrdersListPage() {
   if (!user) redirect("/cont/login");
 
   const orders = await listMyOrders(user.customerId);
+  const repayable = await repayableOrderNumbers(orders);
 
   return (
     <>
@@ -47,7 +49,11 @@ export default async function OrdersListPage() {
         ) : (
           <div>
             {orders.map((o) => (
-              <OrderCard key={o.id} order={o} />
+              <OrderCard
+                key={o.id}
+                order={o}
+                canRepay={repayable.has(o.order_number)}
+              />
             ))}
           </div>
         )}
