@@ -60,8 +60,30 @@ De întrebat: rămân în Google sau `noindex` + scoase din `app/sitemap.ts` pâ
 ### 11. `/vinuri` dă 404 — Minor
 Redirect permanent `/vinuri` → `/shop` (în `next.config` `redirects()`).
 
-### Neverificat
-Lighthouse / Core Web Vitals — API-ul PageSpeed public a dat „quota exceeded”. De rulat cu motorul `seo` de pe laptop (`pagespeed.py` / `lighthouse_runner.py`) pe `/`, `/shop`, o pagină de vin. Țintă > 95.
+### 12. LCP lent pe mobil (home + paginile de vin) — Important
+Vezi măsurătorile Lighthouse de mai jos. Imaginea LCP e descoperită devreme și preîncărcată, dar:
+- **Pagina de vin** (`components/pdp/wine-gallery.tsx`): imaginea sticlei n-are `sizes` → pe mobil se descarcă varianta de 1920px pentru 370px afișați. Fără `fetchPriority="high"` (în Next 16, `priority` face doar preload). Galeria e în `<Reveal>` (`components/pdp/wine-hero.tsx`) → pornește cu `opacity: 0` până la hidratare.
+- **Home** (`components/landing/hero.tsx`): poza hero n-are `fetchPriority="high"`. „Element render delay” variază între 20 ms și 2 s de la o rulare la alta — de investigat cu un trace înainte de alte schimbări.
+
+### 13. 12 fișiere de font preîncărcate pe fiecare pagină — Important
+`app/layout.tsx` încarcă 6 familii (Italiana, Cormorant Garamond, Libre Caslon Display, IBM Plex Mono, Bellefair, Inter), ~270 KB preload pe orice pagină.
+- **Inter** e folosit doar în admin (`admin.css`) → `preload: false` (sau mutat în layout-ul de admin).
+- Italiana apare într-un singur loc (hero), Libre Caslon în două → de discutat cu Mihai dacă rămân.
+
+### 14. Schema `Winery` fără `sameAs` — Minor
+JSON-LD-ul organizației (`lib/seo/schema.ts`) nu are `sameAs`. Adaugă `https://www.instagram.com/domeniul.locus/` (și alte profiluri oficiale când există) — e semnalul prin care Google leagă entitatea de profiluri.
+
+### Lighthouse — 10 oct 2026
+Lighthouse 12 local (Chrome headless, profil mobil simulat), pe versiunea live după `61989ac`. Două rulări pe pagină — prima cu cache rece, a doua cu cache cald.
+
+| Pagina | Performance | LCP | FCP | CLS | TBT | Accessibility | Best practices | SEO |
+|---|---|---|---|---|---|---|---|---|
+| `/` | 71 / 87 | 5,2 / 4,1 s | 3,0 / 1,4 s | 0,001 | 90 / 20 ms | 97 | 100 | 100 |
+| `/shop` | 95 / 90 | 2,9 / 3,6 s | 1,3 / 1,2 s | 0,001 | 20 / 30 ms | 100 | 100 | 100 |
+| `/vinuri/feteasca-neagra-cuvinte` | 80 / 89 | 5,0 / 3,8 s | 1,2 / 1,1 s | 0 | 90 / 30 ms | 99 | 100 | 100 |
+
+Ținta din CLAUDE.md e > 95 la Performance; o atinge doar `/shop` la prima rulare. Accessibility: contrast insuficient pe home, ordine greșită a titlurilor pe pagina de vin.
+De rulat din nou după 12 și 13: `npx lighthouse@12 <url> --only-categories=performance,seo,accessibility,best-practices`, de 2–3 ori pe pagină (variația e mare).
 
 ---
 
