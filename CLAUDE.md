@@ -85,11 +85,14 @@
 
 ## 2. Design system (extras din `Landing_V1.html`)
 
-**Fonts (Google Fonts):**
-- Serif display: **Italiana** — pentru hero, manifesto, game, prețuri (toate `--font-serif`)
-- Mono: **IBM Plex Mono** — UI, eyebrow, body, labels
+**Fonts (Google Fonts, prin `next/font`) — decis cu Mihai pe 10 oct 2026:**
+- Serif: **Libre Caslon Display** — toate titlurile și textele serif (`--font-serif`). O singură grosime (400). A înlocuit Cormorant Garamond și Bellefair.
+- Logo / hero: **Italiana** — doar titlul hero de pe home („un loc. un timp. un vin.”), declarat în `app/(storefront)/page.tsx`. N-are ș/ț cu virgulă.
+- Mono: **IBM Plex Mono** — body, UI, eyebrow, labels, plus cuvintele din manifest (origine/timp/măsură) și numele gamelor (cuvinte/semne). Rămâne preîncărcat (fără preload, layout-ul sare).
+- Admin: **Inter**, declarat doar în `app/(admin)/admin/layout.tsx`.
+- **Fără text înclinat** pe site: `em`/`i` sunt `font-style: normal`, iar `font-synthesis: none` oprește bold/italic sintetizat.
 
-> ⚠️ Brandbook-ul oficial (pagina 10) specifică **Lora** ca font serif (Semibold pentru H1, Regular pentru H2). În testare, Mihai a preferat să rămână pe **Italiana** pentru landing pentru look-ul fashion/art-deco subțire mai apropiat de referință (`context/LOCUS_Landing.jpeg`). În noul proiect: **default Italiana, Lora rămâne disponibil ca opțiune secundară**. Discută cu Mihai înainte de a schimba.
+> Brandbook-ul oficial (pagina 10) specifică **Lora**. Nu se folosește; orice schimbare de font se discută cu Mihai.
 
 **Tokens — light mode:**
 ```css
@@ -121,7 +124,7 @@
 --line:     rgba(203, 190, 174, 0.18);
 ```
 
-**Typography utilities (Italiana, weight 400):**
+**Typography utilities (serif = Libre Caslon Display, weight 400):**
 - `.display` — clamp(56px, 11vw, 168px) line-height 0.92, letter-spacing -0.02em
 - `.h2` — clamp(40px, 6vw, 88px) line-height 1.0
 - `.h3` — clamp(28px, 3.5vw, 44px) line-height 1.1
@@ -416,7 +419,7 @@ RLS pe toate tabelele cu user data. `service_role` pentru backend (webhook-uri, 
 5. ✅ Auth: Supabase **magic link** (NU parolă) pentru clienți; admin separat
 6. ✅ DB: Postgres prin Supabase, RLS activat
 7. ✅ NU Shopify, NU Lovable, NU WooCommerce
-8. ✅ Font default: Italiana (Lora doar dacă brandbook spec-ul devine strict)
+8. ✅ Fonturi: Libre Caslon Display (serif), Italiana (doar hero home), IBM Plex Mono (text). Fără italic.
 9. ✅ Construim într-un workspace VSCode separat (`locus-shop/`)
 
 ---

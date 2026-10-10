@@ -28,6 +28,7 @@ Textele vizibile (titluri, descrieri, copy) se propun întâi, nu se schimbă di
 | 13 | Italiana + Libre Caslon declarate doar în pagina home, Inter doar în layout-ul admin → 8 fonturi preîncărcate în loc de 12 pe paginile obișnuite (`84323de`) | `app/(storefront)/page.tsx`, `app/(admin)/admin/layout.tsx` |
 | 15 | **robots.txt bloca `/contact`**: regula `Disallow: /cont` era prefix → acum `/cont$` (`bc09dac`) | `app/robots.ts` |
 | 16 | Accessibility 100 pe toate paginile publice: titlurile din footer `h4` → `h2`, pașii de pe /cum-cumperi `h3` → `h2`, cardurile „în curând" opacity 0.65 → 0.8 (contrast ≥ 4.5:1) (`7ca839a`) | `components/landing/footer.tsx`, `app/(storefront)/cum-cumperi/page.tsx`, `app/globals.css` |
+| 17 | Fonturi: fără Cormorant italic și fără text înclinat (`ff70489`); un singur serif, Libre Caslon Display, în loc de Cormorant + Bellefair (`44c2c89`). Preload pe paginile obișnuite: 5 fișiere (era 12), ~75–85 KB fonturi (era 287 KB) | `app/layout.tsx`, `app/globals.css` |
 
 Rezolvate tot atunci, în afara listei de audit:
 - Preț pe litru afișat lângă fiecare preț (HG 947/2000) + `unit_pricing_measure` în feed — cerut de Merchant Center.
@@ -76,7 +77,20 @@ Build de producție local, Lighthouse 12 mobil simulat, 3 rulări:
 
 LCP real (fără throttling) 0,2–0,4 s; cu throttling real 4G ~2,6–3,1 s. Ce a mai rămas pentru > 95: fonturile preîncărcate concurează cu imaginea LCP pe conexiuni lente.
 - **Încercat și respins:** IBM Plex Mono fără preload → CLS 0,32 pe pagina de vin (fișa produsului se lățește la swap). Plex rămâne preîncărcat.
-- **De decis cu Mihai (design):** Cormorant italic (72 KB preload) — păstrat sau italic sintetic; numărul de familii pe home (5).
+- **Decis 10 oct:** fără italic; Libre Caslon Display singurul serif; Italiana doar în hero; Plex Mono la text și la cuvintele din manifest / numele gamelor.
+
+### Lighthouse pe site-ul live — 10 oct 2026, după toate etapele
+Lighthouse 12 mobil simulat pe www.domeniul-locus.ro, 3 rulări:
+
+| Pagina | Performance | LCP | Accessibility | Best practices | SEO |
+|---|---|---|---|---|---|
+| `/` | 95–98 | 1,9–2,7 s | 100 | 100 | 100 |
+| `/shop` | 91–96 | 1,9–2,5 s | 100 | 100 | 100 |
+| `/vinuri/feteasca-neagra-cuvinte` | 85–93 | 2,6–3,1 s | 100 | 100 | 100 |
+| `/despre` | 97 | 2,4–2,5 s | 100 | 100 | 100 |
+| `/contact` | 95–97 | 2,5 s | 100 | 100 | 100 |
+
+Pornire: home 71–87, shop 90–95, PDP 80–89 (tabelul din 10 oct de mai sus).
 ---
 
 ## Google Merchant Center (configurat 9 oct 2026)
