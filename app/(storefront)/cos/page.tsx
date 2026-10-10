@@ -5,7 +5,7 @@ import { getAllWines } from "@/lib/wines-queries";
 import { CartPage } from "./cart-page";
 
 export const metadata: Metadata = {
-  title: "Coșul meu · Domeniul Locus",
+  title: "Coșul meu",
   description:
     "Vinurile pe care le-ai ales. Aplică un voucher, adaugă mai multe și treci mai departe la detaliile comenzii.",
 };

@@ -10,7 +10,7 @@ const DESCRIPTION =
   "Cumpără vinurile Domeniului Locus — gamele cuvinte, semne și pauze. Livrare în toată România prin curier, gratuit peste 250 lei.";
 
 export const metadata: Metadata = {
-  title: "Shop · Domeniul Locus",
+  title: "Shop",
   description: DESCRIPTION,
   alternates: { canonical: "/shop" },
   openGraph: pageOpenGraph({

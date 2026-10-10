@@ -3,7 +3,7 @@ import { Footer } from "@/components/landing/footer";
 import { PartnerForm } from "@/components/parteneri/partner-form";
 
 export const metadata: Metadata = {
-  title: "Parteneri B2B · HoReCa · Domeniul Locus",
+  title: "Parteneri B2B · HoReCa",
   description:
     "Vânzări en-gros pentru restaurante, hoteluri, vinoteci și magazine specializate. Catalog dedicat HoReCa, prețuri preferențiale, livrare în toată țara.",
   alternates: { canonical: "/parteneri" },

@@ -9,7 +9,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { getAccountDefaults } from "@/lib/account/defaults";
 
 export const metadata: Metadata = {
-  title: "Detalii comandă · Domeniul Locus",
+  title: "Detalii comandă",
   description:
     "Finalizează comanda — livrare prin curier sau FANbox, plată cu cardul, online sau la livrare.",
 };

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Domeniul Locus — opening soon",
+  title: { absolute: "Domeniul Locus — opening soon" },
   description: "Un loc. Un timp. Un vin. — Opening soon.",
   robots: { index: false, follow: false },
 };

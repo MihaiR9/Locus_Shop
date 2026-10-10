@@ -6,7 +6,7 @@ import { PurchaseTracker } from "@/components/checkout/purchase-tracker";
 import type { GtmItem } from "@/lib/analytics/gtm";
 
 export const metadata = {
-  title: "Comandă confirmată · Domeniul Locus",
+  title: "Comandă confirmată",
 };
 
 // Order details aren't cacheable across users — render fresh each request.

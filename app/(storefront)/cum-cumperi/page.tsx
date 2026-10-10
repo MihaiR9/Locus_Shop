@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Footer } from "@/components/landing/footer";
 
 export const metadata: Metadata = {
-  title: "Cum cumperi · Domeniul Locus",
+  title: "Cum cumperi",
   description:
     "Pași simpli pentru a comanda vin de la Domeniul Locus. Plată cu cardul, online sau la livrare, factură electronică, livrare prin FanCourier. Răspundem la întrebările tale.",
   alternates: { canonical: "/cum-cumperi" },
