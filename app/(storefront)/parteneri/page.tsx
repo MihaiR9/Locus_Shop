@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Parteneri B2B · HoReCa · Domeniul Locus",
   description:
     "Vânzări en-gros pentru restaurante, hoteluri, vinoteci și magazine specializate. Catalog dedicat HoReCa, prețuri preferențiale, livrare în toată țara.",
+  alternates: { canonical: "/parteneri" },
 };
 
 const VALUES = [

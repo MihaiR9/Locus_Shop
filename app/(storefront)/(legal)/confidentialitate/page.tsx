@@ -4,6 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Politica de confidențialitate",
   description: "Cum prelucrează Domeniul Locus datele tale personale, conform GDPR.",
+  alternates: { canonical: "/confidentialitate" },
 };
 
 {/* TODO: review jurist înainte de launch */}

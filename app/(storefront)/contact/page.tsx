@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Contact",
   description:
     "Scrie-ne, sună-ne sau vino la o degustare. Centrul de Vinificație Buciumeni — programare prealabilă.",
+  alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {

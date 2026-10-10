@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Hero } from "@/components/landing/hero";
 import { BottlesBanner } from "@/components/landing/bottles-banner";
 import { Manifesto } from "@/components/landing/manifesto";
@@ -19,6 +20,10 @@ import { Footer } from "@/components/landing/footer";
  * Secțiunea „Despre noi" a fost scoasă: povestea trăiește acum într-un
  * singur loc, pe /despre, unde duce și butonul din `MapSection`.
  */
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
 export default function HomePage() {
   return (
     <>

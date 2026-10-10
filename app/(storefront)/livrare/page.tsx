@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "Livrare · Domeniul Locus",
   description:
     "Livrare prin FanCourier în toată România · curier la ușă sau locker FANbox · gratuit peste 250 lei.",
+  alternates: { canonical: "/livrare" },
 };
 
 export default function LivrarePage() {

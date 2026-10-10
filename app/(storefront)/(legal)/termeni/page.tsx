@@ -4,6 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Termeni și condiții",
   description: "Termenii și condițiile de utilizare a magazinului online Domeniul Locus.",
+  alternates: { canonical: "/termeni" },
 };
 
 {/* TODO: review jurist înainte de launch */}

@@ -5,6 +5,7 @@ import { ResetConsentButton } from "@/components/legal/reset-consent-button";
 export const metadata: Metadata = {
   title: "Politica de cookie-uri",
   description: "Ce cookie-uri folosește Domeniul Locus și pentru ce.",
+  alternates: { canonical: "/cookies" },
 };
 
 {/* TODO: review jurist înainte de launch */}
