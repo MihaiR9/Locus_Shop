@@ -228,14 +228,14 @@ export default async function CheckoutSuccessPage({
             title: "expediere",
             text: isPickup
               ? "Te anunțăm când e gata de ridicat din Buciumeni."
-              : "În 1–2 zile lucrătoare, cu tracking pe email.",
+              : "Predăm coletul curierului în aceeași zi sau a doua zi lucrătoare, cu tracking pe email.",
           },
           {
             n: "04",
             title: "livrare",
             text: isPickup
               ? "Ridici personal, cu programare în prealabil."
-              : "2–4 zile lucrătoare de la expediere.",
+              : "În total, 2–4 zile lucrătoare de la comandă.",
           },
         ]
       : isPendingOnline

@@ -92,25 +92,25 @@ export const SHIPPING_ZONES: ShippingZone[] = [
     id: "bucuresti-ilfov",
     label: "București + Ilfov",
     counties: ["București", "Ilfov"],
-    durationDays: [1, 2],
+    durationDays: [2, 4],
   },
   {
     id: "vecin-buciumeni",
     label: "Județe vecine domeniului",
     counties: ["Galați", "Vrancea", "Brăila", "Buzău"],
-    durationDays: [1, 2],
+    durationDays: [2, 4],
   },
   {
     id: "restul-tarii",
     label: "Restul țării",
     counties: [],
-    durationDays: [2, 3],
+    durationDays: [2, 4],
   },
   {
     id: "rural-indepartat",
     label: "Localități rurale îndepărtate",
     counties: [],
-    durationDays: [3, 4],
+    durationDays: [2, 4],
   },
 ];
 

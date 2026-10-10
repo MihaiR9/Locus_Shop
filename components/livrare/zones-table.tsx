@@ -7,9 +7,9 @@ export function ZonesTable() {
         <div className="eyebrow">02 — zone și durate</div>
         <h2 className="h2">Cât așteaptă vinul.</h2>
         <p className="lead">
-          Estimările sunt zile lucrătoare, calculate de la momentul în care
-          comanda este preluată de curier (de regulă, în aceeași zi sau a doua
-          zi după plată).
+          Estimările sunt zile lucrătoare, de la comandă până la livrare.
+          Coletul pleacă spre curier în aceeași zi sau a doua zi lucrătoare
+          după plată.
         </p>
       </div>
 
