@@ -34,7 +34,9 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/admin",
           "/admin/",
-          "/cont",
+          // `$` = potrivire exactă. Un simplu „/cont" e prefix și bloca
+          // și /contact.
+          "/cont$",
           "/cont/",
           "/checkout",
           "/checkout/",
