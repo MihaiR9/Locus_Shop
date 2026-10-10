@@ -44,6 +44,7 @@ Rezolvate tot atunci, în afara listei de audit:
 Partea tehnică de pe site e terminată. Ce a rămas se face din conturi, din admin sau în afara site-ului.
 
 ### Pe conturi — le face Mihai, câteva minute fiecare
+0. **Google Analytics 4 — nu se măsoară nimic acum.** Containerul GTM publicat (`GTM-5TNDPL7Z`, verificat pe 10 oct) e gol: fără GA4, fără Meta Pixel, fără Ads. Codul trimite deja evenimentele în `dataLayer` (vezi `docs/ANALYTICS.md`). De făcut: proprietate GA4 (`G-…`) → în GTM un Google tag pe toate paginile + tag-uri GA4 Event pentru e-commerce (`view_item`, `add_to_cart`, `begin_checkout`, `purchase`) → Publish → legătură GA4 ↔ Search Console. Consent Mode v2 e deja în cod.
 1. **Google Search Console** — verifică că proprietatea `https://www.domeniul-locus.ro` există și că `sitemap.xml` e trimis. Apoi URL Inspection → `/contact` → **Request indexing** (a fost blocat de robots.txt până pe 10 oct).
 2. **Vercel → Domains** — `domeniul-locus.ro` → redirect **308 (permanent)** către www, în loc de 307.
 3. **Bing Webmaster Tools** — adaugă site-ul (se poate importa direct din Search Console) și trimite sitemap-ul. ChatGPT caută pe web prin indexul Bing; Copilot la fel.
