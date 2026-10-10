@@ -29,6 +29,7 @@ export default async function ContDashboardPage() {
     (r) => r.status !== "completed" && r.status !== "rejected",
   ).length;
   const memberSince = new Date(user.createdAt).toLocaleDateString("ro-RO", {
+    timeZone: "Europe/Bucharest",
     month: "long",
     year: "numeric",
   });

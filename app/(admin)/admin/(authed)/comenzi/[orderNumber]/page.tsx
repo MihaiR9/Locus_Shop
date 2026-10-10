@@ -13,6 +13,7 @@ import { AwbPanel } from "./awb-panel";
 import { InvoicePanel } from "./invoice-panel";
 
 const RO_DATETIME = new Intl.DateTimeFormat("ro-RO", {
+  timeZone: "Europe/Bucharest",
   day: "numeric",
   month: "short",
   year: "numeric",

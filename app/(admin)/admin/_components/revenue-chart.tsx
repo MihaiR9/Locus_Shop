@@ -16,6 +16,7 @@ type Props = {
 };
 
 const RO_DAY = new Intl.DateTimeFormat("ro-RO", {
+  timeZone: "Europe/Bucharest",
   day: "numeric",
   month: "short",
 });

@@ -102,7 +102,7 @@ export function InvoicePanel({
               </div>
               {invoiceCreatedAt && (
                 <div className="text-[11px] text-emerald-700">
-                  {new Date(invoiceCreatedAt).toLocaleString("ro-RO")}
+                  {new Date(invoiceCreatedAt).toLocaleString("ro-RO", { timeZone: "Europe/Bucharest" })}
                 </div>
               )}
             </div>

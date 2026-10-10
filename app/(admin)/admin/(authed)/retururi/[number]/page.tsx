@@ -189,9 +189,9 @@ export default async function ReturnDetailPage({
                   <span className="text-zinc-500">Livrată: </span>
                   <span className="text-zinc-800">
                     {ret.orderDeliveredAt
-                      ? new Date(ret.orderDeliveredAt).toLocaleDateString(
-                          "ro-RO",
-                        )
+                      ? new Date(ret.orderDeliveredAt).toLocaleDateString("ro-RO", {
+                          timeZone: "Europe/Bucharest",
+                        })
                       : "—"}
                   </span>
                 </div>

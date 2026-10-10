@@ -7,6 +7,7 @@ import {
 } from "@/lib/account/orders";
 
 const RO_DATE = new Intl.DateTimeFormat("ro-RO", {
+  timeZone: "Europe/Bucharest",
   day: "numeric",
   month: "short",
   year: "numeric",

@@ -90,7 +90,7 @@ export default async function CustomerDetailPage({
                 <span className="inline-flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
                   Cont creat{" "}
-                  {new Date(customer.createdAt).toLocaleDateString("ro-RO")}
+                  {new Date(customer.createdAt).toLocaleDateString("ro-RO", { timeZone: "Europe/Bucharest" })}
                 </span>
               )}
               {customer.marketingOptIn && (
@@ -118,7 +118,7 @@ export default async function CustomerDetailPage({
           label="Prima comandă"
           value={
             customer.firstOrderAt
-              ? new Date(customer.firstOrderAt).toLocaleDateString("ro-RO")
+              ? new Date(customer.firstOrderAt).toLocaleDateString("ro-RO", { timeZone: "Europe/Bucharest" })
               : "—"
           }
         />

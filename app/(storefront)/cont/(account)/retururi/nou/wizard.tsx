@@ -26,6 +26,7 @@ const RESOLUTIONS = [
 ];
 
 const RO_DATE = new Intl.DateTimeFormat("ro-RO", {
+  timeZone: "Europe/Bucharest",
   day: "numeric",
   month: "long",
   year: "numeric",

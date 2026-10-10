@@ -54,6 +54,7 @@ type OrderItemRow = {
 };
 
 const RO_DATETIME = new Intl.DateTimeFormat("ro-RO", {
+  timeZone: "Europe/Bucharest",
   day: "numeric",
   month: "long",
   year: "numeric",

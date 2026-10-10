@@ -136,7 +136,7 @@ export function AwbPanel({
               </div>
               {awbCreatedAt && (
                 <div className="text-[11px] text-emerald-700">
-                  {new Date(awbCreatedAt).toLocaleString("ro-RO")}
+                  {new Date(awbCreatedAt).toLocaleString("ro-RO", { timeZone: "Europe/Bucharest" })}
                 </div>
               )}
             </div>

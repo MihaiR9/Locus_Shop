@@ -177,7 +177,7 @@ export default async function AdminCouponsPage() {
                     </td>
                     <td className="py-2.5 text-zinc-600">
                       {c.expiresAt
-                        ? new Date(c.expiresAt).toLocaleDateString("ro-RO")
+                        ? new Date(c.expiresAt).toLocaleDateString("ro-RO", { timeZone: "Europe/Bucharest" })
                         : "Nu expiră"}
                     </td>
                     <td className="py-2.5">
