@@ -23,6 +23,11 @@ Textele vizibile (titluri, descrieri, copy) se propun întâi, nu se schimbă di
 | 9 | `lastmod` real: vinurile din `products.updated_at`, /shop și gamele = cea mai recentă modificare a vinurilor lor, paginile statice fără `lastmod` (`f3a0841`) | `app/sitemap.ts` |
 | 11 | Redirect permanent 308 `/vinuri` → `/shop` (`64fa2c9`) | `next.config.ts` |
 | 14 | `sameAs` → Instagram în schema `Winery` (`161e07b`) | `lib/seo/schema.ts` |
+| 10 | AVIF cu fallback WebP (poza sticlei −31%) (`07b0b06`) | `next.config.ts` |
+| 12 | LCP: sticla vizibilă din primul cadru (intrare doar CSS, fără `<Reveal>`), `sizes` + `fetchPriority` pe PDP (`b001262`); `fetchPriority` pe poza hero (`3386e11`); `gtm.js` încărcat `lazyOnload` (`99385ab`) | `components/pdp/*`, `components/landing/hero.tsx`, `app/layout.tsx` |
+| 13 | Italiana + Libre Caslon declarate doar în pagina home, Inter doar în layout-ul admin → 8 fonturi preîncărcate în loc de 12 pe paginile obișnuite (`84323de`) | `app/(storefront)/page.tsx`, `app/(admin)/admin/layout.tsx` |
+| 15 | **robots.txt bloca `/contact`**: regula `Disallow: /cont` era prefix → acum `/cont$` (`bc09dac`) | `app/robots.ts` |
+| 16 | Accessibility 100 pe toate paginile publice: titlurile din footer `h4` → `h2`, pașii de pe /cum-cumperi `h3` → `h2`, cardurile „în curând" opacity 0.65 → 0.8 (contrast ≥ 4.5:1) (`7ca839a`) | `components/landing/footer.tsx`, `app/(storefront)/cum-cumperi/page.tsx`, `app/globals.css` |
 
 Rezolvate tot atunci, în afara listei de audit:
 - Preț pe litru afișat lângă fiecare preț (HG 947/2000) + `unit_pricing_measure` în feed — cerut de Merchant Center.
@@ -47,19 +52,6 @@ Câmpurile `short` și `notes` ale vinurilor (din admin) se suprapun → fraze d
 ### 8. Meta description pe paginile de vin — Minor, copy
 ~65 caractere, conține prețul (se poate învechi). Se generează în `app/(storefront)/vinuri/[slug]/page.tsx`. **Propune texte lui Mihai înainte.**
 
-### 10. AVIF neactivat — Minor
-`next.config` → `images.formats: ["image/avif", "image/webp"]`. Acum se servește doar WebP.
-
-### 12. LCP lent pe mobil (home + paginile de vin) — Important
-Vezi măsurătorile Lighthouse de mai jos. Imaginea LCP e descoperită devreme și preîncărcată, dar:
-- **Pagina de vin** (`components/pdp/wine-gallery.tsx`): imaginea sticlei n-are `sizes` → pe mobil se descarcă varianta de 1920px pentru 370px afișați. Fără `fetchPriority="high"` (în Next 16, `priority` face doar preload). Galeria e în `<Reveal>` (`components/pdp/wine-hero.tsx`) → pornește cu `opacity: 0` până la hidratare.
-- **Home** (`components/landing/hero.tsx`): poza hero n-are `fetchPriority="high"`. „Element render delay” variază între 20 ms și 2 s de la o rulare la alta — de investigat cu un trace înainte de alte schimbări.
-
-### 13. 12 fișiere de font preîncărcate pe fiecare pagină — Important
-`app/layout.tsx` încarcă 6 familii (Italiana, Cormorant Garamond, Libre Caslon Display, IBM Plex Mono, Bellefair, Inter), ~270 KB preload pe orice pagină.
-- **Inter** e folosit doar în admin (`admin.css`) → `preload: false` (sau mutat în layout-ul de admin).
-- Italiana apare într-un singur loc (hero), Libre Caslon în două → de discutat cu Mihai dacă rămân.
-
 ### Lighthouse — 10 oct 2026
 Lighthouse 12 local (Chrome headless, profil mobil simulat), pe versiunea live după `61989ac`. Două rulări pe pagină — prima cu cache rece, a doua cu cache cald.
 
@@ -72,6 +64,19 @@ Lighthouse 12 local (Chrome headless, profil mobil simulat), pe versiunea live d
 Ținta din CLAUDE.md e > 95 la Performance; o atinge doar `/shop` la prima rulare. Accessibility: contrast insuficient pe home, ordine greșită a titlurilor pe pagina de vin.
 De rulat din nou după 12 și 13: `npx lighthouse@12 <url> --only-categories=performance,seo,accessibility,best-practices`, de 2–3 ori pe pagină (variația e mare).
 
+
+### Lighthouse — după etapele B și C (10 oct 2026)
+Build de producție local, Lighthouse 12 mobil simulat, 3 rulări:
+
+| Pagina | Performance | Accessibility | Best practices | SEO |
+|---|---|---|---|---|
+| `/` | 83–85 | 100 | 100 | 100 |
+| `/shop` | 84–89 | 100 | 100 | 100 |
+| `/vinuri/feteasca-neagra-cuvinte` | 87–88 | 100 | 100 | 100 |
+
+LCP real (fără throttling) 0,2–0,4 s; cu throttling real 4G ~2,6–3,1 s. Ce a mai rămas pentru > 95: fonturile preîncărcate concurează cu imaginea LCP pe conexiuni lente.
+- **Încercat și respins:** IBM Plex Mono fără preload → CLS 0,32 pe pagina de vin (fișa produsului se lățește la swap). Plex rămâne preîncărcat.
+- **De decis cu Mihai (design):** Cormorant italic (72 KB preload) — păstrat sau italic sintetic; numărul de familii pe home (5).
 ---
 
 ## Google Merchant Center (configurat 9 oct 2026)
