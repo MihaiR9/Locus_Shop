@@ -16,6 +16,13 @@ Textele vizibile (titluri, descrieri, copy) se propun întâi, nu se schimbă di
 |---|---|---|
 | 1 | Feed Google avea transport 19 lei (rămas de la Sameday); acum 32 lei Standard + 18 lei FANbox, luate din `lib/shipping.ts` | `lib/feed/products.ts` |
 | 2 | og:image + og:site_name + og:locale lipseau pe /shop, /despre, /cuvinte, /semne, /pauze, /social (și site_name/locale pe paginile de vin). Helper comun `pageOpenGraph()` | `lib/seo/open-graph.ts` |
+| 3 | Canonical pe `/`, `/contact`, `/parteneri`, `/livrare`, `/cum-cumperi`, `/termeni`, `/confidentialitate`, `/cookies` (`23d1e3f`) | `metadata.alternates` în fiecare `page.tsx` |
+| 4 | Brandul de două ori în `<title>` pe `/shop`, `/parteneri`, `/livrare`, `/cum-cumperi` (+ `/cos`, `/checkout`, `/checkout/success`, `/coming-soon`) (`a0f5a67`) | `metadata.title` din pagini |
+| 4b | og:title / og:url moșteneau homepage-ul pe contact, parteneri, livrare, cum-cumperi, retur, termeni, confidențialitate, cookies → `pageOpenGraph()` pe toate (`1b94c3f`) | `page.tsx` respective |
+| 7 | Partea de cod: `wineDescription` punea toată descrierea de pairing cu literă mică → acum doar prima literă (`0b0e9d7`) | `lib/seo/schema.ts` |
+| 9 | `lastmod` real: vinurile din `products.updated_at`, /shop și gamele = cea mai recentă modificare a vinurilor lor, paginile statice fără `lastmod` (`f3a0841`) | `app/sitemap.ts` |
+| 11 | Redirect permanent 308 `/vinuri` → `/shop` (`64fa2c9`) | `next.config.ts` |
+| 14 | `sameAs` → Instagram în schema `Winery` (`161e07b`) | `lib/seo/schema.ts` |
 
 Rezolvate tot atunci, în afara listei de audit:
 - Preț pe litru afișat lângă fiecare preț (HG 947/2000) + `unit_pricing_measure` în feed — cerut de Merchant Center.
@@ -26,16 +33,6 @@ Rezolvate tot atunci, în afara listei de audit:
 
 ## Rămase, în ordine
 
-### 3. Canonical lipsă pe 8 pagini — Important
-`/`, `/contact`, `/parteneri`, `/livrare`, `/cum-cumperi`, `/termeni`, `/confidentialitate`, `/cookies` nu au `<link rel="canonical">`.
-Contează la reclame: `?fbclid=` / `?gclid=` creează variante duplicate.
-Fix: `alternates: { canonical: "/…" }` în `metadata` din fiecare `page.tsx`. **Nu** în `app/layout.tsx` (ar pune `/` pe toate paginile).
-
-### 4. Brandul apare de două ori în titlu — Important
-`/shop`, `/parteneri`, `/livrare`, `/cum-cumperi` → „Shop · Domeniul Locus · Domeniul Locus”.
-Layout-ul are deja `template: "%s · Domeniul Locus"`. Fix: în `metadata.title` din pagină scoate sufixul „· Domeniul Locus”.
-Atenție: `openGraph.title` din `pageOpenGraph()` NU trece prin template, acolo sufixul rămâne.
-
 ### 5. Domeniul fără www redirecționează cu 307 (temporar) — Important, îl face Mihai
 `https://domeniul-locus.ro` → 307 → www. Trebuie 308 (permanent).
 Vercel → proiect → Settings → Domains → `domeniul-locus.ro` → Edit → redirect permanent (308) către www.
@@ -44,21 +41,14 @@ Vercel → proiect → Settings → Domains → `domeniul-locus.ro` → Edit →
 `/cuvinte`, `/semne`, `/pauze`, `/parteneri` sunt scoase din meniu dar sunt în `sitemap.xml`. `/social` nu e în sitemap dar e indexabilă (200 + canonical).
 De întrebat: rămân în Google sau `noindex` + scoase din `app/sitemap.ts` până sunt gata?
 
-### 7. Descrieri repetate în feed / JSON-LD — Minor
-- Conținut (din admin): câmpurile `short` și `notes` ale vinurilor se suprapun → fraze dublate în descriere.
-- Bug de cod: `wine.pair.toLowerCase()` în `lib/seo/schema.ts` (`wineDescription`) face și a doua propoziție cu literă mică („excelent ca aperitiv”). Fix: doar prima literă.
+### 7. Descrieri repetate în feed / JSON-LD — Minor, conținut
+Câmpurile `short` și `notes` ale vinurilor (din admin) se suprapun → fraze dublate în descriere. Partea de cod e rezolvată (vezi tabelul).
 
 ### 8. Meta description pe paginile de vin — Minor, copy
 ~65 caractere, conține prețul (se poate învechi). Se generează în `app/(storefront)/vinuri/[slug]/page.tsx`. **Propune texte lui Mihai înainte.**
 
-### 9. `lastmod` din sitemap = momentul generării pe toate paginile — Minor
-`app/sitemap.ts`. Ori dată reală (ex. `updated_at` produs), ori scos.
-
 ### 10. AVIF neactivat — Minor
 `next.config` → `images.formats: ["image/avif", "image/webp"]`. Acum se servește doar WebP.
-
-### 11. `/vinuri` dă 404 — Minor
-Redirect permanent `/vinuri` → `/shop` (în `next.config` `redirects()`).
 
 ### 12. LCP lent pe mobil (home + paginile de vin) — Important
 Vezi măsurătorile Lighthouse de mai jos. Imaginea LCP e descoperită devreme și preîncărcată, dar:
@@ -69,9 +59,6 @@ Vezi măsurătorile Lighthouse de mai jos. Imaginea LCP e descoperită devreme �
 `app/layout.tsx` încarcă 6 familii (Italiana, Cormorant Garamond, Libre Caslon Display, IBM Plex Mono, Bellefair, Inter), ~270 KB preload pe orice pagină.
 - **Inter** e folosit doar în admin (`admin.css`) → `preload: false` (sau mutat în layout-ul de admin).
 - Italiana apare într-un singur loc (hero), Libre Caslon în două → de discutat cu Mihai dacă rămân.
-
-### 14. Schema `Winery` fără `sameAs` — Minor
-JSON-LD-ul organizației (`lib/seo/schema.ts`) nu are `sameAs`. Adaugă `https://www.instagram.com/domeniul.locus/` (și alte profiluri oficiale când există) — e semnalul prin care Google leagă entitatea de profiluri.
 
 ### Lighthouse — 10 oct 2026
 Lighthouse 12 local (Chrome headless, profil mobil simulat), pe versiunea live după `61989ac`. Două rulări pe pagină — prima cu cache rece, a doua cu cache cald.
