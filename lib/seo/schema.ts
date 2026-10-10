@@ -27,13 +27,18 @@ export function wineImageUrl(wine: Wine): string | null {
   return rel.startsWith("http") ? rel : absUrl(rel);
 }
 
+/** Doar prima literă: `pair` are mai multe propoziții, care își păstrează majuscula. */
+function lowerFirst(s: string): string {
+  return s.charAt(0).toLowerCase() + s.slice(1);
+}
+
 /** Descriere text plat, folosită și în JSON-LD și în feed-uri. */
 export function wineDescription(wine: Wine): string {
   const parts = [
     wine.short,
     wine.taste,
     wine.notes,
-    wine.pair ? `Se potrivește cu ${wine.pair.toLowerCase()}` : "",
+    wine.pair ? `Se potrivește cu ${lowerFirst(wine.pair)}` : "",
   ].filter((s) => s && s.trim().length > 0);
 
   const body = parts.join(" ");
