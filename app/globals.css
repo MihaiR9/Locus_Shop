@@ -2513,7 +2513,21 @@
   align-items: start;
 }
 
-/* Gallery */
+/* Gallery
+   Intrare doar din CSS, pornită la primul paint (nu așteaptă hidratarea ca
+   .reveal). Animăm doar poziția, nu opacitatea: sticla e LCP-ul paginii, iar
+   Chrome nu numără un element cu opacity 0. */
+.gallery-rise {
+  animation: gallery-rise 900ms var(--ease) both;
+}
+@keyframes gallery-rise {
+  from { transform: translateY(28px); }
+  to { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gallery-rise { animation: none; }
+}
+
 .gallery {
   display: grid;
   grid-template-columns: 90px 1fr;

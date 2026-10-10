@@ -7,9 +7,11 @@ export function WineHero({ wine }: { wine: Wine }) {
   return (
     <section className="product" aria-label={`Fișa vinului ${wine.name}`}>
       <div className="product-grid">
-        <Reveal as="div">
+        {/* Fără <Reveal>: sticla e LCP-ul paginii și trebuie vizibilă din
+            primul cadru, nu după hidratare. Intrarea e doar CSS (.gallery-rise). */}
+        <div className="gallery-rise">
           <WineGallery wine={wine} />
-        </Reveal>
+        </div>
         <Reveal as="div">
           <WineBuyBox wine={wine} />
         </Reveal>

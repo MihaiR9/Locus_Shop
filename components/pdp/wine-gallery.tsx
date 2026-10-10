@@ -54,6 +54,8 @@ export function WineGallery({ wine }: { wine: Wine }) {
             width={800}
             height={800}
             priority
+            fetchPriority="high"
+            sizes="(max-width: 640px) calc(100vw - 40px), (max-width: 1024px) calc(100vw - 140px), 540px"
             style={{ objectFit: "contain" }}
           />
         ) : (
