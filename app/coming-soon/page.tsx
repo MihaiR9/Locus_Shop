@@ -65,7 +65,6 @@ export default function ComingSoonPage() {
         <p
           style={{
             fontFamily: "var(--font-serif), Georgia, serif",
-            fontStyle: "italic",
             fontSize: "clamp(22px, 3vw, 34px)",
             lineHeight: 1.2,
             letterSpacing: "0.005em",

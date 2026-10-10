@@ -74,6 +74,13 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Fără text înclinat pe site (decizia lui Mihai): accentul din <em>/<i>
+     vine din culoare sau greutate, nu din italic. */
+  em,
+  i {
+    font-style: normal;
+  }
 }
 
 /* ----------------------------------------------------------------
@@ -6737,7 +6744,7 @@
   font-family: var(--font-mono), monospace;
   font-size: 12px; color: var(--ink-soft);
 }
-.sum-row .muted { color: var(--ink-mute); font-style: italic; }
+.sum-row .muted { color: var(--ink-mute); }
 .sum-total {
   display: flex; justify-content: space-between; align-items: baseline;
   margin-bottom: 22px;
@@ -6956,7 +6963,7 @@
 .livrare-method-price .price-free {
   font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(36px, 4vw, 52px);
-  color: var(--vie); font-weight: 400; font-style: italic;
+  color: var(--vie); font-weight: 400;
 }
 .livrare-method-free {
   margin-left: auto;
@@ -7328,7 +7335,7 @@
   font-weight: 400;
   margin-bottom: 28px;
 }
-.parteneri-title em { font-style: italic; color: var(--vie); }
+.parteneri-title em { color: var(--vie); }
 .parteneri-lead {
   font-family: var(--font-mono), monospace;
   font-size: clamp(13px, 1.05vw, 15px);
@@ -7554,7 +7561,7 @@
   color: rgba(235, 225, 218, 0.85);
   max-width: 56ch;
 }
-.parteneri-catalog .lead em { color: var(--pamant); font-style: italic; }
+.parteneri-catalog .lead em { color: var(--pamant); }
 .parteneri-catalog-cta { display: flex; justify-content: flex-end; }
 @media (max-width: 720px) { .parteneri-catalog-cta { justify-content: flex-start; } }
 .parteneri-catalog .btn {
@@ -8954,7 +8961,7 @@
 }
 .co-srow .value { font-variant-numeric: tabular-nums; }
 .co-srow.discount .value { color: var(--vie); }
-.co-srow.muted .value { color: var(--ink-mute); font-style: italic; }
+.co-srow.muted .value { color: var(--ink-mute); }
 .co-voucher {
   display: flex; gap: 8px; padding: 4px 0 2px;
 }
