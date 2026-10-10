@@ -1,6 +1,6 @@
 # Analytics — Google Tag Manager
 
-> **Container GTM:** `GTM-5TNDPL7Z`
+> **Container GTM:** `GTM-5F2DQ9QN`
 > **Instalat prin:** `@next/third-parties` în `app/layout.tsx`
 > **Toate tag-urile** (GA4, Meta Pixel, Google Ads) se configurează în UI-ul
 > GTM de către marketing. În cod trimit doar evenimente pe `window.dataLayer`
@@ -151,7 +151,7 @@ export function ViewItemTracker({ wine }) {
 
 ### 1. Verifică că GTM se încarcă
 
-Deschide DevTools → Network → filtru „gtm.js". Ar trebui să vezi request către `googletagmanager.com/gtm.js?id=GTM-5TNDPL7Z` pe orice pagină.
+Deschide DevTools → Network → filtru „gtm.js". Ar trebui să vezi request către `googletagmanager.com/gtm.js?id=GTM-5F2DQ9QN` pe orice pagină.
 
 ### 2. Verifică dataLayer
 
@@ -305,4 +305,4 @@ Pentru testare, setează `META_TEST_EVENT_CODE` și urmărește în **Events Man
 
 Când marketing adaugă tag-uri noi în GTM (GA4, Meta Pixel, Ads Conversion) și au nevoie de evenimente custom pe care le nu am — să scrie în GitHub Issues ce vor, adăugăm în `lib/analytics/gtm.ts` și legăm în componente.
 
-**Container GTM:** [GTM-5TNDPL7Z](https://tagmanager.google.com/#/container/accounts/0/containers/GTM-5TNDPL7Z)
+**Container GTM:** [GTM-5F2DQ9QN](https://tagmanager.google.com)

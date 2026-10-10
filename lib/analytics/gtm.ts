@@ -1,7 +1,7 @@
 /**
  * Google Tag Manager — dataLayer helpers.
  *
- * Container: GTM-5TNDPL7Z (instalat în app/layout.tsx).
+ * Container: GTM-5F2DQ9QN (instalat în app/layout.tsx).
  *
  * TOATE evenimentele trec pe aici. Marketing-ul configurează în GTM UI ce
  * face cu ele (GA4 tag, Meta Pixel tag, Google Ads Conversion, etc.).

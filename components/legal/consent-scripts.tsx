@@ -7,7 +7,7 @@ import { useConsentStore } from "@/lib/consent-store";
  * Bootstrap Consent Mode v2 la hidratarea consent store-ului.
  *
  * Anterior injecta direct tag-urile GA4 + Meta Pixel. Acum GTM
- * (GTM-5TNDPL7Z, instalat în app/layout.tsx) gestionează toate tag-urile
+ * (GTM-5F2DQ9QN, instalat în app/layout.tsx) gestionează toate tag-urile
  * — marketing-ul le adaugă din UI-ul GTM. Rolul acestui component e doar
  * să trigger-uiască `hydrate()` din consent-store, care la rândul lui
  * face push `gtag('consent', 'update', ...)` cu starea salvată în cookie.

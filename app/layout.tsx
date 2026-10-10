@@ -6,7 +6,7 @@ import { ThemeScript } from "@/components/theme-script";
 import { SvgSprite } from "@/components/svg-sprite";
 import { getSiteUrl } from "@/lib/site";
 
-const GTM_ID = "GTM-5TNDPL7Z";
+const GTM_ID = "GTM-5F2DQ9QN";
 
 // Google Consent Mode v2 default state — TREBUIE injectat înainte de GTM.
 // Toate categoriile de tracking sunt DENIED implicit; se activează doar
@@ -116,7 +116,7 @@ export default function RootLayout({
         />
       </head>
       {/*
-        Google Tag Manager — Container ID GTM-5TNDPL7Z.
+        Google Tag Manager — Container ID GTM-5F2DQ9QN.
         Instalat pe TOATE paginile (public + coming-soon + admin).
         Marketing configurează tag-urile (GA4, Meta Pixel, Ads) în GTM UI —
         eu doar trimit evenimente în dataLayer prin lib/analytics/gtm.ts.
