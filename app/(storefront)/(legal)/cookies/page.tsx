@@ -1,11 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ResetConsentButton } from "@/components/legal/reset-consent-button";
+import { pageOpenGraph } from "@/lib/seo/open-graph";
+
+const DESCRIPTION =
+  "Ce cookie-uri folosește Domeniul Locus și pentru ce.";
 
 export const metadata: Metadata = {
   title: "Politica de cookie-uri",
-  description: "Ce cookie-uri folosește Domeniul Locus și pentru ce.",
+  description: DESCRIPTION,
   alternates: { canonical: "/cookies" },
+  openGraph: pageOpenGraph({
+    url: "/cookies",
+    title: "Politica de cookie-uri · Domeniul Locus",
+    description: DESCRIPTION,
+  }),
 };
 
 {/* TODO: review jurist înainte de launch */}

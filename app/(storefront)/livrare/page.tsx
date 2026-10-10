@@ -5,12 +5,20 @@ import { MethodsGrid } from "@/components/livrare/methods-grid";
 import { ZonesTable } from "@/components/livrare/zones-table";
 import { CalcCost } from "@/components/livrare/calc-cost";
 import { LivrareFAQ } from "@/components/livrare/livrare-faq";
+import { pageOpenGraph } from "@/lib/seo/open-graph";
+
+const DESCRIPTION =
+  "Livrare prin FanCourier în toată România · curier la ușă sau locker FANbox · gratuit peste 250 lei.";
 
 export const metadata: Metadata = {
   title: "Livrare",
-  description:
-    "Livrare prin FanCourier în toată România · curier la ușă sau locker FANbox · gratuit peste 250 lei.",
+  description: DESCRIPTION,
   alternates: { canonical: "/livrare" },
+  openGraph: pageOpenGraph({
+    url: "/livrare",
+    title: "Livrare · Domeniul Locus",
+    description: DESCRIPTION,
+  }),
 };
 
 export default function LivrarePage() {

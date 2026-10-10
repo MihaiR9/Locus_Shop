@@ -1,10 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { pageOpenGraph } from "@/lib/seo/open-graph";
+
+const DESCRIPTION =
+  "Termenii și condițiile de utilizare a magazinului online Domeniul Locus.";
 
 export const metadata: Metadata = {
   title: "Termeni și condiții",
-  description: "Termenii și condițiile de utilizare a magazinului online Domeniul Locus.",
+  description: DESCRIPTION,
   alternates: { canonical: "/termeni" },
+  openGraph: pageOpenGraph({
+    url: "/termeni",
+    title: "Termeni și condiții · Domeniul Locus",
+    description: DESCRIPTION,
+  }),
 };
 
 {/* TODO: review jurist înainte de launch */}

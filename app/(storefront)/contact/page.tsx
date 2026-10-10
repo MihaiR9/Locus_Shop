@@ -3,12 +3,20 @@ import { Reveal } from "@/components/reveal";
 import { Footer } from "@/components/landing/footer";
 import { ContactForm } from "./contact-form";
 import { INSTAGRAM_URL } from "@/lib/social-posts";
+import { pageOpenGraph } from "@/lib/seo/open-graph";
+
+const DESCRIPTION =
+  "Scrie-ne, sună-ne sau vino la o degustare. Centrul de Vinificație Buciumeni — programare prealabilă.";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description:
-    "Scrie-ne, sună-ne sau vino la o degustare. Centrul de Vinificație Buciumeni — programare prealabilă.",
+  description: DESCRIPTION,
   alternates: { canonical: "/contact" },
+  openGraph: pageOpenGraph({
+    url: "/contact",
+    title: "Contact · Domeniul Locus",
+    description: DESCRIPTION,
+  }),
 };
 
 export default function ContactPage() {

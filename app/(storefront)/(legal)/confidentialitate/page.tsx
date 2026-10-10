@@ -1,10 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { pageOpenGraph } from "@/lib/seo/open-graph";
+
+const DESCRIPTION =
+  "Cum prelucrează Domeniul Locus datele tale personale, conform GDPR.";
 
 export const metadata: Metadata = {
   title: "Politica de confidențialitate",
-  description: "Cum prelucrează Domeniul Locus datele tale personale, conform GDPR.",
+  description: DESCRIPTION,
   alternates: { canonical: "/confidentialitate" },
+  openGraph: pageOpenGraph({
+    url: "/confidentialitate",
+    title: "Politica de confidențialitate · Domeniul Locus",
+    description: DESCRIPTION,
+  }),
 };
 
 {/* TODO: review jurist înainte de launch */}

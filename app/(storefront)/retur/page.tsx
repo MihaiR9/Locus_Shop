@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/landing/footer";
+import { pageOpenGraph } from "@/lib/seo/open-graph";
+
+const DESCRIPTION =
+  "Dreptul de retragere de 14 zile (OUG 34/2014). Excepții pentru sticle deschise.";
 
 export const metadata: Metadata = {
   title: "Politica de retur",
-  description:
-    "Dreptul de retragere de 14 zile (OUG 34/2014). Excepții pentru sticle deschise.",
+  description: DESCRIPTION,
   alternates: { canonical: "/retur" },
+  openGraph: pageOpenGraph({
+    url: "/retur",
+    title: "Politica de retur · Domeniul Locus",
+    description: DESCRIPTION,
+  }),
 };
 
 {

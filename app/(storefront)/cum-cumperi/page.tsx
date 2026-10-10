@@ -1,12 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Footer } from "@/components/landing/footer";
+import { pageOpenGraph } from "@/lib/seo/open-graph";
+
+const DESCRIPTION =
+  "Pași simpli pentru a comanda vin de la Domeniul Locus. Plată cu cardul, online sau la livrare, factură electronică, livrare prin FanCourier. Răspundem la întrebările tale.";
 
 export const metadata: Metadata = {
   title: "Cum cumperi",
-  description:
-    "Pași simpli pentru a comanda vin de la Domeniul Locus. Plată cu cardul, online sau la livrare, factură electronică, livrare prin FanCourier. Răspundem la întrebările tale.",
+  description: DESCRIPTION,
   alternates: { canonical: "/cum-cumperi" },
+  openGraph: pageOpenGraph({
+    url: "/cum-cumperi",
+    title: "Cum cumperi · Domeniul Locus",
+    description: DESCRIPTION,
+  }),
 };
 
 const STEPS = [
