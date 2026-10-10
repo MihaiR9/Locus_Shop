@@ -21,6 +21,7 @@ export function Hero() {
                 alt=""
                 fill
                 priority
+                fetchPriority="high"
                 sizes="100vw"
                 quality={85}
               />
