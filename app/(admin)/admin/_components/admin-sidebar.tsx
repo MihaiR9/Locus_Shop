@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -22,6 +23,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getNewOrdersCount } from "./orders-activity-actions";
+import { ORDERS_SEEN_EVENT } from "./orders-activity-event";
 
 type NavItem = {
   href: string;
@@ -78,8 +81,36 @@ function isItemActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(href + "/");
 }
 
+/**
+ * Numărul de comenzi cu activitate nouă (vezi lib/admin/orders-activity.ts).
+ * Se reîncarcă la fiecare navigare în admin, o dată pe minut și imediat după
+ * ce lista de comenzi a fost deschisă.
+ */
+function useNewOrdersCount(pathname: string): number {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let alive = true;
+    const refresh = () =>
+      getNewOrdersCount()
+        .then((n) => alive && setCount(n))
+        .catch(() => {});
+    refresh();
+    const timer = window.setInterval(refresh, 60_000);
+    window.addEventListener(ORDERS_SEEN_EVENT, refresh);
+    return () => {
+      alive = false;
+      window.clearInterval(timer);
+      window.removeEventListener(ORDERS_SEEN_EVENT, refresh);
+    };
+  }, [pathname]);
+
+  return count;
+}
+
 export function AdminSidebar() {
   const pathname = usePathname();
+  const newOrders = useNewOrdersCount(pathname);
 
   const renderLink = (item: NavItem) => {
     const Icon = item.icon;
@@ -97,6 +128,14 @@ export function AdminSidebar() {
       >
         <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
         <span>{item.label}</span>
+        {item.href === "/admin/comenzi" && newOrders > 0 && (
+          <span
+            className="ml-auto min-w-5 rounded-full bg-red-600 px-1.5 text-center text-[11px] font-semibold leading-5 text-white"
+            aria-label={`${newOrders} comenzi cu activitate nouă`}
+          >
+            {newOrders}
+          </span>
+        )}
       </Link>
     );
   };

@@ -15,6 +15,11 @@ import {
 } from "../../_components/payment-fulfillment-badges";
 import { formatRelDate } from "../../_components/rel-date";
 import { OrdersFilters } from "./filters";
+import { MarkOrdersSeen } from "./mark-orders-seen";
+import {
+  getOrderIdsWithNewActivity,
+  getOrdersSeenAt,
+} from "@/lib/admin/orders-activity";
 
 export const metadata: Metadata = { title: "Comenzi · Admin" };
 
@@ -30,15 +35,17 @@ export default async function AdminOrdersPage({
   const search = (params.q as string | undefined) ?? "";
   const page = Math.max(1, Number.parseInt((params.page as string) ?? "1", 10) || 1);
 
-  const [result, kpis] = await Promise.all([
+  const [result, kpis, newActivity] = await Promise.all([
     listOrders({ status: status as OrderStatus | "all", search, page }),
     getOrdersKpis(30),
+    getOrdersSeenAt().then(getOrderIdsWithNewActivity),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(result.totalCount / result.pageSize));
 
   return (
     <>
+      <MarkOrdersSeen />
       <header className="admin-page-head">
         <div>
           <h1 className="admin-page-title">Comenzi</h1>
@@ -149,8 +156,15 @@ export default async function AdminOrdersPage({
                     <td className="py-3">
                       <Link
                         href={`/admin/comenzi/${o.orderNumber}`}
-                        className="font-medium text-zinc-900 hover:underline"
+                        className="inline-flex items-center gap-2 font-medium text-zinc-900 hover:underline"
                       >
+                        {newActivity.has(o.id) && (
+                          <span
+                            className="h-2 w-2 shrink-0 rounded-full bg-red-600"
+                            aria-label="Activitate nouă"
+                            title="Activitate nouă de la ultima vizită"
+                          />
+                        )}
                         {o.orderNumber}
                       </Link>
                     </td>
