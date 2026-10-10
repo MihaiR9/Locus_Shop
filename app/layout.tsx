@@ -4,7 +4,7 @@ import {
   IBM_Plex_Mono,
   Bellefair,
 } from "next/font/google";
-import { GoogleTagManager } from "@next/third-parties/google";
+import Script from "next/script";
 import "./globals.css";
 import { ThemeScript } from "@/components/theme-script";
 import { SvgSprite } from "@/components/svg-sprite";
@@ -133,8 +133,20 @@ export default function RootLayout({
         eu doar trimit evenimente în dataLayer prin lib/analytics/gtm.ts.
         Consent state e sincronizat prin lib/consent-store.ts (Consent Mode v2).
         Vezi docs/ANALYTICS.md pentru harta completă a evenimentelor.
+
+        `gtm.js` (~117 KB) se încarcă `lazyOnload` — după ce pagina s-a încărcat,
+        ca să nu concureze cu imaginea principală (LCP). Evenimentele trimise
+        înainte în dataLayer stau la coadă și sunt procesate când pornește GTM.
+        Init-ul (`gtm.start`) rulează devreme, ca timpii raportați să fie corecți.
       */}
-      <GoogleTagManager gtmId={GTM_ID} />
+      <Script id="gtm-init" strategy="afterInteractive">
+        {`(function(w,l){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});})(window,'dataLayer');`}
+      </Script>
+      <Script
+        id="gtm"
+        strategy="lazyOnload"
+        src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`}
+      />
       <body className="bg-bg text-ink font-mono" suppressHydrationWarning>
         <SvgSprite />
         {children}
