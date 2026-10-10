@@ -27,6 +27,19 @@ export function wineImageUrl(wine: Wine): string | null {
   return rel.startsWith("http") ? rel : absUrl(rel);
 }
 
+/**
+ * Poza pentru feed-uri (Google Merchant, Meta): JPG pătrat pe alb din
+ * `public/photos/products/feed/`, generat de `scripts/build-feed-images.mjs`.
+ * PNG-urile transparente de pe site apar cu fundal negru în Shopping.
+ * O poză setată manual în admin (`heroImage`) se folosește ca atare.
+ */
+export function wineFeedImageUrl(wine: Wine): string | null {
+  if (wine.heroImage) return wineImageUrl(wine);
+  const rel = productPhoto(wine.code);
+  if (!rel) return null;
+  return absUrl(rel.replace("/photos/products/", "/photos/products/feed/").replace(/\.png$/, ".jpg"));
+}
+
 /** Doar prima literă: `pair` are mai multe propoziții, care își păstrează majuscula. */
 function lowerFirst(s: string): string {
   return s.charAt(0).toLowerCase() + s.slice(1);

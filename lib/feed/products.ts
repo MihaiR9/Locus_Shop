@@ -2,7 +2,7 @@ import "server-only";
 import { absUrl, isComingSoon } from "@/lib/site";
 import { getAllWinesStrict } from "@/lib/wines-queries";
 import { BOTTLE_ML, metaLine, type Wine } from "@/lib/wines";
-import { BRAND_NAME, wineDescription, wineImageUrl } from "@/lib/seo/schema";
+import { BRAND_NAME, wineDescription, wineFeedImageUrl } from "@/lib/seo/schema";
 import { SHIPPING_METHODS, getReferencePrice } from "@/lib/shipping";
 
 /**
@@ -100,7 +100,7 @@ export async function getFeedItems(): Promise<{
   const skipped: string[] = [];
 
   for (const wine of wines) {
-    const image = wineImageUrl(wine);
+    const image = wineFeedImageUrl(wine);
     if (!image) {
       skipped.push(wine.code);
       continue;
