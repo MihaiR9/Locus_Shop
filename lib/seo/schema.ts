@@ -1,4 +1,5 @@
 import { absUrl } from "@/lib/site";
+import { INSTAGRAM_URL } from "@/lib/social-posts";
 import { abvLabel, metaLine, productPhoto, type Wine } from "@/lib/wines";
 
 /**
@@ -74,6 +75,7 @@ export function organizationSchema(): JsonLdObject {
       longitude: 27.3,
     },
     areaServed: { "@type": "Country", name: "România" },
+    sameAs: [INSTAGRAM_URL],
   };
 }
 
