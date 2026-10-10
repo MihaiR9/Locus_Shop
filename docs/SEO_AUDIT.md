@@ -32,6 +32,7 @@ Textele vizibile (titluri, descrieri, copy) se propun întâi, nu se schimbă di
 | 6 | Pagini ascunse de Google până sunt gata: `/parteneri`, `/pauze`, `/social` → `noindex` + scoase din sitemap. `/cuvinte` și `/semne` rămân indexate (se ajunge la ele din gamele de pe home). Lista e într-un singur loc: `lib/seo/hidden-pages.ts` | `lib/seo/hidden-pages.ts` |
 | 18 | `/llms.txt` — rezumatul magazinului pentru asistenții AI (vinuri, prețuri, livrare, contact), generat din catalog la fiecare oră. Crawlerele AI rămân permise (decizia lui Mihai: vrea să apară în răspunsurile asistenților) | `app/llms.txt/route.ts` |
 | 5 | Redirect `domeniul-locus.ro` → www trecut din 307 în **308 permanent** (Vercel, setarea domeniului, 10 oct). Calea și parametrii se păstrează | Vercel → Domains |
+| 19 | **IndexNow** — cheie publicată (`public/a59592763354845b9a9662938c6267bb.txt`), cele 17 URL-uri din sitemap trimise pe 10 oct (HTTP 202). Anunță Bing, care alimentează căutarea ChatGPT și Copilot. După schimbări de conținut: `node scripts/indexnow.mjs` | `scripts/indexnow.mjs` |
 
 Rezolvate tot atunci, în afara listei de audit:
 - Preț pe litru afișat lângă fiecare preț (HG 947/2000) + `unit_pricing_measure` în feed — cerut de Merchant Center.
@@ -47,7 +48,7 @@ Partea tehnică de pe site e terminată. Ce a rămas se face din conturi, din ad
 ### Pe conturi — le face Mihai, câteva minute fiecare
 0. **Google Analytics 4 — nu se măsoară nimic acum.** Containerul GTM publicat (`GTM-5TNDPL7Z`, verificat pe 10 oct) e gol: fără GA4, fără Meta Pixel, fără Ads. Codul trimite deja evenimentele în `dataLayer` (vezi `docs/ANALYTICS.md`). De făcut: proprietate GA4 (`G-…`) → în GTM un Google tag pe toate paginile + tag-uri GA4 Event pentru e-commerce (`view_item`, `add_to_cart`, `begin_checkout`, `purchase`) → Publish → legătură GA4 ↔ Search Console. Consent Mode v2 e deja în cod.
 1. **Google Search Console** — proprietatea Domeniu `domeniul-locus.ro` e verificată (prin Cloudflare, 10 oct). De făcut: retrimite `https://www.domeniul-locus.ro/sitemap.xml` (avea „Eroare temporară de procesare”) și Solicită indexarea pentru `/contact`, `/shop` și cele 5 pagini de vin. Peste 3–7 zile: Indexare → Pagini.
-3. **Bing Webmaster Tools** — adaugă site-ul (se poate importa direct din Search Console) și trimite sitemap-ul. ChatGPT caută pe web prin indexul Bing; Copilot la fel.
+3. **Bing Webmaster Tools** (opțional, pentru rapoarte) — login cu contul Google → „Import from Google Search Console”. Indexarea în Bing nu mai depinde de asta: e acoperită de IndexNow (#19).
 4. **Merchant Center** — confirmă că la Products → „Provided by you” sunt 5 vinuri aprobate.
 
 ### Conținut — texte de la Mihai
