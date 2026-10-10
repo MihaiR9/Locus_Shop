@@ -38,7 +38,7 @@ export function Footer() {
         </div>
 
         <div className="footer-col">
-          <h4>Navighează</h4>
+          <h2>Navighează</h2>
           <ul>
             <li><Link href="/">Acasă</Link></li>
             {/* Parteneri e ascunsă cât timp lipsește și din meniul de sus — vezi components/site-header.tsx. */}
@@ -47,13 +47,13 @@ export function Footer() {
             {/* <li><Link href="/parteneri">Parteneri</Link></li> */}
             <li><Link href="/contact">Contact</Link></li>
           </ul>
-          <h4 style={{ marginTop: 32 }}>Cumpără</h4>
+          <h2 style={{ marginTop: 32 }}>Cumpără</h2>
           <ul>
             <li><Link href="/cum-cumperi">Cum cumperi</Link></li>
             <li><Link href="/livrare">Livrare</Link></li>
             <li><Link href="/retur">Retur</Link></li>
           </ul>
-          <h4 style={{ marginTop: 32 }}>Legal</h4>
+          <h2 style={{ marginTop: 32 }}>Legal</h2>
           <ul>
             <li><Link href="/termeni">Termeni</Link></li>
             <li><Link href="/confidentialitate">Confidențialitate</Link></li>
@@ -62,12 +62,12 @@ export function Footer() {
         </div>
 
         <div className="footer-col">
-          <h4>Urmărește-ne</h4>
+          <h2>Urmărește-ne</h2>
           <ul>
             <li><a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Instagram ↗</a></li>
             {/* Facebook ascuns până există pagina (29 sep 2026). */}
           </ul>
-          <h4 style={{ marginTop: 32 }}>Reclamații</h4>
+          <h2 style={{ marginTop: 32 }}>Reclamații</h2>
           <ul>
             <li>
               <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer">

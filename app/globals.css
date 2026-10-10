@@ -1556,7 +1556,7 @@
 }
 .gama-cta svg { width: 14px; height: 14px; }
 
-.gama--soon { opacity: 0.65; cursor: default; }
+.gama--soon { opacity: 0.8; cursor: default; } /* ≥ 4.5:1 contrast pe text */
 .gama--soon:hover { background: var(--surface); }
 .gama--soon .arrow-big { display: none; }
 .gama--soon .gama-cta::before {
@@ -2091,7 +2091,7 @@
   filter: invert(1);
   height: 56px;
 }
-.footer-col h4 {
+.footer-col h2 {
   font-family: var(--font-mono), monospace;
   font-size: 10px;
   font-weight: 500;

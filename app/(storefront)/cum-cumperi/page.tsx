@@ -108,7 +108,7 @@ export default function CumCumperiPage() {
                 <li key={s.n} className="step-item">
                   <span className="step-num">{s.n}</span>
                   <div className="step-body">
-                    <h3 className="step-title">{s.title}</h3>
+                    <h2 className="step-title">{s.title}</h2>
                     <p className="step-text">{s.body}</p>
                   </div>
                 </li>
