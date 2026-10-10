@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { absUrl } from "@/lib/site";
 import { ALL_GAMA } from "@/lib/gama-meta";
 import { getAllWines } from "@/lib/wines-queries";
+import { isHiddenFromSearch } from "@/lib/seo/hidden-pages";
 
 // Regenerăm o dată pe oră: produsele noi trebuie descoperite repede,
 // dar nu justifică o interogare DB la fiecare hit de crawler.
@@ -61,5 +62,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.9,
   }));
 
-  return [...staticEntries, ...gamaEntries, ...wineEntries];
+  // Paginile ascunse de Google (lib/seo/hidden-pages.ts) nu intră în sitemap.
+  return [...staticEntries, ...gamaEntries, ...wineEntries].filter(
+    (e) => !isHiddenFromSearch(new URL(e.url).pathname),
+  );
 }

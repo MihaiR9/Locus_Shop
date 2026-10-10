@@ -7,12 +7,14 @@ import { JsonLd } from "@/components/seo/json-ld";
 import { breadcrumbSchema } from "@/lib/seo/schema";
 import { SOCIAL_POSTS, INSTAGRAM_URL } from "@/lib/social-posts";
 import { pageOpenGraph } from "@/lib/seo/open-graph";
+import { robotsFor } from "@/lib/seo/hidden-pages";
 
 export const metadata: Metadata = {
   title: "Social",
   description:
     "Vinul Domeniului Locus în contexte reale — mese, cadouri, seri lungi. Fotografii din viața vinului.",
   alternates: { canonical: "/social" },
+  robots: robotsFor("/social"),
   openGraph: pageOpenGraph({
     url: "/social",
     title: "Social · Domeniul Locus",

@@ -10,6 +10,7 @@ import { breadcrumbSchema, itemListSchema } from "@/lib/seo/schema";
 import type { Gama } from "@/lib/wines";
 import { getWinesByGama } from "@/lib/wines-queries";
 import { pageOpenGraph } from "@/lib/seo/open-graph";
+import { robotsFor } from "@/lib/seo/hidden-pages";
 
 type Params = { gama: string };
 
@@ -39,6 +40,7 @@ export async function generateMetadata({
     title,
     description: meta.manifesto,
     alternates: { canonical: `/${gama}` },
+    robots: robotsFor(`/${gama}`),
     openGraph: pageOpenGraph({
       url: `/${gama}`,
       title,

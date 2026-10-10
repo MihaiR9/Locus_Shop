@@ -29,6 +29,7 @@ Textele vizibile (titluri, descrieri, copy) se propun întâi, nu se schimbă di
 | 15 | **robots.txt bloca `/contact`**: regula `Disallow: /cont` era prefix → acum `/cont$` (`bc09dac`) | `app/robots.ts` |
 | 16 | Accessibility 100 pe toate paginile publice: titlurile din footer `h4` → `h2`, pașii de pe /cum-cumperi `h3` → `h2`, cardurile „în curând" opacity 0.65 → 0.8 (contrast ≥ 4.5:1) (`7ca839a`) | `components/landing/footer.tsx`, `app/(storefront)/cum-cumperi/page.tsx`, `app/globals.css` |
 | 17 | Fonturi: fără Cormorant italic și fără text înclinat (`ff70489`); un singur serif, Libre Caslon Display, în loc de Cormorant + Bellefair (`44c2c89`). Preload pe paginile obișnuite: 5 fișiere (era 12), ~75–85 KB fonturi (era 287 KB) | `app/layout.tsx`, `app/globals.css` |
+| 6 | Pagini ascunse de Google până sunt gata: `/parteneri`, `/pauze`, `/social` → `noindex` + scoase din sitemap. `/cuvinte` și `/semne` rămân indexate (se ajunge la ele din gamele de pe home). Lista e într-un singur loc: `lib/seo/hidden-pages.ts` | `lib/seo/hidden-pages.ts` |
 
 Rezolvate tot atunci, în afara listei de audit:
 - Preț pe litru afișat lângă fiecare preț (HG 947/2000) + `unit_pricing_measure` în feed — cerut de Merchant Center.
@@ -42,10 +43,6 @@ Rezolvate tot atunci, în afara listei de audit:
 ### 5. Domeniul fără www redirecționează cu 307 (temporar) — Important, îl face Mihai
 `https://domeniul-locus.ro` → 307 → www. Trebuie 308 (permanent).
 Vercel → proiect → Settings → Domains → `domeniul-locus.ro` → Edit → redirect permanent (308) către www.
-
-### 6. Pagini „ascunse” dar indexabile — decizia lui Mihai
-`/cuvinte`, `/semne`, `/pauze`, `/parteneri` sunt scoase din meniu dar sunt în `sitemap.xml`. `/social` nu e în sitemap dar e indexabilă (200 + canonical).
-De întrebat: rămân în Google sau `noindex` + scoase din `app/sitemap.ts` până sunt gata?
 
 ### 7. Descrieri repetate în feed / JSON-LD — Minor, conținut
 Câmpurile `short` și `notes` ale vinurilor (din admin) se suprapun → fraze dublate în descriere. Partea de cod e rezolvată (vezi tabelul).

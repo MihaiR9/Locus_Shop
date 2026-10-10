@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Footer } from "@/components/landing/footer";
 import { PartnerForm } from "@/components/parteneri/partner-form";
 import { pageOpenGraph } from "@/lib/seo/open-graph";
+import { robotsFor } from "@/lib/seo/hidden-pages";
 
 const DESCRIPTION =
   "Vânzări en-gros pentru restaurante, hoteluri, vinoteci și magazine specializate. Catalog dedicat HoReCa, prețuri preferențiale, livrare în toată țara.";
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
   title: "Parteneri B2B · HoReCa",
   description: DESCRIPTION,
   alternates: { canonical: "/parteneri" },
+  robots: robotsFor("/parteneri"),
   openGraph: pageOpenGraph({
     url: "/parteneri",
     title: "Parteneri B2B · HoReCa · Domeniul Locus",
