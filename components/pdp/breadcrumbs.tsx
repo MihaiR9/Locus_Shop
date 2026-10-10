@@ -4,7 +4,7 @@ import type { Wine } from "@/lib/wines";
 export function Breadcrumbs({ wine }: { wine: Wine }) {
   return (
     <nav className="breadcrumb" aria-label="Breadcrumb">
-      <Link href="/#vinuri">Vinuri</Link>
+      <Link href="/shop">Shop</Link>
       <span className="sep" aria-hidden="true">
         /
       </span>

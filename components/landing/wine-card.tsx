@@ -19,7 +19,10 @@ export function WineCard({ wine }: { wine: Wine }) {
     >
       <div className="wine-header">
         <span>
-          {wine.gama} · {wine.code}
+          <Link className="wine-gama-link" href={`/${wine.gama}`}>
+            {wine.gama}
+          </Link>{" "}
+          · {wine.code}
         </span>
         <span>{wine.year}</span>
       </div>

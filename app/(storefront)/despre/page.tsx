@@ -114,8 +114,9 @@ export default function DesprePage() {
           <Reveal as="div" className="poveste-outro-inner">
             <h2 className="h2">Restul se citește în pahar.</h2>
             <p>
-              Gamele Cuvinte și Semne pornesc din aceleași parcele. Diferă
-              registrul, nu locul.
+              Gamele <Link href="/cuvinte">Cuvinte</Link> și{" "}
+              <Link href="/semne">Semne</Link> pornesc din aceleași parcele.
+              Diferă registrul, nu locul.
             </p>
             <Link href="/shop" className="btn-primary">
               <span>Vezi vinurile</span>
