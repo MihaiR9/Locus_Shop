@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
 import {
-  Italiana,
   Cormorant_Garamond,
-  Libre_Caslon_Display,
   IBM_Plex_Mono,
   Bellefair,
-  Inter,
 } from "next/font/google";
 import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
@@ -40,16 +37,6 @@ gtag('set', 'ads_data_redaction', true);
 gtag('set', 'url_passthrough', true);
 `;
 
-/** Fontul din logo. N-are diacritice complete (ș/ț cu virgulă sub), deci
- *  îl folosim doar unde textul e fix și fără ele — momentan titlul hero
- *  de pe pagina principală (`.hero-title`). Restul stă pe Cormorant. */
-const italiana = Italiana({
-  variable: "--font-italiana",
-  subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-});
-
 /** Font serif principal actual — Cormorant Garamond, cu diacritice
  *  complete pentru română (ăâîșț cu virgulă corectă). Vine mapat pe
  *  `--font-serif` folosit peste tot în CSS (h1/h2/titluri, sumar etc.). */
@@ -58,17 +45,6 @@ const cormorant = Cormorant_Garamond({
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-  display: "swap",
-});
-
-/** Font display alternativ — Libre Caslon Display. Are diacritice complete
- *  latin-ext, un caracter mai puternic decât Cormorant pentru titluri
- *  mari. Testat inițial pe landing (map-section h2 și alte serif-uri de
- *  pe / — vezi .landing-display în globals.css). Mapat pe `--font-display`. */
-const libreCaslonDisplay = Libre_Caslon_Display({
-  variable: "--font-display",
-  subsets: ["latin", "latin-ext"],
-  weight: "400",
   display: "swap",
 });
 
@@ -83,13 +59,6 @@ const bellefair = Bellefair({
   variable: "--font-bellefair",
   subsets: ["latin"],
   weight: "400",
-  display: "swap",
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -140,7 +109,7 @@ export default function RootLayout({
     <html
       lang="ro"
       data-theme="light"
-      className={`${cormorant.variable} ${libreCaslonDisplay.variable} ${italiana.variable} ${ibmPlexMono.variable} ${bellefair.variable} ${inter.variable} antialiased`}
+      className={`${cormorant.variable} ${ibmPlexMono.variable} ${bellefair.variable} antialiased`}
       suppressHydrationWarning
     >
       <head>
