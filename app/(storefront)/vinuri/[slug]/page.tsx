@@ -41,7 +41,11 @@ export async function generateMetadata({
   if (!wine) return { title: "Vin negăsit" };
 
   const title = `${wine.name} ${wine.code} · ${wine.gama}`;
-  const description = `${wine.name} (${wine.code}) — gama ${wine.gama}. ${metaLine(wine)} · ${wine.priceRon} lei.`;
+  // Rezumatul vinului + specificația + originea. Fără preț: Google îl arată
+  // oricum sub rezultat, din schema Product, și se poate învechi în snippet.
+  const spec = metaLine(wine).replace(" · ", ", ");
+  const abv = `${wine.abv.toString().replace(".", ",")}%`;
+  const description = `${wine.short} ${spec.charAt(0).toUpperCase()}${spec.slice(1).toLowerCase()}, ${abv}. DOC-CMD Panciu, din Buciumeni.`;
   const url = `/vinuri/${wine.slug}`;
 
   // Imaginea OG NU se setează aici: o generează `opengraph-image.tsx` din

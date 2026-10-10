@@ -35,6 +35,8 @@ Textele vizibile (titluri, descrieri, copy) se propun întâi, nu se schimbă di
 | 19 | **IndexNow** — cheie publicată (`public/a59592763354845b9a9662938c6267bb.txt`), cele 17 URL-uri din sitemap trimise pe 10 oct (HTTP 202). Anunță Bing, care alimentează căutarea ChatGPT și Copilot. După schimbări de conținut: `node scripts/indexnow.mjs` | `scripts/indexnow.mjs` |
 | 20 | **Google Analytics 4 funcționează** (10 oct): proprietate `G-39GETPN76Z` pe contul firmei; container GTM nou `GTM-5F2DQ9QN` (containerul vechi `GTM-5TNDPL7Z` era pe alt cont și gol), versiunea 2 publicată din `docs/gtm/ga4-import.json` — Google tag + GA4 Event pentru cele 8 evenimente de e-commerce. Confirmat în GA4 Realtime. Legat de Search Console (Admin → Product links) | `app/layout.tsx`, `docs/gtm/ga4-import.json` |
 | 21 | Imagini pentru feed-uri: JPG 1200×1200 pe alb (`public/photos/products/feed/`), pentru că PNG-urile transparente apăreau cu fundal negru în Shopping. Site-ul păstrează PNG-urile. La o poză nouă: `node scripts/build-feed-images.mjs` (`f3e1457`) | `scripts/build-feed-images.mjs`, `lib/seo/schema.ts` |
+| 7 | Descrierea din feed / JSON-LD nu mai repetă aromele: folosește doar nota de degustare (`taste`) + asocieri + specificații. Câmpurile din admin rămân neschimbate, fiecare are locul ei pe site (`a4a9f93`) | `lib/seo/schema.ts` |
+| 8 | Meta description pe paginile de vin (varianta A, aleasă de Mihai): rezumatul vinului + tip, dulceață, alcool + „DOC-CMD Panciu, din Buciumeni”. Fără preț — Google îl arată oricum din schema Product | `app/(storefront)/vinuri/[slug]/page.tsx` |
 
 Rezolvate tot atunci, în afara listei de audit:
 - Preț pe litru afișat lângă fiecare preț (HG 947/2000) + `unit_pricing_measure` în feed — cerut de Merchant Center.
@@ -52,9 +54,6 @@ Partea tehnică de pe site e terminată. Ce a rămas se face din conturi, din ad
 3. **Bing Webmaster Tools** (opțional, pentru rapoarte) — login cu contul Google → „Import from Google Search Console”. Indexarea în Bing nu mai depinde de asta: e acoperită de IndexNow (#19).
 4. **Merchant Center** — confirmă că la Products → „Provided by you” sunt 5 vinuri aprobate.
 
-### Conținut — texte de la Mihai
-5. **Descrieri repetate** — câmpurile `short` și `notes` ale vinurilor (din admin) se suprapun → fraze dublate în descrierea din feed / JSON-LD. Partea de cod e rezolvată (#7 în tabel).
-6. **Meta description pe paginile de vin** — ~65 caractere, conține prețul (se poate învechi). Se generează în `app/(storefront)/vinuri/[slug]/page.tsx`. **Se propun variante lui Mihai înainte.**
 
 ### GEO în afara site-ului — ca asistenții AI să recomande crama
 Asistenții AI recomandă mai ales branduri menționate în surse de încredere, nu doar pe site-ul propriu.
