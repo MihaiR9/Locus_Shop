@@ -115,7 +115,5 @@ Cont ID **5871567489**, nume „Domeniul Locus”.
 ## Alte lucruri deschise
 
 - **Reminder plată neefectuată** (livrat 8 oct): sesiunea Stripe expiră după 3h → alertă la office@ + mail către client cu link `/plata/...` valabil 7 zile. **Netestat în producție** — la prima comandă neplătită, verifică în admin istoricul („Reminder de plată trimis clientului”) și mailul.
-- Tabelul pe zone de pe `/livrare` spune 1–2 zile pentru București/vecini, sub cele „2–4 zile” promise în rest. De întrebat dacă se ajustează.
 - Seturile de pe home (3 sticle) nu au preț pe litru — de confirmat cu juristul dacă e nevoie.
 - Retur parțial (doar unele sticle): nu e clar dacă se datorează transportul inițial — de confirmat cu juristul.
-- Imaginea de partajare (`app/opengraph-image.tsx`) e un card tipografic generat din cod; Mihai poate vrea o fotografie reală.
