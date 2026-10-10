@@ -39,17 +39,26 @@ Rezolvate tot atunci, în afara listei de audit:
 - Livrare = **2–4 zile lucrătoare** peste tot (checkout, Cum cumperi, PDP, Termeni, mailuri, Merchant Center).
 - Butonul „vezi vinurile” de pe `/plata` ducea la /vinuri (404) → /shop.
 
-## Rămase, în ordine
+## Rămase, în ordine (actualizat 10 oct 2026)
 
-### 5. Domeniul fără www redirecționează cu 307 (temporar) — Important, îl face Mihai
-`https://domeniul-locus.ro` → 307 → www. Trebuie 308 (permanent).
-Vercel → proiect → Settings → Domains → `domeniul-locus.ro` → Edit → redirect permanent (308) către www.
+Partea tehnică de pe site e terminată. Ce a rămas se face din conturi, din admin sau în afara site-ului.
 
-### 7. Descrieri repetate în feed / JSON-LD — Minor, conținut
-Câmpurile `short` și `notes` ale vinurilor (din admin) se suprapun → fraze dublate în descriere. Partea de cod e rezolvată (vezi tabelul).
+### Pe conturi — le face Mihai, câteva minute fiecare
+1. **Google Search Console** — verifică că proprietatea `https://www.domeniul-locus.ro` există și că `sitemap.xml` e trimis. Apoi URL Inspection → `/contact` → **Request indexing** (a fost blocat de robots.txt până pe 10 oct).
+2. **Vercel → Domains** — `domeniul-locus.ro` → redirect **308 (permanent)** către www, în loc de 307.
+3. **Bing Webmaster Tools** — adaugă site-ul (se poate importa direct din Search Console) și trimite sitemap-ul. ChatGPT caută pe web prin indexul Bing; Copilot la fel.
+4. **Merchant Center** — confirmă că la Products → „Provided by you” sunt 5 vinuri aprobate.
 
-### 8. Meta description pe paginile de vin — Minor, copy
-~65 caractere, conține prețul (se poate învechi). Se generează în `app/(storefront)/vinuri/[slug]/page.tsx`. **Propune texte lui Mihai înainte.**
+### Conținut — texte de la Mihai
+5. **Descrieri repetate** — câmpurile `short` și `notes` ale vinurilor (din admin) se suprapun → fraze dublate în descrierea din feed / JSON-LD. Partea de cod e rezolvată (#7 în tabel).
+6. **Meta description pe paginile de vin** — ~65 caractere, conține prețul (se poate învechi). Se generează în `app/(storefront)/vinuri/[slug]/page.tsx`. **Se propun variante lui Mihai înainte.**
+
+### GEO în afara site-ului — ca asistenții AI să recomande crama
+Asistenții AI recomandă mai ales branduri menționate în surse de încredere, nu doar pe site-ul propriu.
+7. **Google Business Profile** pentru cramă — adresă, poze, program de degustări, categorie „Cramă / Winery”. Gemini și ChatGPT îl folosesc des. (Claude poate scrie textele.)
+8. **Recenzii reale** — Google, Vivino, eventual pe site.
+9. **Mențiuni externe** — articole / bloguri despre vinuri, ghiduri ale podgoriei Panciu, liste de crame din Vrancea și Galați, presă locală.
+10. **Nume, adresă, telefon identice peste tot** (site, Google, Vivino, social) — ca asistenții să recunoască aceeași cramă. Când apar profiluri oficiale noi, se adaugă în `sameAs` (`lib/seo/schema.ts`).
 
 ### Lighthouse — 10 oct 2026
 Lighthouse 12 local (Chrome headless, profil mobil simulat), pe versiunea live după `61989ac`. Două rulări pe pagină — prima cu cache rece, a doua cu cache cald.
