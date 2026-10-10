@@ -22,6 +22,7 @@ export type Wine = {
   year: number;
   stock: number; // feed availability (in_stock / out_of_stock) + JSON-LD Offer
   heroImage: string | null; // override DB pentru poza principală; null → productPhoto()
+  updatedAt: string; // ISO, din products.updated_at — `lastmod` în sitemap
 
   // PDP-rich fields
   short: string;

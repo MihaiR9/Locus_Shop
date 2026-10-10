@@ -27,28 +27,36 @@ const STATIC_ROUTES: { path: string; priority: number; freq: MetadataRoute.Sitem
  *
  * Nu includem /checkout, /cont/*, /admin/* — pagini private sau tranzacționale,
  * fără valoare de indexare (și blocate oricum din robots.txt).
+ *
+ * `lastModified` doar unde avem o dată reală: vinurile (`updated_at`), iar
+ * /shop și paginile de gamă iau cea mai recentă modificare a vinurilor lor.
+ * Paginile statice n-au dată — Google ignoră un `lastmod` care e mereu „acum".
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
   const wines = await getAllWines();
+
+  const latest = (list: typeof wines): Date | undefined =>
+    list.length
+      ? new Date(Math.max(...list.map((w) => Date.parse(w.updatedAt))))
+      : undefined;
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
     url: absUrl(r.path),
-    lastModified: now,
+    lastModified: r.path === "/shop" ? latest(wines) : undefined,
     changeFrequency: r.freq,
     priority: r.priority,
   }));
 
   const gamaEntries: MetadataRoute.Sitemap = ALL_GAMA.map((g) => ({
     url: absUrl(`/${g}`),
-    lastModified: now,
+    lastModified: latest(wines.filter((w) => w.gama === g)),
     changeFrequency: "weekly",
     priority: 0.8,
   }));
 
   const wineEntries: MetadataRoute.Sitemap = wines.map((w) => ({
     url: absUrl(`/vinuri/${w.slug}`),
-    lastModified: now,
+    lastModified: new Date(w.updatedAt),
     changeFrequency: "weekly",
     priority: 0.9,
   }));

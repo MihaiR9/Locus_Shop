@@ -27,6 +27,7 @@ function rowToWine(r: ProductRow): Wine {
     year: r.year ?? new Date().getFullYear(),
     stock: r.stock,
     heroImage: r.hero_image,
+    updatedAt: r.updated_at,
     short: r.short ?? "",
     taste: r.taste ?? "",
     pair: r.pair ?? "",
