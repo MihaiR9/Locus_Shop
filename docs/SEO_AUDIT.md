@@ -34,6 +34,7 @@ Textele vizibile (titluri, descrieri, copy) se propun întâi, nu se schimbă di
 | 5 | Redirect `domeniul-locus.ro` → www trecut din 307 în **308 permanent** (Vercel, setarea domeniului, 10 oct). Calea și parametrii se păstrează | Vercel → Domains |
 | 19 | **IndexNow** — cheie publicată (`public/a59592763354845b9a9662938c6267bb.txt`), cele 17 URL-uri din sitemap trimise pe 10 oct (HTTP 202). Anunță Bing, care alimentează căutarea ChatGPT și Copilot. După schimbări de conținut: `node scripts/indexnow.mjs` | `scripts/indexnow.mjs` |
 | 20 | **Google Analytics 4 funcționează** (10 oct): proprietate `G-39GETPN76Z` pe contul firmei; container GTM nou `GTM-5F2DQ9QN` (containerul vechi `GTM-5TNDPL7Z` era pe alt cont și gol), versiunea 2 publicată din `docs/gtm/ga4-import.json` — Google tag + GA4 Event pentru cele 8 evenimente de e-commerce. Confirmat în GA4 Realtime. Legat de Search Console (Admin → Product links) | `app/layout.tsx`, `docs/gtm/ga4-import.json` |
+| 21 | Imagini pentru feed-uri: JPG 1200×1200 pe alb (`public/photos/products/feed/`), pentru că PNG-urile transparente apăreau cu fundal negru în Shopping. Site-ul păstrează PNG-urile. La o poză nouă: `node scripts/build-feed-images.mjs` (`f3e1457`) | `scripts/build-feed-images.mjs`, `lib/seo/schema.ts` |
 
 Rezolvate tot atunci, în afara listei de audit:
 - Preț pe litru afișat lângă fiecare preț (HG 947/2000) + `unit_pricing_measure` în feed — cerut de Merchant Center.
