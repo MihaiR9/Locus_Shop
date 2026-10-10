@@ -81,6 +81,12 @@
   i {
     font-style: normal;
   }
+
+  /* Libre Caslon și Italiana au o singură grosime: fără bold/italic
+     sintetizat de browser, care deformează literele. */
+  html {
+    font-synthesis: none;
+  }
 }
 
 /* ----------------------------------------------------------------
@@ -922,7 +928,7 @@
 }
 .hero-title {
   color: var(--pamant);
-  /* Italiana, ca în logo. Restul site-ului rămâne pe Cormorant fiindcă
+  /* Italiana, ca în logo. Restul site-ului e pe Libre Caslon fiindcă
      Italiana n-are ș/ț cu virgulă — aici textul e „un loc. un timp. un
      vin.", fără diacritice, deci limitarea nu se vede. Dacă textul
      hero-ului se schimbă vreodată în ceva cu diacritice, mută-l înapoi. */
@@ -1106,7 +1112,7 @@
 }
 .shop-hero .eyebrow { justify-content: center; margin-bottom: 24px; }
 .shop-hero-title {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(56px, 10vw, 128px);
   line-height: 0.96;
   letter-spacing: -0.06em;
@@ -1389,7 +1395,7 @@
   100% { transform: rotate(0deg); }
 }
 .locul-text .h2 {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(56px, 7vw, 112px);
   line-height: 1;
   font-weight: 400;
@@ -1444,7 +1450,7 @@
   text-align: center;
 }
 .vinuri-head .display {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(56px, 7vw, 112px);
   line-height: 1;
   font-weight: 400;
@@ -1599,7 +1605,7 @@
   flex-wrap: wrap;
 }
 .colectia-head .h2 {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(56px, 7vw, 112px);
   line-height: 1;
   font-weight: 400;
@@ -1976,7 +1982,7 @@
 }
 .despre-text .eyebrow { margin-bottom: 24px; }
 .despre-text .h2 {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(56px, 7vw, 112px);
   line-height: 1;
   font-weight: 400;
@@ -2016,7 +2022,7 @@
 }
 .newsletter-text { max-width: 56ch; }
 .newsletter h3 {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(28px, 3vw, 40px);
   line-height: 1.1;
   letter-spacing: -0.06em;
@@ -4258,7 +4264,7 @@
   margin-bottom: 28px;
 }
 .despre-hero h1 {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(56px, 9vw, 144px);
   line-height: 0.95;
   letter-spacing: -0.025em;
@@ -4354,7 +4360,7 @@
   margin: 0 auto;
 }
 .despre-cta h2 {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(40px, 5vw, 72px);
   line-height: 1;
   letter-spacing: -0.02em;
@@ -4391,7 +4397,7 @@
   margin-bottom: 24px;
 }
 .contact-hero h1 {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(48px, 7vw, 112px);
   line-height: 1;
   letter-spacing: -0.06em;
@@ -4617,7 +4623,7 @@
   margin-bottom: 4px;
 }
 .contact-info-value {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: 22px;
   line-height: 1.3;
   color: var(--ink);
@@ -6892,7 +6898,7 @@
 .livrare-section-head .eyebrow { justify-content: center; margin-bottom: 18px; }
 .livrare-section-head .h2 { font-weight: 400; color: var(--ink); margin-bottom: 18px; }
 .parteneri-page .livrare-section-head .h2 {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   letter-spacing: -0.06em;
 }
 .livrare-section-head .lead {
@@ -7327,7 +7333,7 @@
 }
 .parteneri-hero .eyebrow { justify-content: center; margin-bottom: 24px; }
 .parteneri-title {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(56px, 10vw, 128px);
   line-height: 0.96;
   letter-spacing: -0.06em;
@@ -7415,7 +7421,7 @@
   font-weight: 400;
 }
 .parteneri-value-title {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(20px, 1.8vw, 26px);
   line-height: 1.2;
   color: var(--ink);
@@ -7465,7 +7471,7 @@
   color: var(--ink-mute);
 }
 .parteneri-flow-title {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(20px, 1.6vw, 24px);
   color: var(--ink);
   font-weight: 400;
@@ -7506,7 +7512,7 @@
   .parteneri-segment:last-child { border-bottom: none; }
 }
 .parteneri-segment h3 {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-size: clamp(20px, 1.7vw, 24px);
   line-height: 1.2;
   color: var(--ink);
@@ -7548,7 +7554,7 @@
 }
 .parteneri-catalog .eyebrow::before { background: rgba(235, 225, 218, 0.5) !important; opacity: 1 !important; }
 .parteneri-catalog .h2 {
-  font-family: var(--font-bellefair), Georgia, serif;
+  font-family: var(--font-serif), Georgia, serif;
   font-weight: 400;
   letter-spacing: -0.06em;
   color: var(--pamant);
@@ -9049,15 +9055,6 @@
 }
 .co-summary-legal p + p { margin-top: 8px; }
 .co-summary-legal strong { color: var(--ink-soft); font-weight: 500; }
-
-
-/* ═══ Landing display font (Libre Caslon Display) ═══════════
-   Peste tot unde landing-ul folosea Cormorant Garamond (--font-serif),
-   suprascriem cu var(--font-display) doar în interiorul <main.landing-display>.
-   Nu afectează /shop, /vinuri/*, /despre etc. — care rămân pe Cormorant. */
-.landing-display {
-  --font-serif: var(--font-display), 'Cormorant Garamond', Georgia, serif;
-}
 
 /* ═══════════════════════════════════════════════════════════
    CHECKOUT SUCCESS V2 — "bilet de livrare" (letterpress ticket

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Italiana, Libre_Caslon_Display } from "next/font/google";
+import { Italiana } from "next/font/google";
 import { Hero } from "@/components/landing/hero";
 import { BottlesBanner } from "@/components/landing/bottles-banner";
 import { Manifesto } from "@/components/landing/manifesto";
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-/* Cele două fonturi trăiesc doar aici, nu în layout: așa se preîncarcă doar
-   pe home, nu pe fiecare pagină a site-ului. */
+/* Italiana trăiește doar aici, nu în layout: așa se preîncarcă doar pe home,
+   nu pe fiecare pagină a site-ului. */
 
 /** Fontul din logo. N-are diacritice complete (ș/ț cu virgulă sub), deci
  *  îl folosim doar unde textul e fix și fără ele — titlul hero (`.hero-title`). */
@@ -37,25 +37,10 @@ const italiana = Italiana({
   display: "swap",
 });
 
-/** Libre Caslon Display — suprascrie `--font-serif` în `.landing-display`
- *  (vezi globals.css). Are diacritice complete latin-ext. */
-const libreCaslonDisplay = Libre_Caslon_Display({
-  variable: "--font-display",
-  subsets: ["latin", "latin-ext"],
-  weight: "400",
-  display: "swap",
-});
-
 export default function HomePage() {
   return (
     <>
-      {/* landing-display: schimbă temporar --font-serif → Libre Caslon
-          Display doar pentru pagina asta, ca să vedem cum arată noul font
-          fără să afecteze /shop, PDP-uri, admin etc. Vezi globals.css. */}
-      <main
-        id="top"
-        className={`landing-display ${italiana.variable} ${libreCaslonDisplay.variable}`}
-      >
+      <main id="top" className={italiana.variable}>
         <Hero />
         <BottlesBanner />
         <Manifesto />

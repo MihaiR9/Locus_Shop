@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-import {
-  Cormorant_Garamond,
-  IBM_Plex_Mono,
-  Bellefair,
-} from "next/font/google";
+import { Libre_Caslon_Display, IBM_Plex_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ThemeScript } from "@/components/theme-script";
@@ -37,13 +33,14 @@ gtag('set', 'ads_data_redaction', true);
 gtag('set', 'url_passthrough', true);
 `;
 
-/** Font serif principal actual — Cormorant Garamond, cu diacritice
- *  complete pentru română (ăâîșț cu virgulă corectă). Vine mapat pe
- *  `--font-serif` folosit peste tot în CSS (h1/h2/titluri, sumar etc.). */
-const cormorant = Cormorant_Garamond({
+/** Serif-ul site-ului — Libre Caslon Display, pentru toate titlurile și
+ *  textele serif (a înlocuit Cormorant Garamond și Bellefair). Are o singură
+ *  grosime (400) și diacritice complete latin-ext (ș/ț cu virgulă). Mapat pe
+ *  `--font-serif`, folosit peste tot în CSS. */
+const libreCaslonDisplay = Libre_Caslon_Display({
   variable: "--font-serif",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
+  weight: "400",
   display: "swap",
 });
 
@@ -51,13 +48,6 @@ const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
   weight: ["400", "500", "700"],
-  display: "swap",
-});
-
-const bellefair = Bellefair({
-  variable: "--font-bellefair",
-  subsets: ["latin"],
-  weight: "400",
   display: "swap",
 });
 
@@ -108,7 +98,7 @@ export default function RootLayout({
     <html
       lang="ro"
       data-theme="light"
-      className={`${cormorant.variable} ${ibmPlexMono.variable} ${bellefair.variable} antialiased`}
+      className={`${libreCaslonDisplay.variable} ${ibmPlexMono.variable} antialiased`}
       suppressHydrationWarning
     >
       <head>

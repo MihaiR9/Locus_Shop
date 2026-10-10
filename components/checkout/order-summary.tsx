@@ -16,7 +16,7 @@ import { applyVoucherAction } from "@/app/(storefront)/cos/actions";
  * OrderSummary — aside sticky din partea dreaptă a /checkout.
  * Rutare: „← înapoi la coș" pentru edit rapid al items, apoi listă
  * produse compactă, sum-rows (subtotal / voucher / SGR / transport),
- * voucher input, total mare Cormorant, CTA „Plasează comanda".
+ * voucher input, total mare serif (Libre Caslon), CTA „Plasează comanda".
  */
 
 function formatMoneyRo(n: number): { whole: string; cents: string } {
