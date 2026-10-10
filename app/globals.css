@@ -1291,7 +1291,6 @@
   stroke-width: 0.8;
   opacity: 0;
 }
-.map-peak,
 .map-marker,
 .map-ring,
 .map-needle,
@@ -1299,22 +1298,18 @@
   transform-box: fill-box;
   transform-origin: center;
 }
-.map-peak { transform-origin: 50% 100%; }
 
 @media (prefers-reduced-motion: no-preference) {
   .map.in .map-ticks { animation: map-fade 1.2s var(--ease) both; }
 
-  .map.in .map-contours {
-    animation: map-drift 16s ease-in-out 3s infinite;
-  }
-  .map.in .map-contours path {
+  /* Rândurile de vie se „plantează" pe rând, ca într-o parcelă. */
+  .map.in .map-vineyards path {
     stroke-dasharray: 1;
-    animation: map-draw 1.8s var(--ease) calc(var(--i) * 90ms) both;
+    animation: map-draw 900ms var(--ease) calc(300ms + var(--i) * 45ms) both;
   }
-
-  .map.in .map-peak {
-    animation: map-rise 900ms var(--ease) calc(700ms + var(--i) * 140ms) both;
-  }
+  .map.in .map-regions { animation: map-fade 900ms var(--ease) 1.2s both; }
+  .map.in .map-lake { animation: map-fade 900ms var(--ease) 900ms both; }
+  .map.in .map-river-label { animation: map-fade 800ms var(--ease) 2.6s both; }
 
   .map.in .map-river-reveal {
     stroke-dasharray: 1;
@@ -1367,13 +1362,6 @@
 }
 @keyframes map-grow-y {
   from { transform: scaleY(0); }
-}
-@keyframes map-drift {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(-14px); }
-}
-@keyframes map-rise {
-  from { transform: scaleY(0); opacity: 0; }
 }
 @keyframes map-flow {
   to { stroke-dashoffset: -60; }
