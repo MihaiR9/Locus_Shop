@@ -43,10 +43,6 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="hero-watermark" aria-hidden="true">
-          lócus
-        </div>
-
         <div className="hero-content">
           <div>
             <div className="eyebrow hero-eyebrow">

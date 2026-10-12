@@ -1034,20 +1034,6 @@
   background: rgba(235, 225, 218, 0.4);
 }
 
-.hero-watermark {
-  position: absolute;
-  right: clamp(-30px, -3vw, 0px);
-  bottom: 12vh;
-  z-index: 1;
-  font-family: var(--font-serif), Georgia, serif;
-  font-size: clamp(120px, 22vw, 360px);
-  line-height: 1;
-  color: rgba(232, 225, 218, 0.06);
-  pointer-events: none;
-  user-select: none;
-  letter-spacing: -0.04em;
-}
-
 /* ── Hero quote strip ── */
 .hero-quote {
   padding: clamp(48px, 7vw, 96px) var(--px);
@@ -1138,11 +1124,6 @@
   .hero-title {
     font-size: clamp(48px, 13vw, 84px);
   }
-  .hero-watermark {
-    font-size: clamp(140px, 50vw, 280px);
-    bottom: 18vh;
-    right: -8%;
-  }
   .hero-cta-row {
     flex-direction: column;
     align-items: flex-start;
@@ -1158,10 +1139,6 @@
 }
 @media (max-width: 480px) {
   .hero-title { font-size: clamp(42px, 14vw, 68px); }
-  .hero-watermark {
-    font-size: clamp(120px, 60vw, 220px);
-    bottom: 22vh;
-  }
 }
 
 /* ----------------------------------------------------------------
