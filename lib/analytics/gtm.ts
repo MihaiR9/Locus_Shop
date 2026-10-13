@@ -1,3 +1,6 @@
+import { TYPE_LABEL, type Wine } from "@/lib/wines";
+import type { CartLine } from "@/lib/cart-store";
+
 /**
  * Google Tag Manager — dataLayer helpers.
  *
@@ -228,6 +231,43 @@ export function trackViewItem(item: GtmItem): void {
       items: [item],
     },
   });
+}
+
+// ─── Item builders ───────────────────────────────────────────────────
+// Toate evenimentele descriu un vin la fel, ca GA4 să-l vadă ca același
+// produs de la vizualizare până la cumpărare (aceleași câmpuri ca în
+// lib/analytics/purchase.ts).
+
+const BRAND = "Domeniul Locus";
+
+export function wineToGtmItem(
+  wine: Pick<Wine, "code" | "name" | "gama" | "type" | "year" | "priceRon">,
+  quantity: number,
+): GtmItem {
+  return {
+    item_id: wine.code,
+    item_name: wine.name,
+    item_brand: BRAND,
+    item_category: wine.gama,
+    item_category2: TYPE_LABEL[wine.type],
+    item_variant: String(wine.year),
+    price: wine.priceRon,
+    quantity,
+  };
+}
+
+/** Coșurile salvate înainte de 13 oct n-au tipul și anul — le omitem. */
+export function cartLineToGtmItem(line: CartLine, quantity = line.qty): GtmItem {
+  return {
+    item_id: line.code,
+    item_name: line.name,
+    item_brand: BRAND,
+    item_category: line.gama,
+    ...(line.type ? { item_category2: TYPE_LABEL[line.type] } : {}),
+    ...(line.year ? { item_variant: String(line.year) } : {}),
+    price: line.priceRon,
+    quantity,
+  };
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────

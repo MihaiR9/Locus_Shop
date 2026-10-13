@@ -16,13 +16,16 @@
 | `add_to_cart` | Click „Adaugă în coș" pe PDP | [components/pdp/wine-buy-box.tsx](../components/pdp/wine-buy-box.tsx) | `trackAddToCart` |
 | `view_cart` | Deschidere cart drawer | [components/cart/cart-drawer.tsx](../components/cart/cart-drawer.tsx) | `trackViewCart` |
 | `begin_checkout` | Aterizare pe `/checkout` | [components/checkout/checkout-tracker.tsx](../components/checkout/checkout-tracker.tsx) | `trackBeginCheckout` |
-| `purchase` | `/checkout/success` cu comanda plătită | [components/checkout/purchase-tracker.tsx](../components/checkout/purchase-tracker.tsx) | `trackPurchase` |
+| `add_to_cart` | „Adaugă setul" pe home | [components/landing/add-set-button.tsx](../components/landing/add-set-button.tsx) | `trackAddToCart` |
+| `view_item` | Deschiderea paginii unui vin, o dată per vin | [components/pdp/wine-buy-box.tsx](../components/pdp/wine-buy-box.tsx) | `trackViewItem` |
+| `remove_from_cart` | Ștergere din coș sau scăderea cantității (drawer și `/cos`) | [lib/cart-store.ts](../lib/cart-store.ts) — acțiunile `removeItem` / `updateQty` | `trackRemoveFromCart` |
+| `add_shipping_info` | Livrarea salvată în checkout (și automat, pentru clienții logați cu adresă salvată); o dată per metodă | [lib/checkout-store.ts](../lib/checkout-store.ts) — `saveShipping` | `trackAddShippingInfo` |
+| `add_payment_info` | Bifarea termenilor la pasul Plată (sau schimbarea plății după bifare) | [lib/checkout-store.ts](../lib/checkout-store.ts) — `setTerms` / `setPayment` | `trackAddPaymentInfo` |
+| `purchase` | `/checkout/success`: plata online confirmată, sau imediat pentru plata cu cardul la livrare | [components/checkout/purchase-tracker.tsx](../components/checkout/purchase-tracker.tsx) | `trackPurchase` |
 
-**Evenimente adiționale disponibile în lib** (nu sunt legate încă):
-- `view_item` — deschidere PDP
-- `remove_from_cart` — ștergere din drawer
-- `add_shipping_info` — completat pasul livrare
-- `add_payment_info` — ales metoda de plată
+Toate cele 8 evenimente de e-commerce GA4 sunt legate (13 oct 2026). Produsele se descriu la fel în toate: `wineToGtmItem` / `cartLineToGtmItem` din `lib/analytics/gtm.ts` și `buildPurchasePayload` din `lib/analytics/purchase.ts` — brand, gama (`item_category`), tipul (`item_category2`), anul (`item_variant`).
+
+Totul pleacă **din browser, prin GTM**. Trimiterea din server (`lib/analytics/ga4-server.ts`) există, dar e oprită la cererea marketingului — nu pune `GA4_API_SECRET` pe Vercel fără acordul lor.
 
 ---
 
@@ -89,9 +92,7 @@ useEffect(() => {
 - `<CheckoutTracker />` e încă montat pe `page.tsx`
 - Se trimite `begin_checkout` la primul mount
 
-**Bonus recomandat** — trimite `add_shipping_info` și `add_payment_info` când user completează pașii 1 și 2:
-- `components/checkout/step-shipping.tsx` — la submit success
-- `components/checkout/step-payment.tsx` — la selectare metodă
+`add_shipping_info` și `add_payment_info` pleacă din acțiunile `lib/checkout-store.ts`; dacă schimbi cum se salvează livrarea sau plata, verifică să treacă tot prin `saveShipping` / `setTerms` / `setPayment`.
 
 ---
 
@@ -101,7 +102,7 @@ useEffect(() => {
 - `<PurchaseTracker>` are nevoie de `order_number`, `total`, `items`. Dacă schimbi query-ul care aduce comanda → verifică toate câmpurile.
 - Coloana `orders.shipping_cents` sau `orders.discount_cents` — dacă se redenumesc, actualizează în `page.tsx` fetch-ul.
 
-**TODO conștient:** Când adaugi coloana `orders.coupon_code` (când wire-uim cupoanele la checkout), scoate `TODO` din `page.tsx` și populeaz-o.
+Valorile vin din `buildPurchasePayload` (`lib/analytics/purchase.ts`): `value` = vinurile după reducere, fără transport și SGR; `tax`, `shipping` și `coupon` (din `orders.coupon_code`, migrarea 0022) separat.
 
 ---
 
@@ -123,27 +124,7 @@ Când clientul primește refund, GA4 acceptă un eveniment `refund` cu aceeași 
 
 ### 🔧 Dacă modifici PDP-ul (`app/(storefront)/vinuri/[slug]/page.tsx`)
 
-**Adăugare `view_item`** (nu e obligatoriu dar GA4 îl recomandă):
-
-```tsx
-// Component nou ViewItemTracker în components/pdp/
-"use client";
-import { useEffect } from "react";
-import { trackViewItem } from "@/lib/analytics/gtm";
-
-export function ViewItemTracker({ wine }) {
-  useEffect(() => {
-    trackViewItem({
-      item_id: wine.code,
-      item_name: wine.name,
-      item_category: wine.gama,
-      price: wine.priceRon,
-      quantity: 1,
-    });
-  }, [wine.code]);
-  return null;
-}
-```
+`view_item` pleacă din `components/pdp/wine-buy-box.tsx`. Dacă scoți sau înlocuiești buy-box-ul, mută și efectul.
 
 ---
 

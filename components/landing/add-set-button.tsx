@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useCartStore } from "@/lib/cart-store";
-import { trackAddToCart } from "@/lib/analytics/gtm";
+import { trackAddToCart, wineToGtmItem } from "@/lib/analytics/gtm";
 import type { Wine } from "@/lib/wines";
 
 /**
@@ -30,16 +30,7 @@ export function AddSetButton({
 
     wines.forEach((w) => addItem(w));
 
-    trackAddToCart(
-      wines.map((w) => ({
-        item_id: w.code,
-        item_name: w.name,
-        item_category: w.gama,
-        item_variant: w.bottleColor,
-        price: w.priceRon,
-        quantity: 1,
-      })),
-    );
+    trackAddToCart(wines.map((w) => wineToGtmItem(w, 1)));
 
     openCart();
     window.setTimeout(() => setBusy(false), 600);

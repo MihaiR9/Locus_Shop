@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { Wine } from "@/lib/wines";
+import { cartLineToGtmItem, trackRemoveFromCart } from "@/lib/analytics/gtm";
 
 /**
  * Cart line — snapshot of wine fields at add-to-cart time.
@@ -22,6 +23,9 @@ export type CartLine = {
   priceRon: number;
   gama: Wine["gama"];
   bottleColor: Wine["bottleColor"];
+  // Pentru evenimentele GA4. Lipsesc din coșurile salvate înainte de 13 oct.
+  type?: Wine["type"];
+  year?: number;
 };
 
 export type CartItems = Record<string, CartLine>;
@@ -50,7 +54,7 @@ type CartStore = CartState & CartActions;
 
 export const useCartStore = create<CartStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       items: {},
       isOpen: false,
 
@@ -71,19 +75,28 @@ export const useCartStore = create<CartStore>()(
                 priceRon: wine.priceRon,
                 gama: wine.gama,
                 bottleColor: wine.bottleColor,
+                type: wine.type,
+                year: wine.year,
               },
             },
           };
         }),
 
-      removeItem: (code) =>
+      removeItem: (code) => {
+        const line = get().items[code];
+        if (line) trackRemoveFromCart([cartLineToGtmItem(line)]);
         set((s) => {
           const next = { ...s.items };
           delete next[code];
           return { items: next };
-        }),
+        });
+      },
 
-      updateQty: (code, qty) =>
+      updateQty: (code, qty) => {
+        const line = get().items[code];
+        if (line && qty < line.qty) {
+          trackRemoveFromCart([cartLineToGtmItem(line, line.qty - Math.max(0, qty))]);
+        }
         set((s) => {
           if (qty <= 0) {
             const next = { ...s.items };
@@ -95,7 +108,8 @@ export const useCartStore = create<CartStore>()(
           return {
             items: { ...s.items, [code]: { ...existing, qty } },
           };
-        }),
+        });
+      },
 
       clear: () => set({ items: {} }),
       open: () => set({ isOpen: true }),

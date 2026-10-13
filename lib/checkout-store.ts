@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { ShippingMethodId } from "@/lib/shipping";
+import { getShippingMethod, type ShippingMethodId } from "@/lib/shipping";
+import { useCartStore } from "@/lib/cart-store";
+import {
+  cartLineToGtmItem,
+  trackAddPaymentInfo,
+  trackAddShippingInfo,
+} from "@/lib/analytics/gtm";
 
 // ─── Types ──────────────────────────────────────────────────────────
 export type ShipMethod = "curier" | "ridicare";
@@ -102,15 +108,61 @@ const initial: CheckoutState = {
   voucher: null,
 };
 
+// ─── GA4: add_shipping_info / add_payment_info ─────────────────────
+const PAYMENT_LABEL: Record<PaymentMethod, string> = {
+  "card-online": "Card online",
+  "card-livrare": "Card la livrare",
+};
+
+function shippingTier(s: Shipping): string {
+  if (s.method === "ridicare") return "Ridicare personală";
+  return getShippingMethod(s.serviceId)?.name ?? s.serviceId;
+}
+
+function cartItems() {
+  return Object.values(useCartStore.getState().items).map((l) =>
+    cartLineToGtmItem(l),
+  );
+}
+
+/* Livrarea se salvează și automat, pentru clienții logați cu adresă
+   salvată, iar formularul o poate salva de mai multe ori. Trimitem o dată
+   per metodă, per încărcare de pagină. */
+let lastShippingTier: string | null = null;
+
+function trackShipping(s: Shipping) {
+  const tier = shippingTier(s);
+  if (tier === lastShippingTier) return;
+  const items = cartItems();
+  if (items.length === 0) return;
+  lastShippingTier = tier;
+  trackAddShippingInfo(items, tier);
+}
+
+/** Plata contează ca aleasă când clientul bifează termenii (ultimul pas). */
+function trackPayment(p: PaymentMethod) {
+  const items = cartItems();
+  if (items.length > 0) trackAddPaymentInfo(items, PAYMENT_LABEL[p]);
+}
+
 export const useCheckoutStore = create<Store>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...initial,
 
-      saveShipping: (s) => set({ shipping: s }),
+      saveShipping: (s) => {
+        set({ shipping: s });
+        trackShipping(s);
+      },
       saveBilling: (b) => set({ billing: b }),
-      setPayment: (p) => set({ payment: p }),
-      setTerms: (v) => set({ termsAccepted: v }),
+      setPayment: (p) => {
+        set({ payment: p });
+        if (get().termsAccepted) trackPayment(p);
+      },
+      setTerms: (v) => {
+        set({ termsAccepted: v });
+        if (v) trackPayment(get().payment);
+      },
       applyVoucher: (v) => set({ voucher: v }),
       clearVoucher: () => set({ voucher: null }),
       reset: () => set(initial),

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCartStore } from "@/lib/cart-store";
-import { trackAddToCart } from "@/lib/analytics/gtm";
+import { trackAddToCart, trackViewItem, wineToGtmItem } from "@/lib/analytics/gtm";
 import { abvLabel, metaLine, pricePerLitreLabel, type Wine } from "@/lib/wines";
 
 export function WineBuyBox({ wine }: { wine: Wine }) {
@@ -11,6 +11,13 @@ export function WineBuyBox({ wine }: { wine: Wine }) {
 
   const addItem = useCartStore((s) => s.addItem);
   const open = useCartStore((s) => s.open);
+
+  // view_item — o dată per vin deschis. `wine` vine din server, deci
+  // depindem doar de cod: alt vin = altă vizualizare.
+  useEffect(() => {
+    trackViewItem(wineToGtmItem(wine, 1));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wine.code]);
 
   function dec() {
     setQty((q) => Math.max(1, q - 1));
@@ -22,16 +29,7 @@ export function WineBuyBox({ wine }: { wine: Wine }) {
   function addToCart() {
     addItem(wine, qty);
     open();
-    trackAddToCart([
-      {
-        item_id: wine.code,
-        item_name: wine.name,
-        item_category: wine.gama,
-        item_variant: wine.bottleColor,
-        price: wine.priceRon,
-        quantity: qty,
-      },
-    ]);
+    trackAddToCart([wineToGtmItem(wine, qty)]);
     setPulsing(true);
     window.setTimeout(() => setPulsing(false), 600);
   }

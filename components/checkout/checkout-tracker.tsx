@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { useCartStore } from "@/lib/cart-store";
-import { trackBeginCheckout } from "@/lib/analytics/gtm";
+import { cartLineToGtmItem, trackBeginCheckout } from "@/lib/analytics/gtm";
 
 /**
  * Tracker invizibil pentru pagina de checkout — trimite `begin_checkout`
@@ -27,16 +27,7 @@ export function CheckoutTracker() {
     if (firedRef.current) return;
     if (lines.length === 0) return;
     firedRef.current = true;
-    trackBeginCheckout(
-      lines.map((l) => ({
-        item_id: l.code,
-        item_name: l.name,
-        item_category: l.gama,
-        item_variant: l.bottleColor,
-        price: l.priceRon,
-        quantity: l.qty,
-      })),
-    );
+    trackBeginCheckout(lines.map((l) => cartLineToGtmItem(l)));
   }, [lines]);
 
   return null;
