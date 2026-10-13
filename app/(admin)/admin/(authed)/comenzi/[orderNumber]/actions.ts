@@ -1,11 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import Stripe from "stripe";
 import { getCurrentAdmin } from "@/lib/auth/current-admin";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe/server";
+import { sendGa4Refund } from "@/lib/analytics/ga4-server";
 import {
   sendShippedNotification,
   sendDeliveredNotification,
@@ -309,6 +311,9 @@ export async function refundOrder(
     },
   });
 
+  // Rambursarea completă scade vânzarea și din GA4.
+  if (full) after(() => sendGa4Refund(order.id));
+
   // Restore stoc la refund complet (indiferent de metodă)
   if (full) {
     // Service role, NU sesiunea adminului: migrarea 0013 a revocat EXECUTE
@@ -404,7 +409,7 @@ export async function cancelOrder(orderNumber: string): Promise<Result> {
 
   const { data: order } = await supabase
     .from("orders")
-    .select("id, status")
+    .select("id, status, payment_method")
     .eq("order_number", orderNumber)
     .maybeSingle();
 
@@ -428,6 +433,12 @@ export async function cancelOrder(orderNumber: string): Promise<Result> {
     type: "manual_cancel",
     payload: { cancelled_by: "admin" },
   });
+
+  // Plata cu cardul la livrare se numără în GA4 la plasare; anularea
+  // (ex. colet refuzat) o scade. Cardul online neplătit nu a fost numărat.
+  if (order.payment_method !== "card-online") {
+    after(() => sendGa4Refund(order.id));
+  }
 
   revalidatePath(`/admin/comenzi/${orderNumber}`);
   revalidatePath("/admin/comenzi");

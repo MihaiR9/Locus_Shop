@@ -63,6 +63,10 @@ const EVENT_LABEL: Record<string, string> = {
   email_refund_failed: "⚠ Email rambursare netrimis",
   meta_capi_sent: "Conversie trimisă la Meta",
   meta_capi_failed: "⚠ Conversie Meta netrimisă",
+  ga4_purchase_sent: "Vânzare trimisă în Google Analytics",
+  ga4_purchase_failed: "⚠ Vânzare netrimisă în Google Analytics",
+  ga4_refund_sent: "Vânzare scăzută din Google Analytics",
+  ga4_refund_failed: "⚠ Scădere netrimisă în Google Analytics",
 };
 
 /** Doar mesajul de eroare din payload — restul sunt ID-uri tehnice. */

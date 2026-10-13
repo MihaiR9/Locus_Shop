@@ -1,10 +1,13 @@
 "use server";
 
+import { after } from "next/server";
 import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import type { Json } from "@/lib/supabase/database.types";
 import { createOrderCheckoutSession } from "@/lib/stripe/checkout-session";
 import { collectAttribution } from "@/lib/meta/attribution";
+import { collectGaAttribution } from "@/lib/analytics/ga-attribution";
+import { sendGa4Purchase } from "@/lib/analytics/ga4-server";
 import {
   calculateShippingRon,
   getShippingMethod,
@@ -248,7 +251,10 @@ export async function createOrder(
   //
   // Simultan salvăm serviciul FanCourier ales + punctul PUDO (dacă e cazul),
   // ca să le știm la generarea AWB-ului din admin.
-  const attribution = await collectAttribution();
+  const [attribution, ga] = await Promise.all([
+    collectAttribution(),
+    collectGaAttribution(),
+  ]);
   const { error: attrErr } = await supabase
     .from("orders")
     .update({
@@ -270,6 +276,20 @@ export async function createOrder(
     // Nu blocăm comanda pentru atribuire — pierdem doar calitatea
     // potrivirii în Meta, nu vânzarea.
     console.error("[createOrder] salvare atribuire esuata", orderId, attrErr);
+  }
+
+  // Separat de update-ul de mai sus: dacă eșuează, nu trage după el
+  // serviciul de curier și SGR-ul, de care depind AWB-ul și factura.
+  const { error: gaErr } = await supabase
+    .from("orders")
+    .update({
+      ga_client_id: ga.clientId,
+      ga_session_id: ga.sessionId,
+      coupon_code: input.couponCode?.trim().toUpperCase() || null,
+    })
+    .eq("id", orderId);
+  if (gaErr) {
+    console.error("[createOrder] salvare GA4 / voucher esuata", orderId, gaErr);
   }
 
   // ── 5c. Salvez pe cont datele pentru pre-fill la comenzile viitoare ──
@@ -340,6 +360,13 @@ export async function createOrder(
         error: "Plata online e momentan indisponibilă. Comanda nu a fost trimisă.",
       };
     }
+  }
+
+  // Plata cu cardul la livrare: vânzarea se numără la plasare (vezi
+  // lib/analytics/purchase.ts). O trimitem și din server, după răspuns,
+  // în caz că pagina de succes nu apucă să se încarce.
+  if (input.payment !== "card-online") {
+    after(() => sendGa4Purchase(orderId));
   }
 
   return {

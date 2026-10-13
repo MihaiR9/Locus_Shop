@@ -1,20 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import {
-  trackPurchase,
-  hasPurchaseBeenTracked,
-  type GtmItem,
-} from "@/lib/analytics/gtm";
+import { trackPurchase, hasPurchaseBeenTracked } from "@/lib/analytics/gtm";
+import type { PurchasePayload } from "@/lib/analytics/purchase";
 import { useCartStore } from "@/lib/cart-store";
 
 type Props = {
-  transactionId: string;
-  value: number;
-  shipping?: number;
-  discount?: number;
-  couponCode?: string | null;
-  items: GtmItem[];
+  purchase: PurchasePayload;
   clearCartOnFire?: boolean;
 };
 
@@ -29,35 +21,27 @@ type Props = {
  * De ce component separat: `success/page.tsx` e Server Component (fetch DB).
  * dataLayer push-ul rulează în browser.
  */
-export function PurchaseTracker({
-  transactionId,
-  value,
-  shipping,
-  discount,
-  couponCode,
-  items,
-  clearCartOnFire = true,
-}: Props) {
+export function PurchaseTracker({ purchase, clearCartOnFire = true }: Props) {
   const firedRef = useRef(false);
   const clear = useCartStore((s) => s.clear);
 
   useEffect(() => {
     if (firedRef.current) return;
-    if (!transactionId) return;
-    if (hasPurchaseBeenTracked(transactionId)) return;
+    if (!purchase.transactionId) return;
+    if (hasPurchaseBeenTracked(purchase.transactionId)) return;
     firedRef.current = true;
 
     trackPurchase({
-      transactionId,
-      value,
-      shipping,
-      discount,
-      couponCode: couponCode ?? undefined,
-      items,
+      transactionId: purchase.transactionId,
+      value: purchase.value,
+      tax: purchase.tax,
+      shipping: purchase.shipping,
+      couponCode: purchase.coupon,
+      items: purchase.items,
     });
 
     if (clearCartOnFire) clear();
-  }, [transactionId, value, shipping, discount, couponCode, items, clearCartOnFire, clear]);
+  }, [purchase, clearCartOnFire, clear]);
 
   return null;
 }

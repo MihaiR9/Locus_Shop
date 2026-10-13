@@ -366,6 +366,9 @@ export type Database = {
           client_ip: string | null
           client_user_agent: string | null
           courier_service: string | null
+          coupon_code: string | null
+          ga_client_id: string | null
+          ga_session_id: string | null
           created_at: string
           customer_id: string | null
           delivered_at: string | null
@@ -409,6 +412,9 @@ export type Database = {
           client_ip?: string | null
           client_user_agent?: string | null
           courier_service?: string | null
+          coupon_code?: string | null
+          ga_client_id?: string | null
+          ga_session_id?: string | null
           created_at?: string
           customer_id?: string | null
           delivered_at?: string | null
@@ -452,6 +458,9 @@ export type Database = {
           client_ip?: string | null
           client_user_agent?: string | null
           courier_service?: string | null
+          coupon_code?: string | null
+          ga_client_id?: string | null
+          ga_session_id?: string | null
           created_at?: string
           customer_id?: string | null
           delivered_at?: string | null

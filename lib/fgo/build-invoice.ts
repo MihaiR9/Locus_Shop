@@ -39,7 +39,7 @@ type CustomerInfo = {
   phone: string | null;
 };
 
-const VAT_STANDARD = 21; // Cota standard RO (2025+) — vin liniștit intră aici
+export const VAT_STANDARD = 21; // Cota standard RO (2025+) — vin liniștit intră aici
 
 function centsToLei(c: number): number {
   return Math.round(c) / 100;

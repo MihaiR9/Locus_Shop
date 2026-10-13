@@ -3,7 +3,7 @@ import { getSupabaseAdminClient } from "@/lib/supabase/admin";
 import { getStripe } from "@/lib/stripe/server";
 import { formatRon } from "@/lib/wines";
 import { PurchaseTracker } from "@/components/checkout/purchase-tracker";
-import type { GtmItem } from "@/lib/analytics/gtm";
+import { buildPurchasePayload } from "@/lib/analytics/purchase";
 
 export const metadata = {
   title: "Comandă confirmată",
@@ -154,9 +154,7 @@ export default async function CheckoutSuccessPage({
 
   // Fetch order items + extra order columns for the receipt panel below.
   // Runs whenever we have an order (not only when paid) so the pending /
-  // cash states also get a full picture — only the GTM `purchase` event
-  // stays gated on `isPaid`, since that's the one that must not double up
-  // or fire for something that hasn't actually been charged.
+  // cash states also get a full picture.
   let items: OrderItemRow[] = [];
   let details: OrderDetails | null = null;
   if (order) {
@@ -192,18 +190,11 @@ export default async function CheckoutSuccessPage({
       ? "livrare la locker FANbox"
       : "livrare prin curier";
 
-  const gtmItems: GtmItem[] =
-    order && isPaid
-      ? items.map((it) => ({
-          item_id: it.code_snapshot,
-          item_name: it.name_snapshot,
-          price: it.unit_price_cents / 100,
-          quantity: it.qty,
-        }))
-      : [];
-  const gtmShippingRon = isPaid ? (details?.shipping_cents ?? 0) / 100 : 0;
-  const gtmDiscountRon = isPaid ? (details?.discount_cents ?? 0) / 100 : 0;
-  const gtmCouponCode: string | null = null; // TODO: adaugă orders.coupon_code când wire-uim reducerile la checkout
+  // Vânzarea intră în GA4 când e plătită online sau, la plata cu cardul la
+  // livrare, imediat ce e plasată. Un refuz la curier se scade din admin,
+  // cu evenimentul `refund`.
+  const purchase =
+    order && (isPaid || isCash) ? await buildPurchasePayload(order.id) : null;
 
   const nextSteps = !order
     ? []
@@ -255,16 +246,7 @@ export default async function CheckoutSuccessPage({
 
   return (
     <main className="cs-page">
-      {order && isPaid && gtmItems.length > 0 && (
-        <PurchaseTracker
-          transactionId={order.order_number}
-          value={order.total_cents / 100}
-          shipping={gtmShippingRon}
-          discount={gtmDiscountRon || undefined}
-          couponCode={gtmCouponCode}
-          items={gtmItems}
-        />
-      )}
+      {purchase && <PurchaseTracker purchase={purchase} />}
 
       {!order ? (
         <div className="cs-empty">

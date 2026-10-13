@@ -53,7 +53,7 @@ export function pricePerLitreLabel(priceRon: number): string {
   })} lei / litru`;
 }
 
-const TYPE_LABEL: Record<WineType, string> = {
+export const TYPE_LABEL: Record<WineType, string> = {
   alb: "Alb",
   rosu: "Roșu",
   rose: "Rosé",

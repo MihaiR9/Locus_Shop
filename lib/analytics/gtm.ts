@@ -27,8 +27,11 @@
 export type GtmItem = {
   item_id: string; // codul produsului (ex: LC01)
   item_name: string; // numele afișat
+  item_brand?: string; // „Domeniul Locus"
   item_category?: string; // gama: cuvinte / semne / pauze
+  item_category2?: string; // tipul: Alb / Roșu / Rosé
   item_variant?: string; // culoarea / anul, dacă e cazul
+  index?: number; // poziția în listă / în comandă
   price: number; // preț unitar RON
   quantity: number; // câte bucăți
 };
@@ -167,9 +170,9 @@ export function trackAddPaymentInfo(
  */
 export function trackPurchase(params: {
   transactionId: string; // order_number (ex: LC26071500001)
-  value: number; // total în RON (subtotal + shipping - discount)
+  value: number; // vinurile după reducere, cu TVA — fără transport și SGR
+  tax?: number; // TVA inclus în vinuri + transport
   shipping?: number;
-  discount?: number;
   couponCode?: string;
   items: GtmItem[];
 }): void {
@@ -188,8 +191,8 @@ export function trackPurchase(params: {
       transaction_id: params.transactionId,
       currency: "RON",
       value: params.value,
+      tax: params.tax ?? 0,
       shipping: params.shipping ?? 0,
-      ...(params.discount ? { discount: params.discount } : {}),
       ...(params.couponCode ? { coupon: params.couponCode } : {}),
       items: params.items,
     },

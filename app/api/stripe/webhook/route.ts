@@ -15,6 +15,7 @@ import type {
   OrderEmailItem,
 } from "@/lib/email/templates";
 import { createPaymentLink } from "@/lib/payment-link";
+import { sendGa4Purchase } from "@/lib/analytics/ga4-server";
 
 // Webhook handlers must read the RAW body to validate Stripe's signature.
 // Next App Router gives us request.text() which is the raw string —
@@ -158,6 +159,10 @@ async function handleSessionPaid(event: Stripe.Event) {
   // ── Conversie server-side către Meta ──────────────────────────
   await sendMetaPurchase(orderId);
 
+  // ── Vânzarea și în GA4, din server ────────────────────────────
+  // Acoperă clientul care plătește și nu mai revine pe pagina de succes.
+  await sendGa4Purchase(orderId);
+
   // TODO Pas 9: trigger FGO invoice + FanCourier AWB
 }
 
@@ -178,7 +183,7 @@ async function sendMetaPurchase(orderId: string) {
   const { data: order, error } = await supabase
     .from("orders")
     .select(
-      "order_number, total_cents, billing, shipping_address, guest_email, marketing_consent, fbp, fbc, client_ip, client_user_agent",
+      "order_number, subtotal_cents, discount_cents, billing, shipping_address, guest_email, marketing_consent, fbp, fbc, client_ip, client_user_agent",
     )
     .eq("id", orderId)
     .maybeSingle();
@@ -209,7 +214,8 @@ async function sendMetaPurchase(orderId: string) {
 
   const result = await sendPurchaseEvent({
     eventId: order.order_number,
-    valueRon: Math.round(order.total_cents / 100),
+    // Aceeași valoare ca în GA4: vinurile după reducere, fără transport și SGR.
+    valueRon: (order.subtotal_cents - order.discount_cents) / 100,
     items: (items ?? []).map((it) => ({
       code: it.code_snapshot,
       qty: it.qty,
