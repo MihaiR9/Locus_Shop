@@ -12,7 +12,10 @@
 
 ## ▶ Lucru în curs (citește întâi)
 
-- **Audit SEO, pas cu pas:** `docs/SEO_AUDIT.md` — ce s-a rezolvat, ce urmează (următorul: #3 canonical), starea Google Merchant Center și alte lucruri deschise. Luăm punctele pe rând, cu confirmarea lui Mihai înainte de push.
+- **Ce urmează: `docs/TODO.md`** — Meta (catalog, pixel, CAPI), analiza pe server (oprită, pentru mai târziu), verificări la primele comenzi, pași în conturi. Citește-l întâi.
+- **Audit SEO:** `docs/SEO_AUDIT.md` — partea tehnică e gata (10 oct); acolo sunt și Merchant Center și scorurile Lighthouse.
+- **Tracking:** `docs/ANALYTICS.md` — toate cele 8 evenimente GA4, doar din browser prin GTM. Nu adăuga trimiteri din server fără acordul marketingului.
+- Mod de lucru: un punct pe rând, commit + push doar după confirmarea lui Mihai.
 - Unele secțiuni de mai jos sunt depășite (ex. Smartbill/Sameday → FGO/FanCourier; prețurile gamelor). Starea reală e în cod și în baza de date.
 
 ---
