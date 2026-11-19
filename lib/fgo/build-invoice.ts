@@ -1,5 +1,6 @@
 import "server-only";
 import type { FgoClient, FgoContinutItem, FgoTipClient } from "./types";
+import { BOTTLE_ML } from "@/lib/wines";
 
 /**
  * Din datele unei comenzi (row din DB + items + billing snapshot) construim
@@ -32,6 +33,35 @@ type OrderItem = {
   qty: number;
   unit_price_cents: number;
 };
+
+/** Ce ne trebuie din fișa produsului ca să numim vinul pe factură. */
+export type InvoiceProductInfo = {
+  type: string;
+  sweetness: string;
+  gama: string;
+};
+
+const TYPE_WORD: Record<string, string> = { alb: "ALB", rosu: "ROSU", rose: "ROSE" };
+
+/**
+ * Denumirea vinului pe factură, ca în nomenclatorul firmei:
+ * „VIN ROSU FETEASCA NEAGRA DEMISEC, 0.75 L CUVINTE".
+ * Majuscule, fără diacritice. Fără fișa produsului rămâne numele simplu.
+ */
+export function invoiceLineName(name: string, info?: InvoiceProductInfo): string {
+  if (!info) return name;
+  const litres = (BOTTLE_ML / 1000).toFixed(2);
+  const text = [
+    "VIN",
+    TYPE_WORD[info.type] ?? info.type,
+    name,
+    info.sweetness,
+  ].join(" ") + `, ${litres} L ${info.gama}`;
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase();
+}
 
 type CustomerInfo = {
   email: string | null;
@@ -113,14 +143,16 @@ export function buildFgoClient(
 export function buildFgoContinut(args: {
   items: OrderItem[];
   order: OrderRow;
+  /** Fișa produsului per cod, pentru denumirea completă a vinului. */
+  products?: Map<string, InvoiceProductInfo>;
 }): FgoContinutItem[] {
-  const { items, order } = args;
+  const { items, order, products } = args;
   const lines: FgoContinutItem[] = [];
 
   for (const it of items) {
     const totalWithVat = centsToLei(it.unit_price_cents * it.qty);
     lines.push({
-      Denumire: it.name_snapshot,
+      Denumire: invoiceLineName(it.name_snapshot, products?.get(it.code_snapshot)),
       CodArticol: it.code_snapshot,
       UM: "buc",
       NrProduse: it.qty,

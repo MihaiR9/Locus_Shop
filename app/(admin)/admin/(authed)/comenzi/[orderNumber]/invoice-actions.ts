@@ -79,7 +79,23 @@ export async function generateInvoice(
   };
 
   const client = buildFgoClient(billing, customer);
+
+  const { data: productRows } = await supabase
+    .from("products")
+    .select("code, type, sweetness, gama")
+    .in(
+      "code",
+      (order.order_items ?? []).map((it) => it.code_snapshot),
+    );
+  const products = new Map(
+    (productRows ?? []).map((p) => [
+      p.code,
+      { type: p.type, sweetness: p.sweetness, gama: p.gama },
+    ]),
+  );
+
   const continut = buildFgoContinut({
+    products,
     items: order.order_items ?? [],
     order: {
       order_number: order.order_number,
