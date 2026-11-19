@@ -67,12 +67,15 @@ export function ActionsPanel({
     });
   }
 
-  const canShip = status === "paid";
+  const onDelivery = paymentMethod !== "card-online";
+  const canShip = status === "paid" || (onDelivery && status === "pending_payment");
   const canMarkDelivered = status === "shipped";
   const canRefund =
     (status === "paid" || status === "shipped" || status === "delivered") &&
     paymentStatus === "succeeded";
-  const canCancel = status === "pending_payment";
+  const canCancel =
+    status === "pending_payment" ||
+    (onDelivery && status === "shipped" && paymentStatus !== "succeeded");
   const canDelete = ["pending_payment", "cancelled", "refunded"].includes(status);
 
   return (
@@ -278,7 +281,7 @@ export function ActionsPanel({
             onClick={() => run(() => cancelOrder(orderNumber))}
           >
             <XCircle className="mr-2 h-4 w-4" />
-            Anulează comanda
+            {status === "shipped" ? "Colet refuzat — anulează" : "Anulează comanda"}
           </Button>
         )}
 

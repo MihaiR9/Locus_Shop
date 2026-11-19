@@ -98,15 +98,17 @@ export async function markShipped(
 
   const { data: order } = await supabase
     .from("orders")
-    .select("id, status")
+    .select("id, status, payment_method")
     .eq("order_number", orderNumber)
     .maybeSingle();
 
   if (!order) return { ok: false, error: "Comanda nu există." };
-  if (order.status !== "paid") {
+  // Plata la livrare pleacă din „pending_payment" — banii vin la curier.
+  const onDelivery = order.payment_method !== "card-online";
+  if (order.status !== "paid" && !(onDelivery && order.status === "pending_payment")) {
     return {
       ok: false,
-      error: `Nu pot expedia — statusul e "${order.status}" (trebuie "paid").`,
+      error: `Nu pot expedia — statusul e "${order.status}".`,
     };
   }
 
@@ -162,7 +164,7 @@ export async function markDelivered(orderNumber: string): Promise<Result> {
 
   const { data: order } = await supabase
     .from("orders")
-    .select("id, status")
+    .select("id, status, payment_method, payment_status")
     .eq("order_number", orderNumber)
     .maybeSingle();
 
@@ -176,7 +178,14 @@ export async function markDelivered(orderNumber: string): Promise<Result> {
 
   const { error } = await supabase
     .from("orders")
-    .update({ status: "delivered", delivered_at: new Date().toISOString() })
+    .update({
+      status: "delivered",
+      delivered_at: new Date().toISOString(),
+      // Plata la livrare: livrat = încasat de curier.
+      ...(order.payment_method !== "card-online" && order.payment_status !== "succeeded"
+        ? { payment_status: "succeeded" as const, paid_at: new Date().toISOString() }
+        : {}),
+    })
     .eq("id", order.id);
 
   if (error) return { ok: false, error: error.message };
@@ -414,10 +423,12 @@ export async function cancelOrder(orderNumber: string): Promise<Result> {
     .maybeSingle();
 
   if (!order) return { ok: false, error: "Comanda nu există." };
-  if (order.status !== "pending_payment") {
+  const onDelivery = order.payment_method !== "card-online";
+  // Un colet cu plata la livrare refuzat de client se anulează din „shipped".
+  if (order.status !== "pending_payment" && !(onDelivery && order.status === "shipped")) {
     return {
       ok: false,
-      error: `Nu pot anula — status="${order.status}". Doar pending_payment.`,
+      error: `Nu pot anula — status="${order.status}".`,
     };
   }
 
@@ -433,6 +444,21 @@ export async function cancelOrder(orderNumber: string): Promise<Result> {
     type: "manual_cancel",
     payload: { cancelled_by: "admin" },
   });
+
+  // Plata la livrare și-a rezervat stocul la plasare — îl punem la loc.
+  if (onDelivery) {
+    const { error: restoreErr } = await getSupabaseAdminClient().rpc(
+      "restore_stock_for_order",
+      { p_order_id: order.id },
+    );
+    if (restoreErr) {
+      await supabase.from("order_events").insert({
+        order_id: order.id,
+        type: "stock_restore_failed",
+        payload: { error: restoreErr.message ?? String(restoreErr) },
+      });
+    }
+  }
 
   // Plata cu cardul la livrare se numără în GA4 la plasare; anularea
   // (ex. colet refuzat) o scade. Cardul online neplătit nu a fost numărat.

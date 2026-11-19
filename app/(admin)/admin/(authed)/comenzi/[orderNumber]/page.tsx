@@ -328,6 +328,7 @@ export default async function AdminOrderDetailPage({
             courierService={order.courierService}
             pickupPointName={order.pickupPointName}
             pickupPointAddress={order.pickupPointAddress}
+            paymentMethod={order.paymentMethod}
           />
 
           <InvoicePanel

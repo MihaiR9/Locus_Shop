@@ -367,6 +367,21 @@ export async function createOrder(
   // în caz că pagina de succes nu apucă să se încarce.
   if (input.payment !== "card-online") {
     after(() => sendGa4Purchase(orderId));
+
+    /* Stocul scade la plata online din webhook-ul Stripe. Plata la livrare
+       nu trece pe acolo, așa că rezervăm sticlele acum; anularea comenzii
+       din admin le pune la loc. */
+    const { error: stockErr } = await supabase.rpc("decrement_stock_for_order", {
+      p_order_id: orderId,
+    });
+    if (stockErr) {
+      console.error("[createOrder] decrement stoc esuat", orderId, stockErr);
+      await supabase.from("order_events").insert({
+        order_id: orderId,
+        type: "stock_decrement_failed",
+        payload: { error: stockErr.message ?? String(stockErr) },
+      });
+    }
   }
 
   return {

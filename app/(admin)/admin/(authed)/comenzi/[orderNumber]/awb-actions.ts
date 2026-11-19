@@ -72,7 +72,7 @@ export async function generateAwb(
   const { data: order, error: orderErr } = await supabase
     .from("orders")
     .select(
-      "id, order_number, status, shipping_method, shipping_address, courier_service, pickup_point_id, awb_number, guest_email, customers(email, name, phone)",
+      "id, order_number, status, payment_method, payment_status, total_cents, shipping_method, shipping_address, courier_service, pickup_point_id, awb_number, guest_email, customers(email, name, phone)",
     )
     .eq("order_number", orderNumber)
     .maybeSingle();
@@ -106,12 +106,21 @@ export async function generateAwb(
       error: "Comanda e cu ridicare personală — nu se emite AWB.",
     };
   }
-  if (order.status !== "paid" && order.status !== "shipped") {
+  /* Plata la livrare: comanda nu e „plătită" până o încasează curierul,
+     deci AWB-ul se emite din „pending_payment", cu suma de încasat. */
+  const payOnDelivery =
+    order.payment_method !== "card-online" && order.payment_status !== "succeeded";
+  const shippable =
+    order.status === "paid" ||
+    order.status === "shipped" ||
+    (payOnDelivery && order.status === "pending_payment");
+  if (!shippable) {
     return {
       ok: false,
-      error: `Nu pot emite AWB — statusul e "${order.status}" (trebuie "paid").`,
+      error: `Nu pot emite AWB — statusul e "${order.status}".`,
     };
   }
+  const codRon = payOnDelivery ? order.total_cents / 100 : 0;
 
   const addr = (order.shipping_address ?? {}) as ShippingAddressSnapshot;
   const cust = Array.isArray(order.customers) ? order.customers[0] : order.customers;
@@ -179,11 +188,16 @@ export async function generateAwb(
       service,
       packages: { parcel: args.parcels ?? 1, envelopes: 0 },
       weight: args.weightKg,
-      cod: 0, // plată online — fără ramburs
-      declaredValue: 0,
+      // Ramburs: totalul comenzii, încasat de curier cu cardul (POS).
+      cod: codRon,
+      declaredValue: codRon,
       payment: "sender",
       returnPayment: null,
-      observation: args.observation ?? `Comanda ${orderNumber}`,
+      observation:
+        args.observation ??
+        (codRon > 0
+          ? `Comanda ${orderNumber} · ramburs ${codRon.toFixed(2)} lei, plata cu cardul`
+          : `Comanda ${orderNumber}`),
       content: `Comanda ${orderNumber}`,
       dimensions: args.dimensions,
       options: service === "FANbox" ? ["V"] : undefined,

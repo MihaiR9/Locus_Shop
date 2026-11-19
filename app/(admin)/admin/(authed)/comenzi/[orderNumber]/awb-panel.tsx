@@ -15,6 +15,7 @@ type Props = {
   courierService: string | null;
   pickupPointName: string | null;
   pickupPointAddress: string | null;
+  paymentMethod: string;
 };
 
 /** Serviciile FC activate în contract Romvintec (aug 2026). CollectPoint și
@@ -35,6 +36,7 @@ export function AwbPanel({
   courierService,
   pickupPointName,
   pickupPointAddress,
+  paymentMethod,
 }: Props) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +57,10 @@ export function AwbPanel({
   const canGenerate =
     !isRidicare &&
     !awbNumber &&
-    (orderStatus === "paid" || orderStatus === "shipped");
+    (orderStatus === "paid" ||
+      orderStatus === "shipped" ||
+      // Plata la livrare: AWB-ul pleacă înainte de încasare, cu ramburs.
+      (paymentMethod !== "card-online" && orderStatus === "pending_payment"));
 
   function submit() {
     setError(null);
