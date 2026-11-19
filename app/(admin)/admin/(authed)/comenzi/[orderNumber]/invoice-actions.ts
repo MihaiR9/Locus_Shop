@@ -8,6 +8,7 @@ import {
   emitereFactura,
   FgoError,
   printFactura,
+  stergereFactura,
 } from "@/lib/fgo/client";
 import { buildFgoClient, buildFgoContinut } from "@/lib/fgo/build-invoice";
 import { getResend, fromAddress, recipientFor } from "@/lib/resend/server";
@@ -43,7 +44,7 @@ export async function generateInvoice(
   const { data: order, error: orderErr } = await supabase
     .from("orders")
     .select(
-      "id, order_number, guest_email, shipping_cents, sgr_cents, discount_cents, excise_cents, billing, fgo_invoice_number, customers(email, name, phone), order_items(code_snapshot, name_snapshot, qty, unit_price_cents)",
+      "id, order_number, guest_email, shipping_cents, sgr_cents, discount_cents, excise_cents, billing, fgo_invoice_number, fgo_invoice_status, customers(email, name, phone), order_items(code_snapshot, name_snapshot, qty, unit_price_cents)",
     )
     .eq("order_number", orderNumber)
     .maybeSingle();
@@ -52,7 +53,8 @@ export async function generateInvoice(
     return { ok: false, error: `Eroare DB: ${orderErr.message}` };
   }
   if (!order) return { ok: false, error: "Comanda nu există." };
-  if (order.fgo_invoice_number) {
+  // O factură anulată nu blochează emiterea uneia noi pe aceeași comandă.
+  if (order.fgo_invoice_number && order.fgo_invoice_status !== "cancelled") {
     return {
       ok: false,
       error: `Factura există deja (${order.fgo_invoice_number}). Anuleaz-o dacă vrei să regenerezi.`,
@@ -222,6 +224,62 @@ export async function cancelInvoice(
   await supabase.from("order_events").insert({
     order_id: order.id,
     type: "fgo_invoice_cancelled",
+    payload: {
+      numar: order.fgo_invoice_number,
+      serie: order.fgo_invoice_series,
+    },
+  });
+
+  revalidatePath(`/admin/comenzi/${orderNumber}`);
+  return { ok: true };
+}
+
+/**
+ * Șterge factura din FGO și eliberează comanda pentru o nouă emitere.
+ * Spre deosebire de anulare, numărul se eliberează — FGO permite asta doar
+ * pentru ultima factură din serie și doar dacă n-a fost transmisă în SPV.
+ */
+export async function deleteInvoice(orderNumber: string): Promise<Result> {
+  const auth = await assertAdmin();
+  if (!auth.ok) return auth;
+
+  const supabase = await getSupabaseServerClient();
+  const { data: order } = await supabase
+    .from("orders")
+    .select("id, fgo_invoice_number, fgo_invoice_series")
+    .eq("order_number", orderNumber)
+    .maybeSingle();
+
+  if (!order) return { ok: false, error: "Comanda nu există." };
+  if (!order.fgo_invoice_number || !order.fgo_invoice_series) {
+    return { ok: false, error: "Nu există factură FGO pentru comandă." };
+  }
+
+  try {
+    const res = await stergereFactura({
+      numar: order.fgo_invoice_number,
+      serie: order.fgo_invoice_series,
+    });
+    if (!res.Success) return { ok: false, error: `FGO: ${res.Message}` };
+  } catch (err) {
+    const msg = err instanceof FgoError ? `FGO: ${err.message}` : String(err);
+    return { ok: false, error: msg };
+  }
+
+  await supabase
+    .from("orders")
+    .update({
+      fgo_invoice_number: null,
+      fgo_invoice_series: null,
+      fgo_invoice_link: null,
+      fgo_invoice_created_at: null,
+      fgo_invoice_status: null,
+    })
+    .eq("id", order.id);
+
+  await supabase.from("order_events").insert({
+    order_id: order.id,
+    type: "fgo_invoice_deleted",
     payload: {
       numar: order.fgo_invoice_number,
       serie: order.fgo_invoice_series,

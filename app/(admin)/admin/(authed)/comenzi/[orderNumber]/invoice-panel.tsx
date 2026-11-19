@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { FileText, ExternalLink, Mail, XCircle } from "lucide-react";
+import { FileText, ExternalLink, Mail, Trash2, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   generateInvoice,
   cancelInvoice,
+  deleteInvoice,
   resendInvoiceEmail,
 } from "./invoice-actions";
 
@@ -33,6 +34,7 @@ export function InvoicePanel({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [emailFlash, setEmailFlash] = useState(false);
 
   const hasInvoice = !!invoiceNumber && invoiceStatus !== "cancelled";
@@ -57,6 +59,15 @@ export function InvoicePanel({
       const res = await cancelInvoice(orderNumber);
       if (!res.ok) setError(res.error);
       else setConfirmCancel(false);
+    });
+  }
+
+  function runDelete() {
+    setError(null);
+    startTransition(async () => {
+      const res = await deleteInvoice(orderNumber);
+      if (!res.ok) setError(res.error);
+      else setConfirmDelete(false);
     });
   }
 
@@ -163,6 +174,45 @@ export function InvoicePanel({
                 >
                   <XCircle className="h-3.5 w-3.5" />
                   Anulează factură
+                </button>
+              )}
+              {confirmDelete ? (
+                <div className="flex w-full flex-col gap-2 rounded-md border border-red-200 bg-red-50 p-2">
+                  <p className="text-[11px] text-red-800">
+                    Ștergerea scoate factura din FGO și eliberează numărul, ca
+                    următoarea să-l primească. Merge doar pentru ultima factură
+                    din serie, netransmisă în SPV. Continuăm?
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      disabled={isPending}
+                      onClick={runDelete}
+                    >
+                      Da, șterge
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={isPending}
+                      onClick={() => setConfirmDelete(false)}
+                    >
+                      Renunță
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  disabled={isPending}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-red-300 bg-white px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Șterge factura
                 </button>
               )}
             </div>

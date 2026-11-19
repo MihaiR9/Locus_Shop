@@ -55,6 +55,7 @@ const EVENT_LABEL: Record<string, string> = {
   fgo_invoice_issued: "Factură emisă",
   fgo_invoice_failed: "⚠ Emitere factură eșuată",
   fgo_invoice_cancelled: "Factură anulată",
+  fgo_invoice_deleted: "Factură ștearsă din FGO",
   fgo_invoice_email_sent: "Factură trimisă pe email",
   fgo_invoice_email_failed: "⚠ Email factură netrimis",
   fgo_invoice_email_resent: "Factură retrimisă pe email",
