@@ -34,6 +34,10 @@ Ce există deja și cum se pornește:
 
 ## 3. De verificat la primele comenzi reale
 
+- **Prima comandă cu „Card bancar la livrare”** (fluxul reparat pe 19 nov): AWB-ul trebuie să plece cu ramburs = totalul comenzii; „Marchează livrată” trece plata pe încasată; stocul scade la plasare și revine la „Colet refuzat — anulează”.
+- **FANbox + plata la livrare:** de întrebat FanCourier dacă lockerele acceptă ramburs plătit cu cardul. Dacă nu, la FANbox trebuie permisă doar plata online.
+- **Facturile FGO** se emit acum fără mail (19 nov); de verificat în setările FGO că nici FGO nu le trimite automat clientului.
+
 - Prima comandă plătită după 13 oct: în GA4 apare **o singură dată**, cu `value` = vinurile fără transport și SGR; în admin, istoricul comenzii.
 - **Reminderul de plată** (livrat 8 oct, netestat în producție): la prima comandă neplătită, după 3 ore, în admin trebuie „Reminder de plată trimis clientului” + mailul „Plată neefectuată” la office@.
 - Cele 8 evenimente GA4 (toate legate pe 13 oct): marketingul le poate vedea în GTM → Preview sau GA4 → DebugView.
