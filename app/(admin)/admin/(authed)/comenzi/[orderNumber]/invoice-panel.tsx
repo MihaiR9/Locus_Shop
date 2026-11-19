@@ -125,7 +125,7 @@ export function InvoicePanel({
                 className="inline-flex items-center gap-1.5 rounded-md border border-emerald-300 bg-white px-3 py-1.5 text-xs font-medium text-emerald-800 hover:bg-emerald-100 disabled:opacity-50"
               >
                 <Mail className="h-3.5 w-3.5" />
-                {emailFlash ? "✓ trimis" : "Retrimite email"}
+                {emailFlash ? "✓ trimis" : "Trimite pe email"}
               </button>
               {confirmCancel ? (
                 <div className="flex w-full flex-col gap-2 rounded-md border border-amber-200 bg-amber-50 p-2">
@@ -172,7 +172,7 @@ export function InvoicePanel({
         {canGenerate && (
           <Button type="button" onClick={runGenerate} disabled={isPending}>
             <FileText className="mr-2 h-4 w-4" />
-            {isPending ? "Se emite…" : "Emite factură + trimite email"}
+            {isPending ? "Se emite…" : "Emite factură"}
           </Button>
         )}
 

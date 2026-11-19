@@ -31,6 +31,9 @@ async function assertAdmin(): Promise<Result> {
  */
 export async function generateInvoice(
   orderNumber: string,
+  /* Implicit fără email: factura se verifică întâi în FGO (și se poate
+     anula), apoi se trimite din admin cu „Trimite pe email". */
+  opts: { sendEmail?: boolean } = {},
 ): Promise<Result<{ number: string; series: string; link: string }>> {
   const auth = await assertAdmin();
   if (!auth.ok) return auth;
@@ -150,8 +153,8 @@ export async function generateInvoice(
     payload: { numar, serie, link },
   });
 
-  // Email cu link-ul facturii — fail silent, nu blocăm emiterea.
-  if (customer.email && link) {
+  // Email cu link-ul facturii — doar la cerere; fail silent, nu blocăm emiterea.
+  if (opts.sendEmail && customer.email && link) {
     try {
       const emailRes = await getResend().emails.send({
         from: fromAddress(),
