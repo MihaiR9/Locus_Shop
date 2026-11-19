@@ -301,7 +301,7 @@ export async function resendInvoiceEmail(
   const { data: order } = await supabase
     .from("orders")
     .select(
-      "id, order_number, guest_email, fgo_invoice_number, fgo_invoice_series, fgo_invoice_link, customers(email, name)",
+      "id, order_number, guest_email, fgo_invoice_number, fgo_invoice_series, fgo_invoice_link, fgo_invoice_created_at, customers(email, name)",
     )
     .eq("order_number", orderNumber)
     .maybeSingle();
@@ -329,11 +329,22 @@ export async function resendInvoiceEmail(
   });
   if (res.error) return { ok: false, error: res.error.message };
 
+  /* Prima trimitere a facturii curente e „trimisă", următoarele
+     „retrimisă". Contează doar mailurile de după emiterea ei — o factură
+     ștearsă și refăcută începe de la zero. */
+  const { count: alreadySent } = await supabase
+    .from("order_events")
+    .select("id", { count: "exact", head: true })
+    .eq("order_id", order.id)
+    .in("type", ["fgo_invoice_email_sent", "fgo_invoice_email_resent"])
+    .gte("created_at", order.fgo_invoice_created_at ?? "1970-01-01");
+
   await supabase.from("order_events").insert({
     order_id: order.id,
-    type: "fgo_invoice_email_resent",
-    payload: { to },
+    type: alreadySent ? "fgo_invoice_email_resent" : "fgo_invoice_email_sent",
+    payload: { to, numar: order.fgo_invoice_number, serie: order.fgo_invoice_series },
   });
+  revalidatePath(`/admin/comenzi/${orderNumber}`);
   return { ok: true };
 }
 

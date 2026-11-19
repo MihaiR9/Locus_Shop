@@ -340,6 +340,13 @@ export default async function AdminOrderDetailPage({
             invoiceLink={order.fgoInvoiceLink}
             invoiceCreatedAt={order.fgoInvoiceCreatedAt}
             invoiceStatus={order.fgoInvoiceStatus}
+            invoiceEmailSent={order.events.some(
+              (e) =>
+                (e.type === "fgo_invoice_email_sent" ||
+                  e.type === "fgo_invoice_email_resent") &&
+                !!order.fgoInvoiceCreatedAt &&
+                new Date(e.createdAt) >= new Date(order.fgoInvoiceCreatedAt),
+            )}
             hasBilling={
               !!order.billing && Object.keys(order.billing).length > 0
             }
@@ -379,7 +386,9 @@ export default async function AdminOrderDetailPage({
               <div>
                 <dt className="text-zinc-500">Factură FGO</dt>
                 <dd className="mt-0.5 font-mono text-zinc-700">
-                  {order.smartbillInvoiceId ?? "—"}
+                  {order.fgoInvoiceNumber && order.fgoInvoiceStatus !== "cancelled"
+                    ? `${order.fgoInvoiceSeries ?? ""} ${order.fgoInvoiceNumber}`.trim()
+                    : "—"}
                 </dd>
               </div>
             </dl>
