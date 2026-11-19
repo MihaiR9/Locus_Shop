@@ -8,10 +8,11 @@ export function Hero() {
     <section className="hero" id="acasa" aria-label="Hero">
       <div className="hero-stage">
         {/*
-          Trei cadre care se rotesc (vezi HeroPager). Primele două au
-          fotografii reale; al treilea rămâne pe gradient până primim poza.
+          Trei cadre care se rotesc (vezi HeroPager), toate cu fotografii.
           Desaturarea primului cadru se face din CSS (.frame-1 .ken), nu în
-          fișier — o putem regla fără să reprocesăm imaginea.
+          fișier — o putem regla fără să reprocesăm imaginea. Al treilea e
+          deja adus în tonul celui de-al doilea în fișier (saturație redusă
+          + un voal bej), pentru că originalul era auriu și saturat.
         */}
         <div className="hero-frames" aria-hidden="true">
           <div className="hero-frame frame-1 is-active">
@@ -39,7 +40,15 @@ export function Hero() {
             </div>
           </div>
           <div className="hero-frame frame-3">
-            <div className="ken" />
+            <div className="ken">
+              <Image
+                src="/photos/hero/cuvinte-amfora.jpg"
+                alt=""
+                fill
+                sizes="100vw"
+                quality={85}
+              />
+            </div>
           </div>
         </div>
 
