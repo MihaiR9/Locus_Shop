@@ -77,6 +77,7 @@ export default async function EditProductPage({
         ageNote: product.age_note ?? "",
         grape: product.grape ?? "",
         servingTemp: product.serving_temp ?? "",
+        invoiceName: product.invoice_name ?? "",
         heroImage: product.hero_image,
       }}
       collections={collectionOptions}

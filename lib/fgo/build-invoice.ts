@@ -36,6 +36,8 @@ type OrderItem = {
 
 /** Ce ne trebuie din fișa produsului ca să numim vinul pe factură. */
 export type InvoiceProductInfo = {
+  /** Denumirea salvată pe produs (admin). Are prioritate. */
+  invoiceName?: string | null;
   type: string;
   sweetness: string;
   gama: string;
@@ -50,6 +52,7 @@ const TYPE_WORD: Record<string, string> = { alb: "ALB", rosu: "ROSU", rose: "ROS
  */
 export function invoiceLineName(name: string, info?: InvoiceProductInfo): string {
   if (!info) return name;
+  if (info.invoiceName?.trim()) return info.invoiceName.trim();
   const litres = (BOTTLE_ML / 1000).toFixed(2);
   const text = [
     "VIN",

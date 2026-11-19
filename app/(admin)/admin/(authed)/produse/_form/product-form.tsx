@@ -31,6 +31,7 @@ export type ProductFormValues = {
   ageNote: string;
   grape: string;
   servingTemp: string;
+  invoiceName: string;
   heroImage: string | null;
 };
 
@@ -370,6 +371,19 @@ export function ProductForm({
               defaultValue={initial.servingTemp}
               placeholder="ex: 8–10°C"
             />
+          </div>
+          <div className="grid gap-1.5 sm:col-span-2">
+            <Label htmlFor="invoice_name">Denumire pe factură</Label>
+            <Input
+              id="invoice_name"
+              name="invoice_name"
+              defaultValue={initial.invoiceName}
+              placeholder="ex: VIN ROSU FETEASCA NEAGRA DEMISEC, 0.75 L CUVINTE"
+            />
+            <p className="text-xs text-zinc-500">
+              Așa apare vinul pe factura FGO. Gol = se compune automat din tip,
+              soi, dulceață și gamă.
+            </p>
           </div>
         </div>
       </Card>

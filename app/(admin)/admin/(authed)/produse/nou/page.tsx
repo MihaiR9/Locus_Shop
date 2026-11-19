@@ -37,6 +37,7 @@ export default async function NewProductPage() {
         ageNote: "",
         grape: "",
         servingTemp: "",
+        invoiceName: "",
         heroImage: null,
       }}
       collections={collectionOptions}

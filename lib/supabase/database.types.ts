@@ -559,6 +559,7 @@ export type Database = {
           grape: string | null
           hero_image: string | null
           id: string
+          invoice_name: string | null
           name: string
           notes: string | null
           pair: string | null
@@ -586,6 +587,7 @@ export type Database = {
           grape?: string | null
           hero_image?: string | null
           id?: string
+          invoice_name?: string | null
           name: string
           notes?: string | null
           pair?: string | null
@@ -613,6 +615,7 @@ export type Database = {
           grape?: string | null
           hero_image?: string | null
           id?: string
+          invoice_name?: string | null
           name?: string
           notes?: string | null
           pair?: string | null

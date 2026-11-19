@@ -82,7 +82,7 @@ export async function generateInvoice(
 
   const { data: productRows } = await supabase
     .from("products")
-    .select("code, type, sweetness, gama")
+    .select("code, type, sweetness, gama, invoice_name")
     .in(
       "code",
       (order.order_items ?? []).map((it) => it.code_snapshot),
@@ -90,7 +90,7 @@ export async function generateInvoice(
   const products = new Map(
     (productRows ?? []).map((p) => [
       p.code,
-      { type: p.type, sweetness: p.sweetness, gama: p.gama },
+      { invoiceName: p.invoice_name, type: p.type, sweetness: p.sweetness, gama: p.gama },
     ]),
   );
 

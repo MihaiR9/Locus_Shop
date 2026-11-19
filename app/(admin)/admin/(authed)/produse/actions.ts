@@ -60,6 +60,7 @@ type ProductFormPayload = {
   ageNote: string | null;
   grape: string | null;
   servingTemp: string | null;
+  invoiceName: string | null;
 };
 
 function extractPayload(formData: FormData): ProductFormPayload | { error: string } {
@@ -129,6 +130,7 @@ function extractPayload(formData: FormData): ProductFormPayload | { error: strin
     ageNote: asStr("age_note"),
     grape: asStr("grape"),
     servingTemp: asStr("serving_temp"),
+    invoiceName: asStr("invoice_name"),
   };
 }
 
@@ -174,6 +176,7 @@ export async function createProduct(formData: FormData): Promise<Result> {
       age_note: payload.ageNote,
       grape: payload.grape,
       serving_temp: payload.servingTemp,
+      invoice_name: payload.invoiceName,
     })
     .select("id, code")
     .single();
@@ -259,6 +262,7 @@ export async function updateProduct(
       age_note: payload.ageNote,
       grape: payload.grape,
       serving_temp: payload.servingTemp,
+      invoice_name: payload.invoiceName,
       hero_image: heroUrl,
     })
     .eq("id", current.id);
