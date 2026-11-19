@@ -4,6 +4,16 @@ Lista lucrurilor rămase deschise la sfârșitul sesiunii din 13 oct. Mod de luc
 
 ---
 
+## 0. Stadiu la 19 nov 2026
+
+Prima comandă reală: **LOC-2026-00001** (plătită cu cardul). Numerotarea comenzilor a fost resetată la 1 (`order_counters`). Factura corectă e **LOC 0001**, emisă la 15:30, **netrimisă încă pe email**; istoricul comenzii a fost curățat (rămân: plasată, plătită, factură emisă).
+
+Livrate azi: voucherele merg pentru clienți (RLS), checkout cu atenționări (butoane de salvare, câmpuri marcate, pași „de completat”, CTA estompat), facturare simplificată (identică cu livrarea / diferită, județ din listă, email luat de la livrare la persoană fizică), plata cu cardul la livrare tratată cap-coadă (AWB cu ramburs, expediere, livrare = încasat, colet refuzat, stoc rezervat), facturi FGO emise fără mail + „Șterge factura” + denumire completă a vinului (`products.invoice_name`, migrarea 0023, editabilă în admin), hero cadrul 03 cu poza cuvinte + amforă.
+
+De reținut despre FGO: **ștergerea unei facturi nu coboară contorul seriei** — după ștergere, numărul următor se resetează manual în FGO (Setări → Serii documente → LOC). Textul de confirmare de la „Șterge factura” spune încă că numărul se eliberează singur — de corectat.
+
+Deschise din FGO / contabil: contul bancar e introdus de două ori în FGO (apare dublat pe factură); cota de accize 11 lei/hL e de confirmat (vinul liniștit avea istoric 0 lei/hL); factura apare „neîncasată” cu scadență, deși e plătită cu cardul.
+
 ## 1. Meta (următorul pas, început pe 13 oct)
 
 Starea: feed-ul `https://www.domeniul-locus.ro/api/feed/meta.xml` e live și corect (5 vinuri, imagini pe alb, preț, stoc). Pixelul Meta **nu e instalat** (nici pe site, nici în GTM). Conversions API există în cod (`lib/meta/capi.ts`, trimisă din webhook-ul Stripe) dar e **inactivă** — lipsesc cheile.
