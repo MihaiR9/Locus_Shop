@@ -7,6 +7,7 @@ import {
   type BillType,
 } from "@/lib/checkout-store";
 import type { AccountDefaults, SavedBilling } from "@/lib/account/defaults";
+import { COUNTIES } from "@/lib/counties";
 
 /**
  * StepBilling — pasul 2 „Date facturare".
@@ -54,6 +55,8 @@ type JuridicaForm = {
 
 export function StepBilling({ defaults }: Props) {
   const saved = useCheckoutStore((s) => s.billing);
+  const placeAttempted = useCheckoutStore((s) => s.placeAttempted);
+  const setEditing = useCheckoutStore((s) => s.setEditing);
   const saveBilling = useCheckoutStore((s) => s.saveBilling);
 
   const savedFizica = defaults?.billingProfiles.filter((b) => b.type === "fizica") ?? [];
@@ -162,6 +165,17 @@ export function StepBilling({ defaults }: Props) {
   const [f, setF] = useState<FizicaForm>(initialFizica);
   const [j, setJ] = useState<JuridicaForm>(initialJuridica);
 
+  /* La firmă, emailul de facturare rămâne: factura merge des la
+     contabilitate. Îl precompletăm cu emailul de la livrare, ca să nu fie
+     scris de două ori; clientul îl schimbă doar dacă vrea. */
+  const shippingEmailLive = useCheckoutStore((s) =>
+    s.shipping && "email" in s.shipping ? s.shipping.email : "",
+  );
+  useEffect(() => {
+    if (!shippingEmailLive) return;
+    setJ((prev) => (prev.email.trim() ? prev : { ...prev, email: shippingEmailLive }));
+  }, [shippingEmailLive]);
+
   const [selectedFizicaId, setSelectedFizicaId] = useState<string | null>(
     savedFizica.find((b) => b.isDefault)?.id ?? savedFizica[0]?.id ?? null,
   );
@@ -213,15 +227,73 @@ export function StepBilling({ defaults }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, tab, selectedFizicaId, selectedJuridicaId]);
 
+  // Clientul a scris ceva în formular și n-a salvat încă — butonul de
+  // salvare se aprinde, ca să nu treacă mai departe fără să salveze.
+  const [dirty, setDirty] = useState(false);
+  // A apăsat Salvează cu câmpuri lipsă — de acum le marcăm cu roșu, live.
+  const [attempted, setAttempted] = useState(false);
+
+  /** Câmpul e gol sau greșit pe tab-ul curent — se recalculează la fiecare tastă. */
+  function fieldError(k: string): boolean {
+    if (tab === "fizica") {
+      if (k === "address" || k === "city" || k === "county") {
+        return !f.sameAsShipping && !f[k].trim();
+      }
+      if (k === "firstName" || k === "lastName") {
+        return !f.sameAsShipping && !f[k].trim();
+      }
+      return false;
+    }
+    if (k === "email") return !/^\S+@\S+\.\S+$/.test(j.email.trim());
+    if (k === "company" || k === "cui" || k === "hq" || k === "hqCity" || k === "hqCounty") {
+      return !j[k].trim();
+    }
+    return false;
+  }
+
+  const FIELDS =
+    tab === "fizica"
+      ? ["firstName", "lastName", "address", "city", "county"]
+      : ["company", "cui", "email", "hq", "hqCity", "hqCounty"];
+  const hasFieldErrors = FIELDS.some((k) => fieldError(k));
+
+  /** Clasa câmpului: roșu doar după o încercare de salvare, cât timp e greșit. */
+  function fieldClass(k: string, base = "co-field"): string {
+    return (attempted || placeAttempted) && fieldError(k) ? `${base} is-invalid` : base;
+  }
+
+  // Formularul deschis înseamnă pas neterminat, chiar dacă există ceva
+  // salvat dinainte — altfel comanda ar pleca cu datele vechi.
+  const editing = mode !== "saved";
+  useEffect(() => {
+    setEditing("billing", editing);
+  }, [editing, setEditing]);
+  const needsAttention = placeAttempted && (editing || !saved);
+
   function handleSaveForm() {
     setError(null);
+    if (hasFieldErrors) {
+      setAttempted(true);
+      const onlyEmail = FIELDS.every((k) => k === "email" || !fieldError(k));
+      setError(
+        onlyEmail && (tab === "fizica" ? f.email : j.email).trim()
+          ? "Email invalid."
+          : "Completează câmpurile marcate cu roșu.",
+      );
+      return;
+    }
     if (tab === "fizica") {
-      if (!f.firstName.trim() || !f.lastName.trim() || !f.email.trim()) {
-        setError("Completează prenume, nume și email.");
+      if (!f.sameAsShipping && (!f.firstName.trim() || !f.lastName.trim())) {
+        setError("Completează prenumele și numele.");
         return;
       }
-      if (!/^\S+@\S+\.\S+$/.test(f.email)) {
-        setError("Email invalid.");
+      /* Persoana fizică nu mai scrie emailul a doua oară: îl luăm de la
+         livrare. Factura și confirmarea comenzii pleacă la el. */
+      const shpForEmail = useCheckoutStore.getState().shipping;
+      const shippingEmail =
+        shpForEmail && "email" in shpForEmail ? shpForEmail.email.trim() : "";
+      if (!shippingEmail) {
+        setError("Salvează întâi livrarea (pasul 1) — de acolo luăm emailul pentru factură.");
         return;
       }
       /* Adresa e obligatorie pe factură. Dacă user-ul a bifat „folosește
@@ -230,9 +302,14 @@ export function StepBilling({ defaults }: Props) {
       let finalCity = f.city.trim();
       let finalCounty = f.county.trim();
       let finalZip = f.zip.trim();
+      let finalFirst = f.firstName.trim();
+      let finalLast = f.lastName.trim();
       if (f.sameAsShipping) {
         const shp = useCheckoutStore.getState().shipping;
         if (shp && shp.method === "curier") {
+          // Identică cu livrarea: și numele de pe factură e cel de la livrare.
+          finalFirst = shp.firstName;
+          finalLast = shp.lastName;
           finalAddress = shp.address;
           finalCity = shp.city;
           finalCounty = shp.county;
@@ -242,13 +319,16 @@ export function StepBilling({ defaults }: Props) {
       if (!finalAddress || !finalCity || !finalCounty) {
         setError(
           f.sameAsShipping
-            ? "Salvează întâi adresa la pasul 1, sau debifează opțiunea și completează aici."
+            ? "Salvează întâi adresa la pasul 1, sau alege „Adresa de facturare este diferită” și completeaz-o aici."
             : "Adresa, localitatea și județul sunt obligatorii pe factură.",
         );
         return;
       }
       const finalF: FizicaForm = {
         ...f,
+        firstName: finalFirst,
+        lastName: finalLast,
+        email: shippingEmail,
         address: finalAddress,
         city: finalCity,
         county: finalCounty,
@@ -280,6 +360,8 @@ export function StepBilling({ defaults }: Props) {
     /* După orice save reușit, treci la vederea colapsată. Nu depindem de
        hasSavedForTab (care privește doar profilurile de pe cont) — aici
        am completat manual + persistat în Zustand, deci avem date. */
+    setDirty(false);
+    setAttempted(false);
     setMode("saved");
   }
 
@@ -290,12 +372,18 @@ export function StepBilling({ defaults }: Props) {
       : savedJuridica.find((x) => x.id === selectedJuridicaId) ?? null;
 
   return (
-    <section className="co-step" aria-labelledby="co-step-2">
+    <section
+      className={`co-step${needsAttention ? " needs-attention" : ""}`}
+      aria-labelledby="co-step-2"
+    >
       <header className="co-step-head">
         <div className="co-badge">02</div>
         <h2 className="co-step-title" id="co-step-2">Date facturare</h2>
         {isSaved && mode === "saved" && (
           <span className="co-status">salvat</span>
+        )}
+        {needsAttention && (
+          <span className="co-status warn">de completat</span>
         )}
       </header>
 
@@ -471,56 +559,62 @@ export function StepBilling({ defaults }: Props) {
 
       {/* FORM */}
       {mode === "form" && tab === "fizica" && (
-        <form className="co-form" onSubmit={(e) => e.preventDefault()} noValidate>
-          <div className="co-field">
-            <label htmlFor="co-bf-first">
-              Prenume<span className="req">*</span>
+        <form
+          className="co-form"
+          onSubmit={(e) => e.preventDefault()}
+          onChange={() => setDirty(true)}
+          noValidate
+        >
+          <div
+            className="co-pay-list co-address-choice"
+            role="radiogroup"
+            aria-label="Adresa de facturare"
+          >
+            <label className="co-pay-row">
+              <input
+                type="radio"
+                name="co-bf-address-choice"
+                checked={f.sameAsShipping}
+                onChange={() => setF({ ...f, sameAsShipping: true })}
+              />
+              <span className="co-pay-name">Identică cu adresa de livrare</span>
             </label>
-            <input
-              id="co-bf-first"
-              type="text"
-              value={f.firstName}
-              onChange={(e) => setF({ ...f, firstName: e.target.value })}
-            />
-          </div>
-          <div className="co-field">
-            <label htmlFor="co-bf-last">
-              Nume<span className="req">*</span>
-            </label>
-            <input
-              id="co-bf-last"
-              type="text"
-              value={f.lastName}
-              onChange={(e) => setF({ ...f, lastName: e.target.value })}
-            />
-          </div>
-          <div className="co-field span-2">
-            <label htmlFor="co-bf-email">
-              Email<span className="req">*</span>
-            </label>
-            <input
-              id="co-bf-email"
-              type="email"
-              value={f.email}
-              onChange={(e) => setF({ ...f, email: e.target.value })}
-              suppressHydrationWarning
-            />
-          </div>
-          <div className="co-check-row">
-            <input
-              id="co-bf-same"
-              type="checkbox"
-              checked={f.sameAsShipping}
-              onChange={(e) => setF({ ...f, sameAsShipping: e.target.checked })}
-            />
-            <label htmlFor="co-bf-same">
-              Folosește adresa de livrare (pasul 1) și pentru factură
+            <label className="co-pay-row">
+              <input
+                type="radio"
+                name="co-bf-address-choice"
+                checked={!f.sameAsShipping}
+                onChange={() => setF({ ...f, sameAsShipping: false })}
+              />
+              <span className="co-pay-name">Adresa de facturare este diferită</span>
             </label>
           </div>
 
           {!f.sameAsShipping && (
             <>
-              <div className="co-field span-2">
+              <div className={fieldClass("firstName", "co-field")}>
+                <label htmlFor="co-bf-first">
+                  Prenume<span className="req">*</span>
+                </label>
+                <input
+                  id="co-bf-first"
+                  type="text"
+                  value={f.firstName}
+                  onChange={(e) => setF({ ...f, firstName: e.target.value })}
+                />
+              </div>
+              <div className={fieldClass("lastName", "co-field")}>
+                <label htmlFor="co-bf-last">
+                  Nume<span className="req">*</span>
+                </label>
+                <input
+                  id="co-bf-last"
+                  type="text"
+                  value={f.lastName}
+                  onChange={(e) => setF({ ...f, lastName: e.target.value })}
+                />
+              </div>
+              <div className={fieldClass("address", "co-field span-2")}>
                 <label htmlFor="co-bf-address">
                   Adresă facturare<span className="req">*</span>
                 </label>
@@ -534,7 +628,7 @@ export function StepBilling({ defaults }: Props) {
                   suppressHydrationWarning
                 />
               </div>
-              <div className="co-field">
+              <div className={fieldClass("city", "co-field")}>
                 <label htmlFor="co-bf-city">
                   Localitate<span className="req">*</span>
                 </label>
@@ -547,18 +641,25 @@ export function StepBilling({ defaults }: Props) {
                   suppressHydrationWarning
                 />
               </div>
-              <div className="co-field">
+              <div className={fieldClass("county", "co-field")}>
                 <label htmlFor="co-bf-county">
                   Județ<span className="req">*</span>
                 </label>
-                <input
+                <select
                   id="co-bf-county"
-                  type="text"
                   autoComplete="address-level1"
                   value={f.county}
                   onChange={(e) => setF({ ...f, county: e.target.value })}
                   suppressHydrationWarning
-                />
+                >
+                  <option value="">Alege județul</option>
+                  {f.county && !COUNTIES.includes(f.county) && (
+                    <option value={f.county}>{f.county}</option>
+                  )}
+                  {COUNTIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
               </div>
               <div className="co-field">
                 <label htmlFor="co-bf-zip">
@@ -576,19 +677,17 @@ export function StepBilling({ defaults }: Props) {
             </>
           )}
 
-          {error && <p className="co-error">{error}</p>}
+          {error && !(attempted && !hasFieldErrors) && (
+            <p className="co-error">{error}</p>
+          )}
 
           <div className="co-form-actions">
-            {hasSavedForTab && (
-              <button
-                type="button"
-                className="co-chip ghost"
-                onClick={() => setMode("saved")}
-              >
-                Anulează
-              </button>
-            )}
-            <button type="button" className="co-chip" onClick={handleSaveForm}>
+            {dirty && <span className="co-save-hint">Salvează ca să continui</span>}
+            <button
+              type="button"
+              className={`co-chip co-save${dirty ? " is-dirty" : ""}`}
+              onClick={handleSaveForm}
+            >
               Salvează profilul
             </button>
           </div>
@@ -596,8 +695,13 @@ export function StepBilling({ defaults }: Props) {
       )}
 
       {mode === "form" && tab === "juridica" && (
-        <form className="co-form" onSubmit={(e) => e.preventDefault()} noValidate>
-          <div className="co-field span-2">
+        <form
+          className="co-form"
+          onSubmit={(e) => e.preventDefault()}
+          onChange={() => setDirty(true)}
+          noValidate
+        >
+          <div className={fieldClass("company", "co-field span-2")}>
             <label htmlFor="co-bj-company">
               Denumire firmă<span className="req">*</span>
             </label>
@@ -609,7 +713,7 @@ export function StepBilling({ defaults }: Props) {
               autoComplete="organization"
             />
           </div>
-          <div className="co-field">
+          <div className={fieldClass("cui", "co-field")}>
             <label htmlFor="co-bj-cui">
               CUI<span className="req">*</span>
             </label>
@@ -645,7 +749,7 @@ export function StepBilling({ defaults }: Props) {
               placeholder="RO49 AAAA 1B31 0075 9384 0000"
             />
           </div>
-          <div className="co-field">
+          <div className={fieldClass("email", "co-field")}>
             <label htmlFor="co-bj-email">
               Email facturare<span className="req">*</span>
             </label>
@@ -655,8 +759,11 @@ export function StepBilling({ defaults }: Props) {
               value={j.email}
               onChange={(e) => setJ({ ...j, email: e.target.value })}
             />
+            <span className="co-field-hint">
+              Aici trimitem factura — poate fi emailul contabilității.
+            </span>
           </div>
-          <div className="co-field span-2">
+          <div className={fieldClass("hq", "co-field span-2")}>
             <label htmlFor="co-bj-hq">
               Adresă sediu social<span className="req">*</span>
             </label>
@@ -669,7 +776,7 @@ export function StepBilling({ defaults }: Props) {
               autoComplete="street-address"
             />
           </div>
-          <div className="co-field">
+          <div className={fieldClass("hqCity", "co-field")}>
             <label htmlFor="co-bj-city">
               Localitate<span className="req">*</span>
             </label>
@@ -681,32 +788,37 @@ export function StepBilling({ defaults }: Props) {
               onChange={(e) => setJ({ ...j, hqCity: e.target.value })}
             />
           </div>
-          <div className="co-field">
+          <div className={fieldClass("hqCounty", "co-field")}>
             <label htmlFor="co-bj-county">
               Județ<span className="req">*</span>
             </label>
-            <input
+            <select
               id="co-bj-county"
-              type="text"
               autoComplete="address-level1"
               value={j.hqCounty}
               onChange={(e) => setJ({ ...j, hqCounty: e.target.value })}
-            />
+            >
+              <option value="">Alege județul</option>
+              {j.hqCounty && !COUNTIES.includes(j.hqCounty) && (
+                <option value={j.hqCounty}>{j.hqCounty}</option>
+              )}
+              {COUNTIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
           </div>
 
-          {error && <p className="co-error">{error}</p>}
+          {error && !(attempted && !hasFieldErrors) && (
+            <p className="co-error">{error}</p>
+          )}
 
           <div className="co-form-actions">
-            {hasSavedForTab && (
-              <button
-                type="button"
-                className="co-chip ghost"
-                onClick={() => setMode("saved")}
-              >
-                Anulează
-              </button>
-            )}
-            <button type="button" className="co-chip" onClick={handleSaveForm}>
+            {dirty && <span className="co-save-hint">Salvează ca să continui</span>}
+            <button
+              type="button"
+              className={`co-chip co-save${dirty ? " is-dirty" : ""}`}
+              onClick={handleSaveForm}
+            >
               Salvează profilul
             </button>
           </div>

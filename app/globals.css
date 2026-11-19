@@ -9453,3 +9453,157 @@
    multe intră acum pe un singur rând. 92ch e pragul peste care ochiul
    pierde începutul rândului următor. */
 .livrare-faq-item p { max-width: 92ch; }
+
+/* ----------------------------------------------------------------
+   Checkout — butoanele de salvare și voucherul aplicat
+---------------------------------------------------------------- */
+/* Salvarea e pasul pe care clienții îl ratau: butonul e mai mare decât
+   chip-urile din jur și se aprinde (verde, cu un puls discret) din
+   momentul în care s-a scris ceva nesalvat în formular. */
+.co-form-actions { align-items: center; }
+.co-chip.co-save {
+  padding: 12px 22px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  border-color: var(--ink);
+  transition:
+    background 240ms var(--ease),
+    color 240ms var(--ease),
+    border-color 240ms var(--ease);
+}
+.co-chip.co-save.is-dirty {
+  background: var(--co-save-on);
+  border-color: var(--co-save-on);
+  color: #f6f2ea;
+  animation: co-save-pulse 1.8s var(--ease) infinite;
+}
+.co-chip.co-save.is-dirty:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+.co-save-hint {
+  margin-right: auto;
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--co-save-on);
+}
+:root { --co-save-on: #4d6a3f; }
+[data-theme="dark"] { --co-save-on: #7f9c6c; }
+@keyframes co-save-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(77, 106, 63, 0.35); }
+  50% { box-shadow: 0 0 0 6px rgba(77, 106, 63, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .co-chip.co-save.is-dirty { animation: none; }
+}
+
+/* Voucherul aplicat: o bandă verde, discretă, cu suma economisită. */
+.co-voucher-applied {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: var(--co-ok-bg);
+  border: 1px solid var(--co-ok-line);
+  color: var(--co-ok-ink);
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+.co-voucher-applied span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.co-voucher-applied .amount {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+:root {
+  --co-ok-bg: rgba(77, 106, 63, 0.09);
+  --co-ok-line: rgba(77, 106, 63, 0.32);
+  --co-ok-ink: #3f5a33;
+}
+[data-theme="dark"] {
+  --co-ok-bg: rgba(127, 156, 108, 0.12);
+  --co-ok-line: rgba(127, 156, 108, 0.35);
+  --co-ok-ink: #a9c294;
+}
+
+/* Câmpuri obligatorii lipsă, marcate după o încercare de salvare. */
+.co-field.is-invalid input,
+.co-field.is-invalid select,
+.co-field.is-invalid textarea {
+  border-color: #a8402f;
+  box-shadow: inset 0 0 0 1px #a8402f;
+}
+.co-field.is-invalid > label { color: #a8402f; }
+[data-theme="dark"] .co-field.is-invalid input,
+[data-theme="dark"] .co-field.is-invalid select,
+[data-theme="dark"] .co-field.is-invalid textarea {
+  border-color: #d4826f;
+  box-shadow: inset 0 0 0 1px #d4826f;
+}
+[data-theme="dark"] .co-field.is-invalid > label { color: #d4826f; }
+
+/* Pași neterminați, marcați după ce clientul apasă „Plasează comanda”. */
+:root { --co-warn: #a8402f; --co-warn-bg: rgba(168, 64, 47, 0.06); }
+[data-theme="dark"] { --co-warn: #d4826f; --co-warn-bg: rgba(212, 130, 111, 0.08); }
+.co-step { transition: border-color 240ms var(--ease), box-shadow 240ms var(--ease); }
+.co-step.needs-attention {
+  border-color: var(--co-warn);
+  box-shadow: inset 0 0 0 1px var(--co-warn);
+  scroll-margin-top: 96px;
+}
+.co-status.warn {
+  background: var(--co-warn);
+  color: #f6f2ea;
+}
+.co-check-row.is-invalid {
+  padding: 10px 12px;
+  background: var(--co-warn-bg);
+  border: 1px solid var(--co-warn);
+}
+.co-check-row.is-invalid label { color: var(--co-warn); }
+.co-missing {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: var(--co-warn-bg);
+  border: 1px solid var(--co-warn);
+  color: var(--co-warn);
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+/* „Plasează comanda” cât timp lipsește ceva: arată inactiv, dar la click
+   explică ce lipsește (vezi .co-missing) în loc să nu facă nimic. */
+.co-cta.is-incomplete {
+  opacity: 0.38;
+  cursor: help;
+}
+.co-cta.is-incomplete:hover { background: var(--ink); }
+.co-status.warn::before { content: "!"; font-weight: 700; }
+.co-field-hint {
+  font-family: var(--font-mono), monospace;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--ink-mute);
+}
+
+/* Adresa de facturare: identică cu livrarea sau diferită (pasul 2). */
+.co-address-choice {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+.co-address-choice .co-pay-row {
+  grid-template-columns: 20px 1fr;
+  padding: 12px 16px;
+}
+.co-address-choice .co-pay-name { font-size: 15px; }

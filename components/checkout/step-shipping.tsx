@@ -7,6 +7,7 @@ import {
 } from "@/lib/checkout-store";
 import { type ShippingMethodId } from "@/lib/shipping";
 import type { AccountDefaults } from "@/lib/account/defaults";
+import { COUNTIES } from "@/lib/counties";
 import { PickupPointSelect } from "./pickup-point-select";
 import { localitiesInCounty, usePickupPoints } from "./use-pickup-points";
 
@@ -26,16 +27,6 @@ import { localitiesInCounty, usePickupPoints } from "./use-pickup-points";
  * Salvarea se face în checkoutStore, snapshot pentru order + auto-save
  * pe cont la finalizare (vezi lib/account/defaults saveAccountFromOrder).
  */
-
-const COUNTIES = [
-  "Alba", "Arad", "Argeș", "Bacău", "Bihor", "Bistrița-Năsăud", "Botoșani",
-  "Brașov", "Brăila", "București", "Buzău", "Caraș-Severin", "Călărași",
-  "Cluj", "Constanța", "Covasna", "Dâmbovița", "Dolj", "Galați", "Giurgiu",
-  "Gorj", "Harghita", "Hunedoara", "Ialomița", "Iași", "Ilfov", "Maramureș",
-  "Mehedinți", "Mureș", "Neamț", "Olt", "Prahova", "Sălaj", "Satu Mare",
-  "Sibiu", "Suceava", "Teleorman", "Timiș", "Tulcea", "Vaslui", "Vâlcea",
-  "Vrancea",
-];
 
 type TabId = "curier" | "fanbox";
 type Mode = "saved" | "picker" | "form";
@@ -72,6 +63,8 @@ const EMPTY_FORM: FormState = {
 
 export function StepShipping({ defaults }: Props) {
   const saved = useCheckoutStore((s) => s.shipping);
+  const placeAttempted = useCheckoutStore((s) => s.placeAttempted);
+  const setEditing = useCheckoutStore((s) => s.setEditing);
   const saveShipping = useCheckoutStore((s) => s.saveShipping);
 
   const [tab, setTab] = useState<TabId>(
@@ -150,6 +143,11 @@ export function StepShipping({ defaults }: Props) {
   );
 
   const [error, setError] = useState<string | null>(null);
+  // Clientul a scris ceva în formular și n-a salvat încă — butonul de
+  // salvare se aprinde, ca să nu treacă mai departe fără să salveze.
+  const [dirty, setDirty] = useState(false);
+  // A apăsat Salvează cu câmpuri lipsă — de acum le marcăm cu roșu, live.
+  const [attempted, setAttempted] = useState(false);
 
   // Efectiv: adresa curentă din saved-view (curier) sau pickup favorit (fanbox)
   const savedAddress =
@@ -205,39 +203,66 @@ export function StepShipping({ defaults }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, tab, selectedAddressId]);
 
+  /** Câmpul e gol sau greșit — se recalculează la fiecare tastă. */
+  function fieldError(k: keyof FormState): boolean {
+    if (k === "email") return !/^\S+@\S+\.\S+$/.test(form.email.trim());
+    if (k === "address") return tab === "curier" && !form.address.trim();
+    if (k === "pickupPointId") return tab === "fanbox" && !form.pickupPointId;
+    return !String(form[k] ?? "").trim();
+  }
+
+  /** Clasa câmpului: roșu doar după o încercare de salvare, cât timp e greșit. */
+  function fieldClass(k: keyof FormState, base = "co-field"): string {
+    return (attempted || placeAttempted) && fieldError(k) ? `${base} is-invalid` : base;
+  }
+
+  // Formularul deschis înseamnă pas neterminat, chiar dacă există ceva
+  // salvat dinainte — altfel comanda ar pleca cu datele vechi.
+  const editing = mode !== "saved";
+  useEffect(() => {
+    setEditing("shipping", editing);
+  }, [editing, setEditing]);
+  const needsAttention = placeAttempted && (editing || !saved);
+
+  const hasFieldErrors = (
+    ["firstName", "lastName", "phone", "email", "city", "county", "address", "pickupPointId"] as const
+  ).some((k) => fieldError(k));
+
   function handleSaveForm() {
     setError(null);
-    const commonReq: Array<keyof FormState> = [
+    const required: Array<keyof FormState> = [
       "firstName",
       "lastName",
       "phone",
-      "email",
       "city",
       "county",
     ];
-    for (const k of commonReq) {
-      if (!String(form[k] ?? "").trim()) {
-        setError("Completează câmpurile marcate.");
-        return;
-      }
-    }
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) {
-      setError("Email invalid.");
+    const emptyRequired = required.some((k) => fieldError(k));
+    if (
+      emptyRequired ||
+      fieldError("email") ||
+      fieldError("address") ||
+      fieldError("pickupPointId")
+    ) {
+      setAttempted(true);
+      setError(
+        emptyRequired || !form.email.trim()
+          ? "Completează câmpurile marcate cu roșu."
+          : fieldError("email")
+            ? "Email invalid."
+            : fieldError("address")
+              ? "Adresa e obligatorie pentru livrare la ușă."
+              : "Alege un locker FANbox.",
+      );
       return;
     }
-    if (tab === "curier" && !form.address.trim()) {
-      setError("Adresa e obligatorie pentru livrare la ușă.");
-      return;
-    }
-    if (tab === "fanbox" && !form.pickupPointId) {
-      setError("Alege un locker FANbox.");
-      return;
-    }
+    setAttempted(false);
     saveShipping({
       method: "curier",
       serviceId,
       ...form,
     });
+    setDirty(false);
     /* După orice save reușit, treci la vederea colapsată — chiar dacă
        nu avem încă un profil pe cont, avem date în Zustand → afișăm card. */
     setMode("saved");
@@ -246,10 +271,16 @@ export function StepShipping({ defaults }: Props) {
   const isSaved = saved !== null && saved.method === "curier";
 
   return (
-    <section className="co-step" aria-labelledby="co-step-1">
+    <section
+      className={`co-step${needsAttention ? " needs-attention" : ""}`}
+      aria-labelledby="co-step-1"
+    >
       <header className="co-step-head">
         <div className="co-badge">01</div>
         <h2 className="co-step-title" id="co-step-1">Livrare</h2>
+        {needsAttention && (
+          <span className="co-status warn">de completat</span>
+        )}
         {isSaved && mode === "saved" && (
           <span className="co-status">salvat</span>
         )}
@@ -415,11 +446,12 @@ export function StepShipping({ defaults }: Props) {
       {mode === "form" && (
         <div>
           <form
-            className={tab === "fanbox" ? "co-form" : "co-form"}
+            className="co-form"
             onSubmit={(e) => e.preventDefault()}
+            onChange={() => setDirty(true)}
             noValidate
           >
-            <div className="co-field">
+            <div className={fieldClass("firstName", "co-field")}>
               <label htmlFor="co-first">
                 Prenume<span className="req">*</span>
               </label>
@@ -431,7 +463,7 @@ export function StepShipping({ defaults }: Props) {
                 onChange={(e) => setForm({ ...form, firstName: e.target.value })}
               />
             </div>
-            <div className="co-field">
+            <div className={fieldClass("lastName", "co-field")}>
               <label htmlFor="co-last">
                 Nume<span className="req">*</span>
               </label>
@@ -443,7 +475,7 @@ export function StepShipping({ defaults }: Props) {
                 onChange={(e) => setForm({ ...form, lastName: e.target.value })}
               />
             </div>
-            <div className="co-field">
+            <div className={fieldClass("phone", "co-field")}>
               <label htmlFor="co-phone">
                 Telefon<span className="req">*</span>
               </label>
@@ -456,7 +488,7 @@ export function StepShipping({ defaults }: Props) {
                 placeholder="07xx xxx xxx"
               />
             </div>
-            <div className="co-field">
+            <div className={fieldClass("email", "co-field")}>
               <label htmlFor="co-email">
                 Email<span className="req">*</span>
               </label>
@@ -468,7 +500,7 @@ export function StepShipping({ defaults }: Props) {
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
               />
             </div>
-            <div className="co-field">
+            <div className={fieldClass("county", "co-field")}>
               <label htmlFor="co-county">
                 Județ<span className="req">*</span>
               </label>
@@ -492,7 +524,7 @@ export function StepShipping({ defaults }: Props) {
                 ))}
               </select>
             </div>
-            <div className="co-field">
+            <div className={fieldClass("city")}>
               <label htmlFor="co-city">
                 Localitate<span className="req">*</span>
               </label>
@@ -553,7 +585,7 @@ export function StepShipping({ defaults }: Props) {
 
             {tab === "curier" ? (
               <>
-                <div className="co-field span-2">
+                <div className={fieldClass("address", "co-field span-2")}>
                   <label htmlFor="co-address">
                     Adresă<span className="req">*</span>
                   </label>
@@ -580,7 +612,7 @@ export function StepShipping({ defaults }: Props) {
                 </div>
               </>
             ) : (
-              <div className="co-field span-2">
+              <div className={fieldClass("pickupPointId", "co-field span-2")}>
                 <PickupPointSelect
                   type="fanbox"
                   county={form.county}
@@ -594,14 +626,15 @@ export function StepShipping({ defaults }: Props) {
                         }
                       : null
                   }
-                  onChange={(p) =>
+                  onChange={(p) => {
+                    setDirty(true);
                     setForm({
                       ...form,
                       pickupPointId: p?.id,
                       pickupPointName: p?.name,
                       pickupPointAddress: p?.address,
-                    })
-                  }
+                    });
+                  }}
                 />
               </div>
             )}
@@ -623,21 +656,15 @@ export function StepShipping({ defaults }: Props) {
               </div>
             )}
 
-            {error && <p className="co-error">{error}</p>}
+            {error && !(attempted && !hasFieldErrors) && (
+              <p className="co-error">{error}</p>
+            )}
 
             <div className="co-form-actions">
-              {(hasSavedForTab || isSaved) && (
-                <button
-                  type="button"
-                  className="co-chip ghost"
-                  onClick={() => setMode(hasSavedForTab ? "saved" : "form")}
-                >
-                  Anulează
-                </button>
-              )}
+              {dirty && <span className="co-save-hint">Salvează ca să continui</span>}
               <button
                 type="button"
-                className="co-chip"
+                className={`co-chip co-save${dirty ? " is-dirty" : ""}`}
                 onClick={handleSaveForm}
               >
                 Salvează adresa

@@ -86,6 +86,10 @@ type CheckoutState = {
   payment: PaymentMethod;
   termsAccepted: boolean;
   voucher: VoucherState | null;
+  /** A apăsat „Plasează comanda” cu pași neterminați — pașii se marchează. */
+  placeAttempted: boolean;
+  /** Pasul are formularul deschis: ce e salvat nu e ce vede clientul. */
+  editing: { shipping: boolean; billing: boolean };
 };
 
 type CheckoutActions = {
@@ -95,6 +99,8 @@ type CheckoutActions = {
   setTerms: (v: boolean) => void;
   applyVoucher: (v: VoucherState) => void;
   clearVoucher: () => void;
+  setPlaceAttempted: (v: boolean) => void;
+  setEditing: (step: "shipping" | "billing", v: boolean) => void;
   reset: () => void;
 };
 
@@ -106,6 +112,8 @@ const initial: CheckoutState = {
   payment: "card-online",
   termsAccepted: false,
   voucher: null,
+  placeAttempted: false,
+  editing: { shipping: false, billing: false },
 };
 
 // ─── GA4: add_shipping_info / add_payment_info ─────────────────────
@@ -165,6 +173,9 @@ export const useCheckoutStore = create<Store>()(
       },
       applyVoucher: (v) => set({ voucher: v }),
       clearVoucher: () => set({ voucher: null }),
+      setPlaceAttempted: (v) => set({ placeAttempted: v }),
+      setEditing: (step, v) =>
+        set((s) => ({ editing: { ...s.editing, [step]: v } })),
       reset: () => set(initial),
     }),
     {

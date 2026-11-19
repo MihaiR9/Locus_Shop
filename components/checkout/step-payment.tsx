@@ -34,13 +34,19 @@ export function StepPayment() {
   const setPayment = useCheckoutStore((s) => s.setPayment);
   const terms = useCheckoutStore((s) => s.termsAccepted);
   const setTerms = useCheckoutStore((s) => s.setTerms);
+  const placeAttempted = useCheckoutStore((s) => s.placeAttempted);
+  const termsMissing = placeAttempted && !terms;
 
   return (
-    <section className="co-step" aria-labelledby="co-step-3">
+    <section
+      className={`co-step${termsMissing ? " needs-attention" : ""}`}
+      aria-labelledby="co-step-3"
+    >
       <header className="co-step-head">
         <div className="co-badge">03</div>
         <h2 className="co-step-title" id="co-step-3">Plată</h2>
         {terms && <span className="co-status">salvat</span>}
+        {termsMissing && <span className="co-status warn">de completat</span>}
       </header>
 
       <div className="co-pay-list" role="radiogroup" aria-label="Metodă de plată">
@@ -63,7 +69,7 @@ export function StepPayment() {
         ))}
       </div>
 
-      <div className="co-check-row">
+      <div className={`co-check-row${termsMissing ? " is-invalid" : ""}`}>
         <input
           id="co-terms"
           type="checkbox"

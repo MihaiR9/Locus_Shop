@@ -135,7 +135,25 @@ export function OrderSummary() {
     });
   }
 
+  const setPlaceAttempted = useCheckoutStore((s) => s.setPlaceAttempted);
+  const editing = useCheckoutStore((s) => s.editing);
+  const missingSteps = [
+    (!shipping || editing.shipping) && { id: "co-step-1", label: "livrarea" },
+    (!billing || editing.billing) && { id: "co-step-2", label: "datele de facturare" },
+    !terms && { id: "co-step-3", label: "acordul cu termenii" },
+  ].filter(Boolean) as Array<{ id: string; label: string }>;
+
   function placeOrder() {
+    /* Butonul nu mai e dezactivat în tăcere: dacă lipsește ceva, spunem
+       ce anume, marcăm pașii și derulăm la primul. */
+    if (lines.length > 0 && missingSteps.length > 0) {
+      setPlaceAttempted(true);
+      document
+        .getElementById(missingSteps[0].id)
+        ?.closest("section")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
     if (!canPlace || !shipping || !billing) return;
     setPlaceError(null);
     startPlacingTransition(async () => {
@@ -143,7 +161,10 @@ export function OrderSummary() {
         idempotencyKey: idemRef.current,
         items: lines.map((l) => ({ code: l.code, qty: l.qty })),
         shipping,
-        billing,
+        billing:
+          billing.type === "fizica" && "email" in shipping
+            ? { ...billing, email: shipping.email }
+            : billing,
         payment: useCheckoutStore.getState().payment,
         couponCode: voucher?.code ?? null,
       });
@@ -248,8 +269,20 @@ export function OrderSummary() {
             </button>
           )}
         </div>
-        {voucherMsg && (
-          <div className={`co-voucher-msg ${voucherMsg.kind}`}>{voucherMsg.text}</div>
+        {voucher && voucherRon > 0 ? (
+          <div className="co-voucher-applied" role="status">
+            <span>
+              <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true">
+                <path d="M1.5 6.2 4.6 9.2 10.5 2.8" fill="none" stroke="currentColor" strokeWidth="1.6" />
+              </svg>
+              {voucher.code} aplicat
+            </span>
+            <span className="amount">−{formatRon(voucherRon)}</span>
+          </div>
+        ) : (
+          voucherMsg && (
+            <div className={`co-voucher-msg ${voucherMsg.kind}`}>{voucherMsg.text}</div>
+          )
         )}
       </div>
 
@@ -274,8 +307,9 @@ export function OrderSummary() {
 
       <button
         type="button"
-        className="co-cta"
-        disabled={!canPlace || placing}
+        className={`co-cta${missingSteps.length > 0 ? " is-incomplete" : ""}`}
+        aria-disabled={missingSteps.length > 0}
+        disabled={lines.length === 0 || placing}
         onClick={placeOrder}
       >
         {placing ? "Se procesează…" : "Plasează comanda"}
