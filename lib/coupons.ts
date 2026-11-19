@@ -1,5 +1,9 @@
 import "server-only";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSupabaseAdminClient } from "@/lib/supabase/admin";
+
+/* Cupoanele se citesc cu cheia de server: RLS lasă tabelul `coupons` doar
+   adminilor, ca nimeni să nu poată lista codurile din browser. Cu sesiunea
+   clientului, orice cod ieșea „invalid". Aici citim doar codul introdus. */
 
 export type CouponValidation =
   | {
@@ -17,7 +21,7 @@ export async function validateCoupon(
   const code = codeRaw.trim().toUpperCase();
   if (!code) return { ok: false, error: "Introdu un cod." };
 
-  const supabase = await getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase
     .from("coupons")
     .select("*")
@@ -60,7 +64,7 @@ export async function validateCoupon(
 }
 
 export async function incrementCouponUse(couponId: string): Promise<void> {
-  const supabase = await getSupabaseServerClient();
+  const supabase = getSupabaseAdminClient();
   const { data } = await supabase
     .from("coupons")
     .select("used_count")
